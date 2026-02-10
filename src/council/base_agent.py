@@ -4,7 +4,7 @@
 """
 
 from abc import ABC, abstractmethod
-from src.models.schemas import Signal, MarketEvent
+from models.schemas import Signal, MarketEvent
 import hashlib
 import json
 from typing import Optional
@@ -31,17 +31,12 @@ class BaseAgent(ABC):
         Args:
             api_key: API ключ для AI сервісу
             name: Ім'я агента ("Grok", "Claude", etc.)
-        
-        🧒 ПОЯСНЕННЯ:
-        - __init__ = конструктор (те, що виконується при створенні об'єкта)
-        - self.api_key = зберігаємо ключ в об'єкті
-        - self.name = зберігаємо ім'я в об'єкті
         """
         self.api_key = api_key
         self.name = name
     
     @abstractmethod
-    async def analyze(self, event: MarketEvent, context: dict) -> Signal:
+    def analyze(self, event: MarketEvent, context: dict) -> Signal:
         """
         Аналізує подію на ринку та повертає сигнал
         
@@ -55,10 +50,7 @@ class BaseAgent(ABC):
         🧒 ПОЯСНЕННЯ:
         - @abstractmethod = "абстрактний метод"
         - Це означає: кожен агент ОБОВ'ЯЗКОВО має реалізувати цей метод
-        - Це як правило: "кожне печиво ПОВИННО мати смак"
-        - Claude реалізує по-своєму, Grok - по-своєму
-        
-        - async = асинхронний (може чекати відповіді від AI не блокуючи інших)
+        - Прибрали async - буде sync для простоти
         """
         pass
     
@@ -71,18 +63,6 @@ class BaseAgent(ABC):
         
         Returns:
             Hex string з hash
-        
-        🧒 ПОЯСНЕННЯ:
-        - Hash = "відбиток пальця" для тексту
-        - Якщо текст змінився хоч на 1 літеру - hash буде інший
-        - Це для того, щоб можна було перевірити: чи промпт не змінився
-        
-        ПРИКЛАД:
-        >>> hash_prompt("Hello")
-        "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969"
-        
-        >>> hash_prompt("Hello!")  # Додали "!" - hash повністю інший
-        "334d016f755cd6dc58c53a86e183882f8ec14f52fb05345887c8a5edd42c87b7"
         """
         return hashlib.sha256(prompt.encode()).hexdigest()
     
@@ -95,11 +75,6 @@ class BaseAgent(ABC):
         
         Returns:
             Валідний Signal або fallback Signal якщо помилка
-        
-        🧒 ПОЯСНЕННЯ:
-        - LLM іноді можуть помилятись і видати невірний JSON
-        - Ця функція перевіряє і виправляє помилки
-        - Якщо все зламалось - повертає безпечний WAIT сигнал
         """
         try:
             # Спробувати створити Signal з output
@@ -110,25 +85,20 @@ class BaseAgent(ABC):
             return Signal(
                 action="WAIT",
                 confidence=0.0,
-                thesis=f"Failed to parse {self.name} output: {str(e)}",
-                risk_notes="Technical error in agent response",
+                thesis=f"Parse error in {self.name}",  # 🔧 ФІКС: коротка thesis
+                risk_notes="Technical error in agent",
                 sources=[]
             )
     
     def extract_json_from_response(self, response_text: str) -> dict:
         """
-        Витягує JSON з відповіді LLM (на випадок якщо є зайвий текст)
+        Витягує JSON з відповіді LLM
         
         Args:
             response_text: Текст відповіді від LLM
         
         Returns:
             Словник з JSON
-        
-        🧒 ПОЯСНЕННЯ:
-        - Іноді LLM додає зайвий текст: "Here's the analysis: {...}"
-        - Або обгортає в ```json ... ```
-        - Ця функція очищає текст і витягує тільки JSON
         """
         # Видалити markdown code blocks якщо є
         text = response_text.strip()
@@ -156,14 +126,10 @@ class BaseAgent(ABC):
         Форматує context в читабельний текст
         
         Args:
-            context: Словник з контекстом (новини, індикатори)
+            context: Словник з контекстом
         
         Returns:
             Відформатований текст
-        
-        🧒 ПОЯСНЕННЯ:
-        - Робить словник красивим для читання
-        - Замість {"rsi": 78} → "RSI: 78"
         """
         formatted = []
         
@@ -178,13 +144,7 @@ class BaseAgent(ABC):
         return "\n".join(formatted)
     
     def __repr__(self) -> str:
-        """
-        Строкове представлення агента
-        
-        🧒 ПОЯСНЕННЯ:
-        - __repr__ = як об'єкт виглядає коли його print()
-        - Замість <BaseAgent object at 0x...> → "BaseAgent(name=Claude)"
-        """
+        """Строкове представлення агента"""
         return f"{self.__class__.__name__}(name={self.name})"
 
 
@@ -195,11 +155,11 @@ class BaseAgent(ABC):
 if __name__ == "__main__":
     print("🧪 Testing BaseAgent...")
     
-    # Створимо тестовий агент (не абстрактний)
+    # Створимо тестовий агент
     class TestAgent(BaseAgent):
         """Тестовий агент для перевірки BaseAgent"""
         
-        async def analyze(self, event: MarketEvent, context: dict) -> Signal:
+        def analyze(self, event: MarketEvent, context: dict) -> Signal:
             """Проста реалізація для тесту"""
             return Signal(
                 action="WAIT",
@@ -236,6 +196,7 @@ if __name__ == "__main__":
     invalid_output = {"invalid": "data"}
     fallback_signal = agent.validate_output(invalid_output)
     print(f"✅ Invalid output fallback: {fallback_signal.action}")
+    print(f"   Thesis length: {len(fallback_signal.thesis)} chars (must be <500)")
     
     # Тест 5: Витяг JSON з тексту
     messy_response = """

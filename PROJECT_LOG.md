@@ -2,7 +2,7 @@
 
 **Проєкт:** AI-powered trading council для аналізу крипто-ринків  
 **Розпочато:** 9 лютого 2026  
-**Статус:** 🟡 В розробці (Phase 1: Infrastructure)
+**Статус:** 🟢 Phase 1 Complete! (Council Infrastructure Ready)
 
 ---
 
@@ -393,23 +393,39 @@ trading-council-bot/
 ├── .env                    ✅ Секретні ключі (fake поки що)
 ├── .gitignore              ✅ Захист секретів
 ├── requirements.txt        ✅ Залежності
+├── setup.py                ✅ Package configuration
 ├── PROJECT_LOG.md          ✅ Цей файл
 ├── test_schemas.py         ✅ Тести моделей
 │
 ├── config/
 │   ├── __init__.py         ✅
-│   └── settings.py         ✅ Налаштування проєкту
+│   ├── settings.py         ✅ Налаштування проєкту
+│   └── prompts.py          ✅ System prompts для агентів
 │
 ├── src/
+│   ├── __init__.py         ✅
 │   ├── models/
 │   │   ├── __init__.py     ✅
 │   │   └── schemas.py      ✅ Pydantic моделі
 │   │
-│   ├── council/            🔜 Наступний крок
-│   ├── detectors/          ⏳ Пізніше
-│   ├── risk/               ⏳ Пізніше
-│   ├── journal/            ⏳ Пізніше
-│   └── notifications/      ⏳ Пізніше
+│   ├── council/            ✅ PHASE 1 COMPLETE!
+│   │   ├── __init__.py     ✅
+│   │   ├── base_agent.py   ✅ Базовий клас
+│   │   ├── claude_agent.py ✅ Risk Manager 🛡️
+│   │   ├── grok_agent.py   ✅ Sentiment Hunter 🔥
+│   │   ├── gemini_agent.py ✅ Pattern Analyst 🔬
+│   │   ├── perplexity_agent.py ✅ Fact Checker 🔍 (опціонально)
+│   │   └── aggregator.py   ✅ Детермінований алгоритм
+│   │
+│   ├── detectors/          🔜 Phase 2
+│   ├── risk/               🔜 Phase 2
+│   ├── journal/            🔜 Phase 2
+│   └── notifications/      🔜 Phase 2
+│
+├── tests/
+│   ├── __init__.py         ✅
+│   ├── test_claude_agent.py ✅ Claude unit тести (6/6 passed)
+│   └── test_integration.py  ✅ Full council test (3/3 passed)
 │
 ├── data/
 │   └── logs/               ✅ Створено
@@ -418,7 +434,7 @@ trading-council-bot/
 ```
 
 **Легенда:**
-- ✅ Готово
+- ✅ Готово і протестовано
 - 🔜 Наступний крок
 - ⏳ В черзі
 
@@ -634,10 +650,38 @@ git status  # .env не має з'являтись
 
 ## Changelog
 
+### 2026-02-10 (вечір) - 🎉 PHASE 1 ЗАВЕРШЕНО!
+- ✅ Створено всі AI агенти та Aggregator
+- ✅ Всі unit тести пройшли
+- ✅ Integration test пройшов (3/3)
+- ✅ Система готова до тестування з real API
+
+**Створені файли:**
+- `src/council/base_agent.py` - Базовий клас для агентів
+- `src/council/claude_agent.py` - Claude (Risk Manager 🛡️)
+- `src/council/grok_agent.py` - Grok (Sentiment Hunter 🔥)
+- `src/council/gemini_agent.py` - Gemini (Pattern Analyst 🔬)
+- `src/council/perplexity_agent.py` - Perplexity (Fact Checker 🔍, опціонально)
+- `src/council/aggregator.py` - Aggregator (детермінований алгоритм)
+- `config/prompts.py` - System prompts для всіх агентів
+- `tests/test_claude_agent.py` - Unit тести для Claude
+- `tests/test_integration.py` - Integration тест всієї ради
+
+**Фікси:**
+- Виправлено імпорти (БЕЗ `src.` prefix)
+- Оновлено Gemini SDK: `google.genai` замість deprecated
+- Виправлено aggregator CONFLICT логіку
+- Виправлено fallback thesis (< 500 chars)
+
+**Тести:**
+- ✅ 6/6 Claude unit тестів пройшли
+- ✅ 3/3 Integration тестів пройшли
+- ✅ Aggregator тест пройшов
+
 ### 2026-02-10 (ранок)
 - ✅ Створено PROJECT_LOG.md
 - ✅ Задокументовано всі попередні кроки
-- 🔜 **НАСТУПНИЙ КРОК:** Створення Claude агента
+- ✅ Створення Claude агента розпочато
 
 ### 2026-02-09
 - ✅ Початок проєкту

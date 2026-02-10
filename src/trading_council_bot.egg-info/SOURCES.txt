@@ -1,0 +1,17 @@
+setup.py
+src/council/__init__.py
+src/council/aggregator.py
+src/council/base_agent.py
+src/council/claude_agent.py
+src/council/gemini_agent.py
+src/council/grok_agent.py
+src/council/perplexity_agent.py
+src/models/__init__.py
+src/models/schemas.py
+src/trading_council_bot.egg-info/PKG-INFO
+src/trading_council_bot.egg-info/SOURCES.txt
+src/trading_council_bot.egg-info/dependency_links.txt
+src/trading_council_bot.egg-info/requires.txt
+src/trading_council_bot.egg-info/top_level.txt
+tests/test_claude_agent.py
+tests/test_integration.py

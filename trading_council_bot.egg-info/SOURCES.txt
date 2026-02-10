@@ -1,0 +1,10 @@
+setup.py
+config/__init__.py
+config/prompts.py
+config/settings.py
+tests/test_claude_agent.py
+trading_council_bot.egg-info/PKG-INFO
+trading_council_bot.egg-info/SOURCES.txt
+trading_council_bot.egg-info/dependency_links.txt
+trading_council_bot.egg-info/requires.txt
+trading_council_bot.egg-info/top_level.txt

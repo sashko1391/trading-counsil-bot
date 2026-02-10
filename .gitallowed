@@ -5,3 +5,18 @@ fake_key_replace_later
 fake_secret_replace_later
 FAKE-TOKEN
 fake_chat_id
+cat >> .gitallowed << 'EOF'
+sk-ant-api03-xxxxx
+sk-ant-api03-get-from-console
+get-from-console.anthropic.com
+xai-get-from-console.x.ai
+get-from-aistudio.google.com
+get-from-botfather
+sk-ant-\[A-Za-z0-9-\]\+
+EOF
+sk-ant-api03-xxxxx
+sk-ant-api03-get-from-console
+get-from-console.anthropic.com
+sk-ant-api03-xxxxx
+sk-ant-api03-get-from-console
+get-from-console.anthropic.com

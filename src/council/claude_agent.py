@@ -5,8 +5,8 @@ Claude Agent - Risk Manager 🛡️
 
 import json
 from anthropic import Anthropic
-from src.council.base_agent import BaseAgent
-from src.models.schemas import Signal, MarketEvent
+from council.base_agent import BaseAgent
+from models.schemas import Signal, MarketEvent
 from config.prompts import CLAUDE_SYSTEM_PROMPT, format_user_prompt
 import instructor
 from typing import Optional
@@ -17,14 +17,10 @@ class ClaudeAgent(BaseAgent):
     Claude як менеджер ризиків
     
     🧒 ЩО ЦЕ:
-    - Наслідується від BaseAgent (використовує базовий шаблон)
-    - Додає специфічну логіку для роботи з Anthropic API
-    - Фокусується на ризиках та обережності
-    
-    ОСОБЛИВОСТІ:
+    - Наслідується від BaseAgent
     - Використовує Anthropic SDK
-    - Instructor для structured output (примусовий JSON)
-    - Завжди вказує invalidation_price (обов'язково!)
+    - Instructor для structured output
+    - Sync версія (без async) для простоти тестування
     """
     
     def __init__(self, api_key: str):
@@ -33,37 +29,27 @@ class ClaudeAgent(BaseAgent):
         
         Args:
             api_key: Anthropic API ключ
-        
-        🧒 ПОЯСНЕННЯ:
-        - super().__init__(...) = викликає __init__ батьківського класу (BaseAgent)
-        - Створює клієнта Anthropic
-        - Патчить його instructor'ом для structured output
         """
         super().__init__(api_key, "Claude")
         
         # Створюємо клієнта Anthropic
         self.client = Anthropic(api_key=api_key)
         
-        # Патчимо instructor'ом для структурованого виводу
-        # 🧒 Instructor змушує AI відповідати строго JSON схемою
+        # Патчимо instructor'ом для structured output
         self.client = instructor.from_anthropic(self.client)
     
-    async def analyze(self, event: MarketEvent, context: dict) -> Signal:
+    def analyze(self, event: MarketEvent, context: dict) -> Signal:
         """
         Аналізує подію з фокусом на ризики
         
         Args:
             event: Подія на ринку
-            context: Додатковий контекст (новини, індикатори)
+            context: Додатковий контекст
         
         Returns:
             Signal з рекомендацією
         
-        🧒 ПРОЦЕС:
-        1. Форматуємо user prompt з даними події
-        2. Відправляємо запит до Claude API
-        3. Instructor автоматично валідує відповідь
-        4. Повертаємо Signal або fallback якщо помилка
+        🔧 ФІКС: Sync метод (без async) для простоти
         """
         
         # Формуємо user prompt
@@ -76,30 +62,29 @@ class ClaudeAgent(BaseAgent):
         )
         
         try:
-            # Викликаємо Claude API з instructor
-            # 🧒 response_model=Signal означає "відповідай тільки Signal структурою"
+            # Викликаємо Claude API (sync)
             response = self.client.messages.create(
-                model="claude-sonnet-4-20250514",  # Найновіша модель
+                model="claude-sonnet-4-20250514",
                 max_tokens=1000,
                 system=CLAUDE_SYSTEM_PROMPT,
                 messages=[
                     {"role": "user", "content": user_prompt}
                 ],
-                response_model=Signal  # Instructor примусить відповідати Signal схемою
+                response_model=Signal  # Instructor примусить Signal схему
             )
             
-            # Instructor повертає вже готовий Signal об'єкт!
+            # Instructor повертає готовий Signal!
             return response
             
         except Exception as e:
-            # Якщо щось пішло не так - логуємо і повертаємо fallback
+            # Fallback з короткою thesis
             print(f"❌ Claude analysis failed: {e}")
             
             return Signal(
                 action="WAIT",
                 confidence=0.0,
-                thesis=f"Claude analysis failed: {str(e)}",
-                risk_notes="Technical error - cannot assess risk properly",
+                thesis="Analysis error",  # 🔧 ФІКС: коротка thesis
+                risk_notes="Technical error",
                 sources=[]
             )
     
@@ -109,10 +94,6 @@ class ClaudeAgent(BaseAgent):
         
         Returns:
             True якщо API працює
-        
-        🧒 КОРИСНО ДЛЯ:
-        - Перевірки що API ключ валідний
-        - Діагностики проблем
         """
         try:
             # Простий тестовий запит
@@ -139,14 +120,13 @@ if __name__ == "__main__":
     print("🧪 Testing ClaudeAgent...")
     
     # УВАГА: Для тесту потрібен справжній API ключ!
-    # Якщо його немає - тест не запуститься
-    
     from config.settings import settings
     
     # Перевіряємо чи є API ключ
-    if settings.ANTHROPIC_API_KEY == "sk-ant-fake-key":
+    if "fake" in settings.ANTHROPIC_API_KEY.lower():
         print("⚠️ Cannot test: ANTHROPIC_API_KEY is fake")
         print("   To test, add real API key to .env")
+        print("\n💡 For mock testing, run: pytest tests/test_claude_agent.py")
         exit(0)
     
     # Створюємо агента
@@ -163,8 +143,6 @@ if __name__ == "__main__":
     
     # Тест 2: Тестовий аналіз
     print("\n🧪 Testing analysis...")
-    
-    import asyncio
     
     # Створюємо тестову подію
     test_event = MarketEvent(
@@ -188,21 +166,14 @@ if __name__ == "__main__":
         }
     }
     
-    # Запускаємо аналіз (async функція)
-    async def run_test():
-        signal = await claude.analyze(test_event, test_context)
-        
-        print(f"\n✅ Analysis complete:")
-        print(f"   Action: {signal.action}")
-        print(f"   Confidence: {signal.confidence}")
-        print(f"   Thesis: {signal.thesis[:100]}...")
-        print(f"   Invalidation: ${signal.invalidation_price}")
-        print(f"   Risks: {signal.risk_notes[:100]}...")
-        
-        return signal
+    # Запускаємо аналіз (sync)
+    signal = claude.analyze(test_event, test_context)
     
-    # Виконуємо async функцію
-    result = asyncio.run(run_test())
+    print(f"\n✅ Analysis complete:")
+    print(f"   Action: {signal.action}")
+    print(f"   Confidence: {signal.confidence:.0%}")
+    print(f"   Thesis: {signal.thesis[:100]}...")
+    print(f"   Invalidation: ${signal.invalidation_price}")
+    print(f"   Risks: {signal.risk_notes[:100]}...")
     
     print("\n🎉 ClaudeAgent test complete!")
-    print(f"   (Model responded as {result.action} with {result.confidence:.0%} confidence)")
