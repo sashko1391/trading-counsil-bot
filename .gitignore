@@ -1,0 +1,34 @@
+touch .gitignore
+```
+
+Відкрий `.gitignore` і вставляй:
+```
+# ===== СЕКРЕТИ (ніколи не загружати!) =====
+.env
+*.env
+
+# ===== ВІРТУАЛЬНЕ СЕРЕДОВИЩЕ =====
+venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ===== ДАНІ ТА ЛОГИ =====
+data/trades.json
+data/logs/*.log
+*.log
+
+# ===== IDE (редактори коду) =====
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ===== ТИМЧАСОВІ ФАЙЛИ =====
+*.tmp
+*.temp
+.pytest_cache/
