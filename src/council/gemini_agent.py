@@ -57,6 +57,11 @@ class GeminiAgent(BaseAgent):
             indicators=context.get("indicators", {}),
         )
 
+        # Inject agent's own history if available
+        agent_history = context.get("agent_history", "")
+        if agent_history:
+            user_prompt += f"\n\n{agent_history}\n"
+
         # Gemini does not natively support system messages in the same way,
         # so we prepend the system prompt to the user content.
         full_prompt = f"""{GEMINI_SYSTEM_PROMPT}

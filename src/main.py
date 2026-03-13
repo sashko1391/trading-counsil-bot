@@ -49,6 +49,7 @@ from notifications.telegram_notifier import TelegramNotifier
 from risk.risk_governor import RiskGovernor
 from journal.trade_journal import TradeJournal
 from journal.digest_history import DigestHistory, DigestRecord
+from journal.agent_memory import AgentMemory
 from watchers.oil_price_watcher import OilPriceWatcher
 from watchers.oil_news_scanner import OilNewsScanner
 from watchers.scheduled_events import ScheduledEventsManager
@@ -143,6 +144,7 @@ class TradingCouncil:
         self.min_confidence = min_confidence
         self.digest_interval_hours = digest_interval_hours
         self.digest_history = DigestHistory()
+        self.agent_memory = AgentMemory()
         self.running = False
 
         # Accumulator: stores analyses between digest cycles
@@ -255,9 +257,28 @@ class TradingCouncil:
         for name, agent in self.agents.items():
             try:
                 logger.info(f"  -> {name.upper()}...")
-                sig = agent.analyze(event, {"prompt": user_prompt, **context})
+                # Inject per-agent history into context
+                agent_ctx = {"prompt": user_prompt, **context}
+                agent_hist = self.agent_memory.format_for_prompt(
+                    name, event.instrument, n=8
+                )
+                if agent_hist:
+                    agent_ctx["agent_history"] = agent_hist
+
+                sig = agent.analyze(event, agent_ctx)
                 signals[name] = sig
                 logger.info(f"    {name}: {sig.action} ({sig.confidence:.0%})")
+
+                # Save to agent memory
+                self.agent_memory.save_signal(
+                    agent_name=name,
+                    instrument=event.instrument,
+                    event_type=event.event_type,
+                    action=sig.action,
+                    confidence=sig.confidence,
+                    thesis=sig.thesis,
+                    risk_notes=sig.risk_notes,
+                )
             except Exception as exc:
                 logger.error(f"    {name} failed: {exc}")
                 signals[name] = Signal(

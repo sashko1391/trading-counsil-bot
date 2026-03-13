@@ -41,6 +41,11 @@ class PerplexityAgent(BaseAgent):
             indicators=context.get("indicators", {}),
         )
 
+        # Inject agent's own history if available
+        agent_history = context.get("agent_history", "")
+        if agent_history:
+            user_prompt += f"\n\n{agent_history}\n"
+
         # Ask for single instrument signal only
         user_prompt += f"""
 
