@@ -68,11 +68,12 @@ Respond ONLY with valid JSON (no markdown, no preamble):
 {{
     "action": "LONG" | "SHORT" | "WAIT",
     "confidence": 0.0-1.0,
-    "thesis": "max 500 chars with macro/fundamental rationale",
+    "thesis": "макс 500 символів УКРАЇНСЬКОЮ — макро/фундаментальне обґрунтування",
     "invalidation_price": number or null,
-    "risk_notes": "what could invalidate the thesis",
+    "risk_notes": "що може спростувати тезу — УКРАЇНСЬКОЮ",
     "sources": ["url1", "url2"]
-}}"""
+}}
+ОБОВ'ЯЗКОВО: thesis та risk_notes писати УКРАЇНСЬКОЮ (uk-UA). Англійський текст = помилка формату."""
 
         try:
             response = self.client.models.generate_content(

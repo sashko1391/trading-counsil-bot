@@ -48,11 +48,12 @@ Use this exact schema:
 {{
     "action": "LONG" | "SHORT" | "WAIT",
     "confidence": 0.0-1.0,
-    "thesis": "max 500 chars",
+    "thesis": "макс 500 символів УКРАЇНСЬКОЮ — чому саме ця дія",
     "invalidation_price": number or null,
-    "risk_notes": "what could go wrong",
+    "risk_notes": "що може піти не так — УКРАЇНСЬКОЮ",
     "sources": ["url1"]
 }}
+ОБОВ'ЯЗКОВО: thesis та risk_notes писати УКРАЇНСЬКОЮ (uk-UA). Англійський текст = помилка формату.
 Pure JSON only — no markdown, no preamble."""
 
         try:
