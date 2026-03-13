@@ -56,6 +56,8 @@ class Settings:
     COOLDOWN_MINUTES: int = 10
     MAX_DAILY_ALERTS: int = 30
     MAX_PIPELINE_RUNS_PER_HOUR: int = 5
+    DIGEST_INTERVAL_HOURS: int = 3          # send consolidated Telegram digest every N hours
+    POLL_INTERVAL_SECONDS: int = 300        # how often to poll for events (silent between digests)
 
     # ── Adversarial stage ─────────────────────────────────────────────────────
     ADVERSARIAL_ENABLED: bool = True
@@ -220,7 +222,8 @@ class Settings:
                 setattr(self, key, float(v))
 
         for key in ["MAX_DAILY_ALERTS", "COOLDOWN_MINUTES", "RAG_TOP_K",
-                    "RAG_CHUNK_SIZE", "RAG_CHUNK_OVERLAP", "MAX_PIPELINE_RUNS_PER_HOUR"]:
+                    "RAG_CHUNK_SIZE", "RAG_CHUNK_OVERLAP", "MAX_PIPELINE_RUNS_PER_HOUR",
+                    "DIGEST_INTERVAL_HOURS", "POLL_INTERVAL_SECONDS"]:
             v = os.environ.get(key)
             if v is not None:
                 setattr(self, key, int(v))

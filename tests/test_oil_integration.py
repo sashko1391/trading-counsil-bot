@@ -306,10 +306,13 @@ async def test_non_dry_run_calls_telegram(
             min_confidence=0.3,
         )
 
+        # Force digest to fire immediately
+        from datetime import timedelta
+        council._last_digest_time = council._last_digest_time - timedelta(hours=999)
+
         await council.run_once()
 
-        # With 3 LONG agents, consensus is LONG -> forecast should be built
-        # and _send_message should be called
+        # Digest sends accumulated analyses via _send_message
         assert notifier._send_message.call_count >= 1
 
 

@@ -23,7 +23,7 @@ import argparse
 import asyncio
 import signal
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -127,6 +127,7 @@ class TradingCouncil:
         eia_client: Optional[EIAClient] = None,
         dry_run: bool = False,
         min_confidence: float = 0.6,
+        digest_interval_hours: int = 3,
     ):
         self.agents = agents
         self.aggregator = aggregator
@@ -139,7 +140,13 @@ class TradingCouncil:
         self.eia_client = eia_client or EIAClient()
         self.dry_run = dry_run
         self.min_confidence = min_confidence
+        self.digest_interval_hours = digest_interval_hours
         self.running = False
+
+        # Accumulator: stores analyses between digest cycles
+        # Key: instrument, Value: list of analysis dicts
+        self._accumulator: dict[str, list[dict]] = {}
+        self._last_digest_time: datetime = datetime.now()
 
     # ------------------------------------------------------------------
     # Context builder
@@ -283,6 +290,20 @@ class TradingCouncil:
         entry_id = self.journal.add_entry(event, council_response, risk_check)
         logger.info(f"Journal entry: {entry_id}")
 
+        # 5. Accumulate for digest
+        instrument = event.instrument
+        if instrument not in self._accumulator:
+            self._accumulator[instrument] = []
+        self._accumulator[instrument].append({
+            "timestamp": datetime.now(),
+            "event_type": event.event_type,
+            "signals": signals,
+            "consensus": council_response.consensus,
+            "consensus_strength": council_response.consensus_strength,
+            "combined_confidence": council_response.combined_confidence,
+            "key_risks": council_response.key_risks,
+        })
+
         return {
             "council_response": council_response,
             "risk_check": risk_check,
@@ -401,6 +422,51 @@ class TradingCouncil:
             logger.error(f"Notification error: {exc}")
 
     # ------------------------------------------------------------------
+    # Digest
+    # ------------------------------------------------------------------
+
+    def _is_digest_due(self) -> bool:
+        """Check if enough time has passed for a digest."""
+        elapsed = datetime.now() - self._last_digest_time
+        return elapsed >= timedelta(hours=self.digest_interval_hours)
+
+    async def _send_digest(self, context: dict) -> None:
+        """Build and send a consolidated digest for each instrument."""
+        if not self._accumulator:
+            logger.info("No accumulated analyses — skipping digest")
+            return
+
+        for instrument, analyses in self._accumulator.items():
+            if not analyses:
+                continue
+
+            # Get current price from context
+            prices = context.get("prices", {})
+            current_price = prices.get(instrument, {}).get("price", 0.0)
+
+            logger.info(
+                f"Sending digest for {instrument}: "
+                f"{len(analyses)} analyses over {self.digest_interval_hours}h"
+            )
+
+            if self.dry_run:
+                msg = TelegramNotifier.format_digest(
+                    instrument, analyses, self.digest_interval_hours, current_price
+                )
+                logger.info(f"[DRY-RUN] Digest:\n{msg}")
+            else:
+                try:
+                    await self.notifier.send_digest(
+                        instrument, analyses, self.digest_interval_hours, current_price
+                    )
+                except Exception as exc:
+                    logger.error(f"Digest notification error: {exc}")
+
+        # Clear accumulator
+        self._accumulator.clear()
+        self._last_digest_time = datetime.now()
+
+    # ------------------------------------------------------------------
     # Main loop
     # ------------------------------------------------------------------
 
@@ -452,16 +518,17 @@ class TradingCouncil:
         for event in all_events:
             try:
                 result = self.analyze_event(event, context)
-                council = result["council_response"]
-                signals = result["signals"]
-
-                forecast = self.build_forecast(council, signals, context)
-                await self._notify(forecast, council, result["risk_check"])
-
+                # Build forecast for journal/tracking (no Telegram per event)
+                council_resp = result["council_response"]
+                forecast = self.build_forecast(council_resp, result["signals"], context)
                 result["forecast"] = forecast
                 results.append(result)
             except Exception as exc:
                 logger.error(f"Error analysing event: {exc}")
+
+        # Check if digest is due
+        if self._is_digest_due():
+            await self._send_digest(context)
 
         return results
 
@@ -471,9 +538,10 @@ class TradingCouncil:
         cycle = 0
 
         logger.info("=" * 60)
-        logger.info("OIL TRADING INTELLIGENCE BOT STARTED")
+        logger.info("BREKHUNI — OIL TRADING INTELLIGENCE BOT")
         logger.info(f"   Agents: {list(self.agents.keys())}")
         logger.info(f"   Poll interval: {poll_interval}s")
+        logger.info(f"   Digest every: {self.digest_interval_hours}h")
         logger.info(f"   Journal: {self.journal.journal_path}")
         logger.info(f"   Telegram: {'enabled' if self.notifier.enabled else 'disabled'}")
         logger.info(f"   Dry-run: {self.dry_run}")
@@ -481,8 +549,13 @@ class TradingCouncil:
 
         while self.running:
             cycle += 1
+            acc_count = sum(len(v) for v in self._accumulator.values())
+            time_to_digest = self.digest_interval_hours * 3600 - (datetime.now() - self._last_digest_time).total_seconds()
             logger.info(f"\n{'─' * 40}")
-            logger.info(f"Cycle #{cycle} -- {datetime.now().strftime('%H:%M:%S')}")
+            logger.info(
+                f"Cycle #{cycle} -- {datetime.now().strftime('%H:%M:%S')} "
+                f"| accumulated: {acc_count} | digest in: {max(0, time_to_digest)/60:.0f}m"
+            )
             logger.info(f"{'─' * 40}")
 
             await self.run_once()
@@ -572,6 +645,7 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true", help="Mock agents, no Telegram")
     parser.add_argument("--once", action="store_true", help="Single poll cycle, then exit")
     parser.add_argument("--interval", type=int, default=300, help="Poll interval in seconds (default 300)")
+    parser.add_argument("--digest-hours", type=int, default=None, help="Digest interval in hours (default from settings, usually 3)")
 
     args = parser.parse_args()
 
@@ -602,6 +676,8 @@ def main() -> None:
         telegram_chat_ids = None
         journal_path = Path("data/trades_dryrun.json")
         min_confidence = 0.6
+        digest_interval_hours = 3
+        poll_interval_sec = 300
     else:
         logger.info("Loading settings...")
         try:
@@ -616,6 +692,8 @@ def main() -> None:
             telegram_chat_ids = settings.TELEGRAM_CHAT_IDS
             journal_path = settings.JOURNAL_PATH
             min_confidence = settings.MIN_CONFIDENCE
+            digest_interval_hours = settings.DIGEST_INTERVAL_HOURS
+            poll_interval_sec = settings.POLL_INTERVAL_SECONDS
         except Exception as exc:
             logger.error(f"Failed to load settings: {exc}")
             logger.info("Try running with --dry-run flag")
@@ -625,6 +703,13 @@ def main() -> None:
     risk_governor = RiskGovernor()
     journal = TradeJournal(journal_path=journal_path)
     notifier = TelegramNotifier(bot_token=telegram_token, chat_id=telegram_chat, chat_ids=telegram_chat_ids)
+
+    # CLI --digest-hours overrides settings
+    if args.digest_hours is not None:
+        digest_interval_hours = args.digest_hours
+    # CLI --interval overrides settings
+    if args.interval != 300:
+        poll_interval_sec = args.interval
 
     council = TradingCouncil(
         agents=agents,
@@ -638,6 +723,7 @@ def main() -> None:
         eia_client=eia_client,
         dry_run=args.dry_run,
         min_confidence=min_confidence,
+        digest_interval_hours=digest_interval_hours,
     )
 
     # Graceful shutdown
@@ -651,7 +737,9 @@ def main() -> None:
 
     # Run
     if args.once:
-        logger.info("Running ONE cycle...")
+        logger.info("Running ONE cycle (with immediate digest)...")
+        # Set last digest to past so digest fires immediately
+        council._last_digest_time = datetime.now() - timedelta(hours=999)
         results = loop.run_until_complete(council.run_once())
         logger.info(f"\nResults: {len(results)} events analysed")
         for r in results:
@@ -662,7 +750,7 @@ def main() -> None:
                 f"-- {'ALLOWED' if rc.allowed else 'BLOCKED'} {rc.reason}"
             )
     else:
-        loop.run_until_complete(council.run(poll_interval=args.interval))
+        loop.run_until_complete(council.run(poll_interval=poll_interval_sec))
 
 
 if __name__ == "__main__":
