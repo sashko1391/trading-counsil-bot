@@ -119,23 +119,26 @@ class BaseAgent(ABC):
         elif text.startswith("```"):
             text = text.replace("```", "").strip()
 
-        # Спробувати як масив: [ ... ]
-        arr_start = text.find("[")
-        arr_end = text.rfind("]") + 1
-        if arr_start != -1 and arr_end > arr_start:
-            try:
-                return json.loads(text[arr_start:arr_end])
-            except json.JSONDecodeError:
-                pass
-
-        # Спробувати як об'єкт: { ... }
+        # Try as object first: { ... } — most agents return single objects
         obj_start = text.find("{")
         obj_end = text.rfind("}") + 1
         if obj_start != -1 and obj_end > obj_start:
             try:
                 return json.loads(text[obj_start:obj_end])
-            except json.JSONDecodeError as e:
-                raise ValueError(f"Invalid JSON: {e}")
+            except json.JSONDecodeError:
+                pass
+
+        # Try as array: [ ... ] — system prompt asks for array of objects
+        arr_start = text.find("[")
+        arr_end = text.rfind("]") + 1
+        if arr_start != -1 and arr_end > arr_start:
+            try:
+                parsed = json.loads(text[arr_start:arr_end])
+                # Only accept if array contains at least one dict (not just URLs)
+                if isinstance(parsed, list) and any(isinstance(item, dict) for item in parsed):
+                    return parsed
+            except json.JSONDecodeError:
+                pass
 
         raise ValueError("No JSON found in response")
     

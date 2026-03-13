@@ -45,8 +45,11 @@ wrapped in a JSON array. Each object must match this schema exactly:
   }
 ]
 
-LANGUAGE: Write "thesis" and "risk_notes" fields in UKRAINIAN (uk-UA).
-All other JSON fields (action, confidence, sources, etc.) stay in English.
+LANGUAGE REQUIREMENT (MANDATORY):
+- "thesis" field → MUST be written in UKRAINIAN (uk-UA)
+- "risk_notes" field → MUST be written in UKRAINIAN (uk-UA)
+- All other JSON fields (action, confidence, sources, instrument) → English
+- This is non-negotiable. English text in thesis/risk_notes is a format violation.
 
 No preamble, no markdown fences — pure JSON array only.
 """
@@ -204,6 +207,7 @@ Consider:
 Remember your role in the council.
 Respond ONLY with a valid JSON array (one object per instrument).
 No preamble, no markdown — pure JSON.
+REMINDER: "thesis" and "risk_notes" MUST be in Ukrainian (uk-UA).
 """
 
 # ==============================================================================
@@ -306,12 +310,14 @@ Rules:
 4. Your confidence should reflect the strength of the counter-argument (0.0-1.0)
 5. Do not be contrarian for the sake of it — construct a genuine steel-man case
 
+LANGUAGE: Write "thesis" and "risk_notes" in UKRAINIAN (uk-UA).
+
 Output JSON:
 {
   "action": "LONG|SHORT|WAIT",
   "confidence": 0.0-1.0,
-  "thesis": "The counter-case in 2-3 sentences",
-  "risk_notes": ["specific risk 1", "specific risk 2"],
+  "thesis": "Контр-аргумент 2-3 реченнями українською",
+  "risk_notes": ["конкретний ризик 1", "конкретний ризик 2"],
   "invalidation_price": 0.0,
   "sources": []
 }
@@ -332,15 +338,17 @@ The 4-agent council has reached a consensus. Your task:
 
 Be decisive. Do not hedge excessively. State what you believe and why.
 
+LANGUAGE: Write "thesis", "key_arguments", "risk_notes", "invalidation_triggers" in UKRAINIAN (uk-UA).
+
 Output JSON:
 {
   "action": "LONG|SHORT|WAIT",
   "confidence": 0.0-1.0,
-  "thesis": "Bold thesis statement with price target and timeframe",
-  "key_arguments": ["argument 1", "argument 2", "argument 3"],
+  "thesis": "Теза українською з ціллю та таймфреймом",
+  "key_arguments": ["аргумент 1", "аргумент 2", "аргумент 3"],
   "invalidation_price": 0.0,
-  "invalidation_triggers": ["trigger 1", "trigger 2"],
-  "risk_notes": ["risk 1", "risk 2"]
+  "invalidation_triggers": ["тригер 1", "тригер 2"],
+  "risk_notes": ["ризик 1", "ризик 2"]
 }
 """
 
@@ -355,15 +363,17 @@ You have received a PRIMARY THESIS from another analyst. Your task:
 IMPORTANT: You do NOT know the primary analyst's confidence level. Judge the thesis on its merits only.
 Do NOT be sycophantic — genuine disagreement is valuable.
 
+LANGUAGE: Write "argument", "strongest_counter_thesis", "historical_precedent" in UKRAINIAN (uk-UA).
+
 Output JSON:
 {
   "counter_action": "LONG|SHORT|WAIT",
   "objections": [
-    {"id": "OBJ-1", "severity": "high|medium|low", "argument": "specific objection"},
-    {"id": "OBJ-2", "severity": "high|medium|low", "argument": "specific objection"}
+    {"id": "OBJ-1", "severity": "high|medium|low", "argument": "конкретне заперечення"},
+    {"id": "OBJ-2", "severity": "high|medium|low", "argument": "конкретне заперечення"}
   ],
-  "strongest_counter_thesis": "The best case against the primary thesis",
-  "historical_precedent": "A specific past event that contradicts the primary thesis"
+  "strongest_counter_thesis": "Найсильніший аргумент проти основної тези",
+  "historical_precedent": "Конкретний історичний прецедент"
 }
 """
 
@@ -379,17 +389,19 @@ Your task:
 Be intellectually honest. If an objection is valid, accept it and adjust.
 Stubbornly holding a position despite valid counter-arguments is a failure mode.
 
+LANGUAGE: Write "reasoning", "final_thesis", "risk_notes" in UKRAINIAN (uk-UA).
+
 Output JSON:
 {
   "action": "LONG|SHORT|WAIT",
   "confidence": 0.0-1.0,
   "confidence_delta": 0.0,
   "objection_responses": [
-    {"id": "OBJ-1", "verdict": "ACCEPTED|REJECTED", "reasoning": "why"},
-    {"id": "OBJ-2", "verdict": "ACCEPTED|REJECTED", "reasoning": "why"}
+    {"id": "OBJ-1", "verdict": "ACCEPTED|REJECTED", "reasoning": "пояснення"},
+    {"id": "OBJ-2", "verdict": "ACCEPTED|REJECTED", "reasoning": "пояснення"}
   ],
-  "final_thesis": "Updated thesis incorporating accepted objections",
+  "final_thesis": "Оновлена теза з урахуванням прийнятих заперечень",
   "invalidation_price": 0.0,
-  "risk_notes": ["updated risk 1", "updated risk 2"]
+  "risk_notes": ["оновлений ризик 1", "оновлений ризик 2"]
 }
 """
