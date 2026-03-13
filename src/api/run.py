@@ -58,6 +58,7 @@ def main():
         journal_path = Path("data/trades_dryrun.json")
         telegram_token = None
         telegram_chat = None
+        telegram_chat_ids = None
         min_confidence = 0.6
         eia_key = ""
     else:
@@ -66,6 +67,7 @@ def main():
         journal_path = settings.JOURNAL_PATH
         telegram_token = settings.TELEGRAM_BOT_TOKEN
         telegram_chat = settings.TELEGRAM_CHAT_ID
+        telegram_chat_ids = settings.TELEGRAM_CHAT_IDS
         min_confidence = settings.MIN_CONFIDENCE
         eia_key = settings.EIA_API_KEY
 
@@ -74,7 +76,7 @@ def main():
         aggregator=Aggregator(),
         risk_governor=RiskGovernor(),
         journal=TradeJournal(journal_path=journal_path),
-        notifier=TelegramNotifier(bot_token=telegram_token, chat_id=telegram_chat),
+        notifier=TelegramNotifier(bot_token=telegram_token, chat_id=telegram_chat, chat_ids=telegram_chat_ids),
         price_watcher=OilPriceWatcher(),
         news_scanner=OilNewsScanner(),
         events_manager=ScheduledEventsManager(),

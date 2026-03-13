@@ -28,6 +28,7 @@ class Settings:
     # ── Telegram ─────────────────────────────────────────────────────────────
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_CHAT_ID: str = ""
+    TELEGRAM_CHAT_IDS: str = ""  # comma-separated, overrides TELEGRAM_CHAT_ID
 
     # ── Data APIs (Phase 3A) ──────────────────────────────────────────────────
     EIA_API_KEY: str = ""
@@ -200,7 +201,7 @@ class Settings:
         str_keys = [
             "XAI_API_KEY", "ANTHROPIC_API_KEY", "PERPLEXITY_API_KEY",
             "GOOGLE_AI_API_KEY", "GOOGLE_API_KEY", "OPENAI_API_KEY",
-            "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID",
+            "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "TELEGRAM_CHAT_IDS",
             "EIA_API_KEY", "OILPRICEAPI_KEY", "DATABENTO_API_KEY",
             "NASDAQ_DATA_LINK_KEY", "PINECONE_API_KEY",
             "GROK_MODEL", "CLAUDE_SONNET_MODEL", "CLAUDE_OPUS_MODEL",

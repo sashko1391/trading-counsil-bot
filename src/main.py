@@ -599,6 +599,7 @@ def main() -> None:
         eia_client = EIAClient()
         telegram_token = None
         telegram_chat = None
+        telegram_chat_ids = None
         journal_path = Path("data/trades_dryrun.json")
         min_confidence = 0.6
     else:
@@ -612,6 +613,7 @@ def main() -> None:
             eia_client = EIAClient(api_key=settings.EIA_API_KEY)
             telegram_token = settings.TELEGRAM_BOT_TOKEN
             telegram_chat = settings.TELEGRAM_CHAT_ID
+            telegram_chat_ids = settings.TELEGRAM_CHAT_IDS
             journal_path = settings.JOURNAL_PATH
             min_confidence = settings.MIN_CONFIDENCE
         except Exception as exc:
@@ -622,7 +624,7 @@ def main() -> None:
     aggregator = Aggregator()
     risk_governor = RiskGovernor()
     journal = TradeJournal(journal_path=journal_path)
-    notifier = TelegramNotifier(bot_token=telegram_token, chat_id=telegram_chat)
+    notifier = TelegramNotifier(bot_token=telegram_token, chat_id=telegram_chat, chat_ids=telegram_chat_ids)
 
     council = TradingCouncil(
         agents=agents,
