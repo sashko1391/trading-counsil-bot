@@ -66,60 +66,64 @@ class BaseAgent(ABC):
         """
         return hashlib.sha256(prompt.encode()).hexdigest()
     
-    def validate_output(self, output: dict) -> Signal:
+    def validate_output(self, output: dict | list, instrument: str = "") -> Signal:
         """
-        Перевіряє що вивід LLM відповідає схемі Signal
-        
-        Args:
-            output: Словник з відповіддю LLM
-        
-        Returns:
-            Валідний Signal або fallback Signal якщо помилка
+        Перевіряє що вивід LLM відповідає схемі Signal.
+        Якщо output — масив, бере елемент для потрібного інструмента.
         """
         try:
-            # Спробувати створити Signal з output
+            if isinstance(output, list):
+                for item in output:
+                    if isinstance(item, dict) and item.get("instrument", "") == instrument:
+                        return Signal(**{k: v for k, v in item.items() if k != "instrument"})
+                if output:
+                    item = output[0]
+                    return Signal(**{k: v for k, v in item.items() if k != "instrument"})
             return Signal(**output)
         except Exception as e:
-            # Якщо помилка - повернути безпечний fallback
-            print(f"⚠️ {self.name} output validation failed: {e}")
+            print(f"{self.name} output validation failed: {e}")
             return Signal(
                 action="WAIT",
                 confidence=0.0,
-                thesis=f"Parse error in {self.name}",  # 🔧 ФІКС: коротка thesis
+                thesis=f"Parse error in {self.name}",
                 risk_notes="Technical error in agent",
                 sources=[]
             )
     
-    def extract_json_from_response(self, response_text: str) -> dict:
+    def extract_json_from_response(self, response_text: str) -> dict | list:
         """
-        Витягує JSON з відповіді LLM
-        
-        Args:
-            response_text: Текст відповіді від LLM
-        
+        Витягує JSON з відповіді LLM (об'єкт або масив).
+
         Returns:
-            Словник з JSON
+            dict або list з JSON
         """
-        # Видалити markdown code blocks якщо є
         text = response_text.strip()
-        
+
+        # Видалити markdown code blocks
         if text.startswith("```json"):
             text = text.replace("```json", "").replace("```", "").strip()
         elif text.startswith("```"):
             text = text.replace("```", "").strip()
-        
-        # Знайти перший { та останній }
-        start = text.find("{")
-        end = text.rfind("}") + 1
-        
-        if start != -1 and end > start:
-            json_text = text[start:end]
+
+        # Спробувати як масив: [ ... ]
+        arr_start = text.find("[")
+        arr_end = text.rfind("]") + 1
+        if arr_start != -1 and arr_end > arr_start:
             try:
-                return json.loads(json_text)
+                return json.loads(text[arr_start:arr_end])
+            except json.JSONDecodeError:
+                pass
+
+        # Спробувати як об'єкт: { ... }
+        obj_start = text.find("{")
+        obj_end = text.rfind("}") + 1
+        if obj_start != -1 and obj_end > obj_start:
+            try:
+                return json.loads(text[obj_start:obj_end])
             except json.JSONDecodeError as e:
                 raise ValueError(f"Invalid JSON: {e}")
-        else:
-            raise ValueError("No JSON found in response")
+
+        raise ValueError("No JSON found in response")
     
     def format_context(self, context: dict) -> str:
         """

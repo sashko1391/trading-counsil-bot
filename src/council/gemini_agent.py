@@ -84,7 +84,7 @@ Respond ONLY with valid JSON (no markdown, no preamble):
 
             response_text = response.text
             json_data = self.extract_json_from_response(response_text)
-            return self.validate_output(json_data)
+            return self.validate_output(json_data, instrument=event.instrument)
 
         except Exception as e:
             print(f"Gemini analysis failed: {e}")

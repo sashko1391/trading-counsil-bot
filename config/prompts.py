@@ -45,6 +45,9 @@ wrapped in a JSON array. Each object must match this schema exactly:
   }
 ]
 
+LANGUAGE: Write "thesis" and "risk_notes" fields in UKRAINIAN (uk-UA).
+All other JSON fields (action, confidence, sources, etc.) stay in English.
+
 No preamble, no markdown fences — pure JSON array only.
 """
 

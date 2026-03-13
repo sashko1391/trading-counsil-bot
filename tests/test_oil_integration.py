@@ -235,15 +235,15 @@ async def test_telegram_format():
 
     msg = TelegramNotifier.format_oil_alert(forecast, council)
 
-    assert "OIL ALERT" in msg
+    assert "BREKHUNI" in msg
     assert "BZ=F" in msg
-    assert "BULLISH" in msg
+    assert "ЗРОСТАННЯ" in msg
     assert "75%" in msg
-    assert "24h" in msg
+    assert "24" in msg
     assert "$85.00" in msg
     assert "OPEC cuts" in msg
     assert "Demand weakness" in msg
-    assert "NOT financial advice" in msg
+    assert "НЕ фінансова порада" in msg
 
 
 @pytest.mark.asyncio

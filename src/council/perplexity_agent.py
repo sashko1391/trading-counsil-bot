@@ -68,7 +68,7 @@ Pure JSON only — no markdown, no preamble."""
 
             response_text = response.choices[0].message.content
             json_data = self.extract_json_from_response(response_text)
-            return self.validate_output(json_data)
+            return self.validate_output(json_data, instrument=event.instrument)
 
         except Exception as e:
             print(f"Perplexity analysis failed: {e}")

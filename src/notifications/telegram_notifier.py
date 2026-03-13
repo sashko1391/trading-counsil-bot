@@ -65,16 +65,22 @@ class TelegramNotifier:
         drivers_str = "; ".join(forecast.drivers[:4]) if forecast.drivers else "N/A"
         risks_str = "; ".join(forecast.risks[:3]) if forecast.risks else "N/A"
 
+        direction_ua = {
+            "BULLISH": "ЗРОСТАННЯ",
+            "BEARISH": "ПАДІННЯ",
+            "NEUTRAL": "НЕЙТРАЛЬНО",
+        }
+
         lines = [
-            f"\U0001f6e2\ufe0f OIL ALERT \u2014 {forecast.instrument}",
-            f"{d_emoji} Direction: {forecast.direction}",
-            f"\U0001f4aa Confidence: {forecast.confidence * 100:.0f}%",
-            f"\u23f0 Timeframe: {forecast.timeframe_hours}h",
-            f"\U0001f3af Target: ${forecast.target_price:.2f} ({move_pct:+.1f}%)",
-            f"\U0001f4ca Drivers: {drivers_str}",
-            f"\u26a0\ufe0f Risks: {risks_str}",
-            f"\U0001f916 Council: {consensus_count}/4 {council.consensus} ({council.consensus_strength})",
-            f"\U0001f4dd NOT financial advice.",
+            f"\U0001f6e2\ufe0f BREKHUNI \u2014 {forecast.instrument}",
+            f"{d_emoji} Напрямок: {direction_ua.get(forecast.direction, forecast.direction)}",
+            f"\U0001f4aa Впевненість: {forecast.confidence * 100:.0f}%",
+            f"\u23f0 Горизонт: {forecast.timeframe_hours} год",
+            f"\U0001f3af Ціль: ${forecast.target_price:.2f} ({move_pct:+.1f}%)",
+            f"\U0001f4ca Драйвери: {drivers_str}",
+            f"\u26a0\ufe0f Ризики: {risks_str}",
+            f"\U0001f916 Рада: {consensus_count}/4 {council.consensus} ({council.consensus_strength})",
+            f"\U0001f4dd Це НЕ фінансова порада.",
         ]
         return "\n".join(lines)
 
@@ -104,28 +110,28 @@ class TelegramNotifier:
 
         lines = [
             f"{'=' * 30}",
-            f"\U0001f3db\ufe0f TRADING COUNCIL DECISION",
+            f"\U0001f3db\ufe0f BREKHUNI — РІШЕННЯ РАДИ",
             f"{'=' * 30}",
             "",
-            f"\U0001f4ca Instrument: {cr.instrument}",
-            f"\u26a1 Trigger: {cr.event_type}",
+            f"\U0001f4ca Інструмент: {cr.instrument}",
+            f"\u26a1 Тригер: {cr.event_type}",
             "",
-            f"\U0001f3af Consensus: {action_emoji.get(cr.consensus, cr.consensus)}",
-            f"\U0001f4aa Strength: {strength_emoji.get(cr.consensus_strength, cr.consensus_strength)}",
-            f"\U0001f4c8 Confidence: {cr.combined_confidence:.0%}",
+            f"\U0001f3af Консенсус: {action_emoji.get(cr.consensus, cr.consensus)}",
+            f"\U0001f4aa Сила: {strength_emoji.get(cr.consensus_strength, cr.consensus_strength)}",
+            f"\U0001f4c8 Впевненість: {cr.combined_confidence:.0%}",
         ]
 
         if cr.invalidation_price:
-            lines.append(f"\U0001f6ab Invalidation: ${cr.invalidation_price:,.0f}")
+            lines.append(f"\U0001f6ab Інвалідація: ${cr.invalidation_price:,.0f}")
 
         rec = cr.recommendation
         if rec.get("max_position_size"):
-            lines.append(f"\U0001f4d0 Max Position: {rec['max_position_size']:.1%}")
+            lines.append(f"\U0001f4d0 Макс. позиція: {rec['max_position_size']:.1%}")
 
         lines.extend([
             "",
             f"{'─' * 30}",
-            f"\U0001f5f3\ufe0f Individual Votes:",
+            f"\U0001f5f3\ufe0f Голоси агентів:",
             f"  \U0001f525 Grok:       {cr.grok.action} ({cr.grok.confidence:.0%})",
             f"  \U0001f50d Perplexity: {cr.perplexity.action} ({cr.perplexity.confidence:.0%})",
             f"  \U0001f6e1\ufe0f Claude:     {cr.claude.action} ({cr.claude.confidence:.0%})",
@@ -133,18 +139,18 @@ class TelegramNotifier:
         ])
 
         if cr.key_risks:
-            lines.extend(["", f"{'─' * 30}", "\u26a0\ufe0f Key Risks:"])
+            lines.extend(["", f"{'─' * 30}", "\u26a0\ufe0f Ключові ризики:"])
             for i, risk in enumerate(cr.key_risks[:4], 1):
                 risk_short = risk[:80] + "..." if len(risk) > 80 else risk
                 lines.append(f"  {i}. {risk_short}")
 
         if risk_check:
-            status = "\u2705 ALLOWED" if risk_check.allowed else "\U0001f6ab BLOCKED"
+            status = "\u2705 ДОЗВОЛЕНО" if risk_check.allowed else "\U0001f6ab ЗАБЛОКОВАНО"
             lines.extend([
                 "",
                 f"{'─' * 30}",
-                f"\U0001f6e1\ufe0f Risk Governor: {status}",
-                f"   Reason: {risk_check.reason}",
+                f"\U0001f6e1\ufe0f Ризик-контроль: {status}",
+                f"   Причина: {risk_check.reason}",
             ])
 
         lines.append(f"\n{'=' * 30}")

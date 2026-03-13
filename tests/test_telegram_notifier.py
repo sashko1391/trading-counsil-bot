@@ -72,7 +72,7 @@ def test_format_signal_basic(notifier, sample_response):
     """Formatting without risk check"""
     message = notifier.format_signal(sample_response)
 
-    assert "TRADING COUNCIL DECISION" in message
+    assert "BREKHUNI" in message
     assert "BZ=F" in message
     assert "LONG" in message
     assert "Grok" in message
@@ -87,8 +87,8 @@ def test_format_signal_with_risk_allowed(notifier, sample_response, sample_risk_
     """Formatting with allowed risk check"""
     message = notifier.format_signal(sample_response, sample_risk_allowed)
 
-    assert "ALLOWED" in message
-    assert "Risk Governor" in message
+    assert "ДОЗВОЛЕНО" in message
+    assert "Ризик-контроль" in message
 
     print(f"Allowed risk format OK")
 
@@ -97,7 +97,7 @@ def test_format_signal_with_risk_blocked(notifier, sample_response, sample_risk_
     """Formatting with blocked risk check"""
     message = notifier.format_signal(sample_response, sample_risk_blocked)
 
-    assert "BLOCKED" in message
+    assert "ЗАБЛОКОВАНО" in message
     assert "Daily loss" in message or "daily loss" in message
 
     print(f"Blocked risk format OK")
@@ -129,7 +129,7 @@ def test_format_risks(notifier, sample_response):
     """Risks are included in message"""
     message = notifier.format_signal(sample_response)
 
-    assert "Key Risks" in message
+    assert "Ключові ризики" in message
 
     print("Risks included in message")
 
