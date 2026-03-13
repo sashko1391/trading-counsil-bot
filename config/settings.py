@@ -6,11 +6,14 @@
 import os
 from pathlib import Path
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from typing import Optional
 
 
 class Settings(BaseSettings):
     """Налаштування додатку з environment variables"""
+
+    model_config = ConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
     # ===== AI APIs =====
     ANTHROPIC_API_KEY: str
@@ -61,12 +64,6 @@ class Settings(BaseSettings):
     JOURNAL_PATH: Path = Path("data/trades.json")
     KNOWLEDGE_PATH: Path = Path("data/knowledge")
     LOG_LEVEL: str = "INFO"
-
-    class Config:
-        """Конфігурація Pydantic"""
-        env_file = ".env"
-        case_sensitive = True
-        extra = "ignore"
 
 
 def get_settings() -> Settings:

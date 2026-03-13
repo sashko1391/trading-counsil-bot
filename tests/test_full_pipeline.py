@@ -74,6 +74,8 @@ def pipeline(mock_agents, mock_price_watcher):
 
 def test_analyze_single_oil_event(pipeline):
     """Analyse a single oil price spike event."""
+    import random
+    random.seed(42)
     event = MarketEvent(
         event_type="price_spike",
         instrument="BZ=F",

@@ -189,7 +189,7 @@ def test_council_integration_mock(
         # Should have risks
         assert len(council_response.key_risks) == 4  # One from each agent
 
-        return council_response
+        assert council_response is not None
 
 
 def test_unanimous_consensus():
