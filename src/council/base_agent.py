@@ -5,6 +5,7 @@
 
 from abc import ABC, abstractmethod
 from models.schemas import Signal, MarketEvent
+from loguru import logger
 import hashlib
 import json
 from typing import Optional
@@ -76,7 +77,7 @@ class BaseAgent(ABC):
                 # Нормалізуємо: рядки в масиві -> dict
                 items = []
                 for item in output:
-                    if isinstance(item, str):
+                    if isinstance(item, str) and item.strip():
                         item = json.loads(item)
                     if isinstance(item, dict):
                         items.append(item)
@@ -94,7 +95,7 @@ class BaseAgent(ABC):
                 output = json.loads(output)
             return Signal(**output)
         except Exception as e:
-            print(f"{self.name} output validation failed: {e}")
+            logger.error(f"{self.name} output validation failed: {e} | raw type={type(output).__name__} | raw={str(output)[:300]}")
             return Signal(
                 action="WAIT",
                 confidence=0.0,

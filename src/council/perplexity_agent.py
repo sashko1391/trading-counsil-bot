@@ -4,6 +4,7 @@ Uses Perplexity API (OpenAI-compatible SDK) with manual JSON parsing
 """
 
 from openai import OpenAI
+from loguru import logger
 from council.base_agent import BaseAgent
 from models.schemas import Signal, MarketEvent
 from config.prompts import PERPLEXITY_SYSTEM_PROMPT, format_user_prompt
@@ -67,11 +68,12 @@ Pure JSON only — no markdown, no preamble."""
             )
 
             response_text = response.choices[0].message.content
+            logger.debug(f"Perplexity raw response ({len(response_text)} chars): {response_text[:500]}")
             json_data = self.extract_json_from_response(response_text)
             return self.validate_output(json_data, instrument=event.instrument)
 
         except Exception as e:
-            print(f"Perplexity analysis failed: {e}")
+            logger.error(f"Perplexity analysis failed: {e}")
             return Signal(
                 action="WAIT",
                 confidence=0.0,

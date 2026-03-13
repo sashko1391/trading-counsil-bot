@@ -248,12 +248,13 @@ class TestSignal:
         )
         assert sig.action == "LONG"
 
-    def test_invalid_url(self):
-        with pytest.raises(Exception):
-            Signal(
-                action="WAIT",
-                confidence=0.5,
-                thesis="test",
-                risk_notes="test",
-                sources=["not-a-url"],
-            )
+    def test_invalid_url_filtered(self):
+        """Non-URL sources are silently filtered out (not rejected)"""
+        sig = Signal(
+            action="WAIT",
+            confidence=0.5,
+            thesis="test",
+            risk_notes="test",
+            sources=["not-a-url", "https://valid.com"],
+        )
+        assert sig.sources == ["https://valid.com"]

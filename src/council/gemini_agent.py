@@ -5,6 +5,7 @@ Uses Google GenAI SDK
 
 from google import genai
 from google.genai import types
+from loguru import logger
 from council.base_agent import BaseAgent
 from models.schemas import Signal, MarketEvent
 from config.prompts import GEMINI_SYSTEM_PROMPT, format_user_prompt
@@ -83,11 +84,12 @@ Respond ONLY with valid JSON (no markdown, no preamble):
             )
 
             response_text = response.text
+            logger.debug(f"Gemini raw response ({len(response_text)} chars): {response_text[:500]}")
             json_data = self.extract_json_from_response(response_text)
             return self.validate_output(json_data, instrument=event.instrument)
 
         except Exception as e:
-            print(f"Gemini analysis failed: {e}")
+            logger.error(f"Gemini analysis failed: {e}")
             return Signal(
                 action="WAIT",
                 confidence=0.0,

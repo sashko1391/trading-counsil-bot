@@ -20,16 +20,22 @@ class Signal(BaseModel):
     confidence: float = Field(ge=0, le=1)
     thesis: str = Field(max_length=600)
     invalidation_price: Optional[float] = None
-    risk_notes: str
+    risk_notes: str = ""
     sources: List[str] = Field(default_factory=list)
+
+    @field_validator("risk_notes", mode="before")
+    @classmethod
+    def coerce_risk_notes(cls, v):
+        # LLMs sometimes return a list instead of a string
+        if isinstance(v, list):
+            return "; ".join(str(item) for item in v)
+        return v
 
     @field_validator("sources")
     @classmethod
     def validate_sources(cls, v):
-        for url in v:
-            if not url.startswith(("http://", "https://")):
-                raise ValueError(f"Invalid URL: {url}")
-        return v
+        # LLMs often return non-URL strings; keep only valid URLs, discard the rest
+        return [url for url in v if isinstance(url, str) and url.startswith(("http://", "https://"))]
 
 
 # ============================================================
