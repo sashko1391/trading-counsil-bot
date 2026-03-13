@@ -175,6 +175,7 @@ class TelegramNotifier:
         analyses: List[Dict],
         hours: int,
         current_price: float = 0.0,
+        previous_trend: Optional[str] = None,
     ) -> str:
         """
         Build a consolidated digest message from accumulated analyses.
@@ -254,8 +255,18 @@ class TelegramNotifier:
             f"{'=' * 32}",
             "",
             f"{trend_emoji} ТРЕНД: {trend}",
-            f"\U0001f4aa Середня впевненість: {avg_conf:.0%}",
         ]
+
+        # Trend evolution vs previous digest
+        if previous_trend:
+            trend_map = {"LONG": "ЗРОСТАННЯ", "SHORT": "ПАДІННЯ", "WAIT": "НЕЙТРАЛЬНО"}
+            prev_ua = trend_map.get(previous_trend, previous_trend)
+            if previous_trend == trend_action:
+                lines.append(f"\U0001f501 Тренд підтверджено (було: {prev_ua})")
+            else:
+                lines.append(f"\U0001f504 Зміна тренду: {prev_ua} \u2192 {trend}")
+
+        lines.append(f"\U0001f4aa Середня впевненість: {avg_conf:.0%}")
 
         if current_price > 0:
             lines.append(f"\U0001f4b0 Поточна ціна: ${current_price:.2f}")
@@ -268,7 +279,7 @@ class TelegramNotifier:
         ])
 
         # Per-agent breakdown
-        lines.extend(["", f"{'─' * 32}", "\U0001f5f3\ufe0f Агенти за {hours} год:"])
+        lines.extend(["", f"{'─' * 32}", f"\U0001f5f3\ufe0f Агенти за {hours} год:"])
         for agent_name, counts in agent_actions.items():
             emoji_map = {"Grok": "\U0001f525", "Perplexity": "\U0001f50d", "Claude": "\U0001f6e1\ufe0f", "Gemini": "\U0001f52c"}
             emoji = emoji_map.get(agent_name, "\U0001f916")
@@ -303,9 +314,10 @@ class TelegramNotifier:
         analyses: List[Dict],
         hours: int,
         current_price: float = 0.0,
+        previous_trend: Optional[str] = None,
     ) -> bool:
         """Format and send a digest message."""
-        text = self.format_digest(instrument, analyses, hours, current_price)
+        text = self.format_digest(instrument, analyses, hours, current_price, previous_trend)
         if not text:
             return False
         return await self._send_message(text)

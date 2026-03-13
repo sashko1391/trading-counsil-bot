@@ -48,6 +48,7 @@ from models.schemas import (
 from notifications.telegram_notifier import TelegramNotifier
 from risk.risk_governor import RiskGovernor
 from journal.trade_journal import TradeJournal
+from journal.digest_history import DigestHistory, DigestRecord
 from watchers.oil_price_watcher import OilPriceWatcher
 from watchers.oil_news_scanner import OilNewsScanner
 from watchers.scheduled_events import ScheduledEventsManager
@@ -141,6 +142,7 @@ class TradingCouncil:
         self.dry_run = dry_run
         self.min_confidence = min_confidence
         self.digest_interval_hours = digest_interval_hours
+        self.digest_history = DigestHistory()
         self.running = False
 
         # Accumulator: stores analyses between digest cycles
@@ -205,6 +207,14 @@ class TradingCouncil:
             logger.warning(f"Scheduled events error: {exc}")
             context["upcoming_events"] = []
 
+        # 5. Previous digest history (for cross-digest learning)
+        digest_contexts: dict[str, str] = {}
+        for instrument in self.price_watcher.instruments:
+            hist = self.digest_history.get_context_for_agents(instrument, n=4)
+            if hist:
+                digest_contexts[instrument] = hist
+        context["digest_history"] = digest_contexts
+
         return context
 
     # ------------------------------------------------------------------
@@ -233,6 +243,11 @@ class TradingCouncil:
                 "prices": context.get("prices", {}),
             },
         )
+
+        # Inject previous digest history for cross-digest learning
+        digest_hist = context.get("digest_history", {}).get(event.instrument, "")
+        if digest_hist:
+            user_prompt += f"\n\n{digest_hist}\n"
 
         # 1. Collect signals from all agents
         logger.info("Querying all 4 agents...")
@@ -444,6 +459,9 @@ class TradingCouncil:
             prices = context.get("prices", {})
             current_price = prices.get(instrument, {}).get("price", 0.0)
 
+            # Get previous trend for evolution display
+            previous_trend = self.digest_history.get_previous_trend(instrument)
+
             logger.info(
                 f"Sending digest for {instrument}: "
                 f"{len(analyses)} analyses over {self.digest_interval_hours}h"
@@ -451,20 +469,81 @@ class TradingCouncil:
 
             if self.dry_run:
                 msg = TelegramNotifier.format_digest(
-                    instrument, analyses, self.digest_interval_hours, current_price
+                    instrument, analyses, self.digest_interval_hours,
+                    current_price, previous_trend=previous_trend,
                 )
                 logger.info(f"[DRY-RUN] Digest:\n{msg}")
             else:
                 try:
                     await self.notifier.send_digest(
-                        instrument, analyses, self.digest_interval_hours, current_price
+                        instrument, analyses, self.digest_interval_hours,
+                        current_price, previous_trend=previous_trend,
                     )
                 except Exception as exc:
                     logger.error(f"Digest notification error: {exc}")
 
+            # Save to digest history for cross-digest learning
+            self._save_digest_record(instrument, analyses)
+
         # Clear accumulator
         self._accumulator.clear()
         self._last_digest_time = datetime.now()
+
+    def _save_digest_record(self, instrument: str, analyses: list[dict]) -> None:
+        """Compute stats from analyses and persist a DigestRecord."""
+        action_counts: dict[str, int] = {"LONG": 0, "SHORT": 0, "WAIT": 0}
+        agent_dominants: dict[str, dict[str, int]] = {}
+        confidences: list[float] = []
+        theses: list[str] = []
+        risks: list[str] = []
+
+        for a in analyses:
+            consensus = a.get("consensus", "WAIT")
+            action_counts[consensus] = action_counts.get(consensus, 0) + 1
+            confidences.append(a.get("combined_confidence", 0.0))
+
+            for agent_name, sig in a.get("signals", {}).items():
+                if agent_name not in agent_dominants:
+                    agent_dominants[agent_name] = {"LONG": 0, "SHORT": 0, "WAIT": 0}
+                agent_dominants[agent_name][sig.action] = (
+                    agent_dominants[agent_name].get(sig.action, 0) + 1
+                )
+                if sig.thesis and sig.action != "WAIT" and len(theses) < 4:
+                    short = sig.thesis[:120]
+                    if short not in theses:
+                        theses.append(short)
+                if sig.risk_notes and len(risks) < 3:
+                    short = sig.risk_notes[:100]
+                    if short not in risks:
+                        risks.append(short)
+
+        # Determine trend
+        if action_counts["LONG"] > action_counts["SHORT"] and action_counts["LONG"] > action_counts["WAIT"]:
+            trend = "LONG"
+        elif action_counts["SHORT"] > action_counts["LONG"] and action_counts["SHORT"] > action_counts["WAIT"]:
+            trend = "SHORT"
+        else:
+            trend = "WAIT"
+
+        # Per-agent dominant action
+        agent_dom_str = {}
+        for name, counts in agent_dominants.items():
+            agent_dom_str[name] = max(counts, key=counts.get)
+
+        avg_conf = sum(confidences) / len(confidences) if confidences else 0.0
+
+        record = DigestRecord(
+            instrument=instrument,
+            timestamp=datetime.now().strftime("%Y-%m-%d %H:%M"),
+            trend=trend,
+            avg_confidence=round(avg_conf, 2),
+            event_count=len(analyses),
+            action_counts=action_counts,
+            agent_dominants=agent_dom_str,
+            key_theses=theses,
+            key_risks=risks,
+        )
+        self.digest_history.add(record)
 
     # ------------------------------------------------------------------
     # Main loop
@@ -644,7 +723,7 @@ def main() -> None:
     )
     parser.add_argument("--dry-run", action="store_true", help="Mock agents, no Telegram")
     parser.add_argument("--once", action="store_true", help="Single poll cycle, then exit")
-    parser.add_argument("--interval", type=int, default=300, help="Poll interval in seconds (default 300)")
+    parser.add_argument("--interval", type=int, default=900, help="Poll interval in seconds (default 900 = 15min)")
     parser.add_argument("--digest-hours", type=int, default=None, help="Digest interval in hours (default from settings, usually 3)")
 
     args = parser.parse_args()
@@ -677,7 +756,7 @@ def main() -> None:
         journal_path = Path("data/trades_dryrun.json")
         min_confidence = 0.6
         digest_interval_hours = 3
-        poll_interval_sec = 300
+        poll_interval_sec = 900
     else:
         logger.info("Loading settings...")
         try:
@@ -708,7 +787,7 @@ def main() -> None:
     if args.digest_hours is not None:
         digest_interval_hours = args.digest_hours
     # CLI --interval overrides settings
-    if args.interval != 300:
+    if args.interval != 900:
         poll_interval_sec = args.interval
 
     council = TradingCouncil(

@@ -57,7 +57,7 @@ class Settings:
     MAX_DAILY_ALERTS: int = 30
     MAX_PIPELINE_RUNS_PER_HOUR: int = 5
     DIGEST_INTERVAL_HOURS: int = 3          # send consolidated Telegram digest every N hours
-    POLL_INTERVAL_SECONDS: int = 300        # how often to poll for events (silent between digests)
+    POLL_INTERVAL_SECONDS: int = 900        # how often to poll for events (15 min, silent between digests)
 
     # ── Adversarial stage ─────────────────────────────────────────────────────
     ADVERSARIAL_ENABLED: bool = True
