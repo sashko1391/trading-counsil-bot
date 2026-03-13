@@ -73,12 +73,25 @@ class BaseAgent(ABC):
         """
         try:
             if isinstance(output, list):
+                # Нормалізуємо: рядки в масиві -> dict
+                items = []
                 for item in output:
-                    if isinstance(item, dict) and item.get("instrument", "") == instrument:
+                    if isinstance(item, str):
+                        item = json.loads(item)
+                    if isinstance(item, dict):
+                        items.append(item)
+
+                # Шукаємо потрібний інструмент
+                for item in items:
+                    if item.get("instrument", "") == instrument:
                         return Signal(**{k: v for k, v in item.items() if k != "instrument"})
-                if output:
-                    item = output[0]
+                # Fallback — перший елемент
+                if items:
+                    item = items[0]
                     return Signal(**{k: v for k, v in item.items() if k != "instrument"})
+
+            if isinstance(output, str):
+                output = json.loads(output)
             return Signal(**output)
         except Exception as e:
             print(f"{self.name} output validation failed: {e}")
