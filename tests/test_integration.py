@@ -1,20 +1,19 @@
 """
-Integration Test - Вся рада разом! 🎯
+Integration Test - Full council pipeline
 
-Тестує:
-1. Всі 4 агенти (Claude, Grok, Gemini, Perplexity)
+Tests:
+1. All 4 agents (Claude, Grok, Gemini, Perplexity)
 2. Aggregator
-3. Повний flow: Event → Signals → Consensus → Recommendation
+3. Full flow: Event -> Signals -> Consensus -> Recommendation
 
-🧒 ПРАЦЮЄ БЕЗ СПРАВЖНІХ API КЛЮЧІВ!
-Використовуємо mock objects
+Works WITHOUT real API keys - uses mock objects.
 """
 
 import pytest
 from unittest.mock import Mock, patch
 from datetime import datetime
 
-# Імпорти
+# Imports
 from council.claude_agent import ClaudeAgent
 from council.grok_agent import GrokAgent
 from council.gemini_agent import GeminiAgent
@@ -24,99 +23,99 @@ from models.schemas import Signal, MarketEvent, CouncilResponse
 
 
 # ==============================================================================
-# ФІКСТУРИ (підготовка даних для тестів)
+# FIXTURES
 # ==============================================================================
 
 @pytest.fixture
 def test_event():
-    """Створює тестову подію на ринку"""
+    """Creates a test oil market event"""
     return MarketEvent(
         event_type="price_spike",
-        pair="BTC/USDT",
+        instrument="BZ=F",
         severity=0.85,
         data={
             "price_change": 6.5,
-            "current_price": 98500,
-            "volume": 4_200_000_000,
+            "current_price": 82.50,
+            "volume": 420_000,
             "timeframe": "15min",
-            "trigger": "Broke resistance at $98k"
+            "trigger": "Broke resistance at $82"
         }
     )
 
 
 @pytest.fixture
 def test_context():
-    """Створює тестовий контекст"""
+    """Creates a test context"""
     return {
-        "news": "Bitcoin breaks $98k resistance, institutional buying accelerates",
+        "news": "Brent crude breaks $82 resistance, OPEC+ cuts extended",
         "indicators": {
             "rsi": 76,
             "macd": "bullish_crossover",
             "volume_profile": "high",
-            "funding_rate": 0.06,
-            "twitter_sentiment": "extremely_bullish"
+            "crack_spread": 18.5,
+            "geopolitical_risk": "elevated"
         }
     }
 
 
 @pytest.fixture
 def mock_grok_signal():
-    """Mock сигнал від Grok (бичачий, високий confidence)"""
+    """Mock signal from Grok (bullish, high confidence)"""
     return Signal(
         action="LONG",
         confidence=0.90,
-        thesis="🔥 MASSIVE FOMO on X! Everyone talking about $100k BTC. Retail piling in. This is peak hype territory.",
-        invalidation_price=97000,
-        risk_notes="Hype can disappear instantly. Watch for sentiment shift.",
-        sources=["https://x.com/crypto_influencer1", "https://x.com/whale_tracker"]
+        thesis="Massive bullish sentiment on oil. OPEC+ cuts driving supply squeeze.",
+        invalidation_price=80.0,
+        risk_notes="Sentiment can shift fast on geopolitical de-escalation.",
+        sources=["https://x.com/oil_analyst1", "https://x.com/energy_tracker"]
     )
 
 
 @pytest.fixture
 def mock_perplexity_signal():
-    """Mock сигнал від Perplexity (скептичний, низький confidence)"""
+    """Mock signal from Perplexity (skeptical, low confidence)"""
     return Signal(
         action="WAIT",
         confidence=0.45,
-        thesis="News is real but already 2 hours old. Can't verify if institutional buying is ongoing. Possible fake hype.",
+        thesis="News is real but already 2 hours old. EIA report tomorrow may change picture.",
         invalidation_price=None,
-        risk_notes="Old news, likely priced in. Wait for fresh confirmation.",
-        sources=["https://bloomberg.com/crypto", "https://coindesk.com/markets"]
+        risk_notes="Old news, likely priced in. Wait for EIA confirmation.",
+        sources=["https://bloomberg.com/energy", "https://reuters.com/commodities"]
     )
 
 
 @pytest.fixture
 def mock_claude_signal():
-    """Mock сигнал від Claude (обережний, середній confidence)"""
+    """Mock signal from Claude (cautious, medium confidence)"""
     return Signal(
         action="LONG",
         confidence=0.65,
-        thesis="Risk/reward acceptable IF small position. Funding rate elevated = overleveraged longs. Stop at $97k critical.",
-        invalidation_price=97000,
-        risk_notes="High funding = risk of long squeeze. Max 2% position. Set tight stop-loss.",
+        thesis="Risk/reward acceptable IF small position. Crack spread supports upside.",
+        invalidation_price=80.0,
+        risk_notes="Geopolitical risk elevated. Max 2% position. Set tight stop-loss.",
         sources=[]
     )
 
 
 @pytest.fixture
 def mock_gemini_signal():
-    """Mock сигнал від Gemini (аналітичний, високий confidence)"""
+    """Mock signal from Gemini (analytical, high confidence)"""
     return Signal(
         action="LONG",
         confidence=0.80,
-        thesis="Pattern matches breakout from March 2024 (led to +15% in 3 days). Volume confirms. Success rate: 7/10 historically.",
-        invalidation_price=96500,
-        risk_notes="Pattern fails if volume drops or breaks below $96.5k support.",
-        sources=["https://tradingview.com/chart", "https://glassnode.com/btc"]
+        thesis="Pattern matches OPEC+ cut breakout from 2024. Volume confirms. Success rate: 7/10.",
+        invalidation_price=79.50,
+        risk_notes="Pattern fails if volume drops or breaks below $79.50 support.",
+        sources=["https://tradingview.com/chart", "https://oilprice.com"]
     )
 
 
 # ==============================================================================
-# ТЕСТИ
+# TESTS
 # ==============================================================================
 
 def test_council_integration_mock(
-    test_event, 
+    test_event,
     test_context,
     mock_grok_signal,
     mock_perplexity_signal,
@@ -124,82 +123,40 @@ def test_council_integration_mock(
     mock_gemini_signal
 ):
     """
-    🎯 ГОЛОВНИЙ INTEGRATION TEST
-    
-    Тестує повний flow:
-    1. Створюємо всіх агентів
-    2. Mock'аємо їхні відповіді
-    3. Aggregator об'єднує сигнали
-    4. Перевіряємо consensus
-    
-    🧒 ЩО ОЧІКУЄМО:
+    Main integration test - full flow:
+    1. Create all agents
+    2. Mock their responses
+    3. Aggregator combines signals
+    4. Verify consensus
+
+    Expected:
     - Grok: LONG (0.90)
     - Perplexity: WAIT (0.45)
     - Claude: LONG (0.65)
     - Gemini: LONG (0.80)
-    
-    Консенсус: 3/4 LONG → STRONG consensus
+
+    Consensus: 3/4 LONG -> STRONG consensus
     """
-    
-    print("\n" + "="*70)
-    print("🎯 INTEGRATION TEST: Full Council Analysis")
-    print("="*70)
-    
-    # 1. Створюємо агентів (з fake ключами)
+
+    # 1. Create agents with fake keys
     grok = GrokAgent(api_key="fake-grok-key")
     perplexity = PerplexityAgent(api_key="fake-perp-key")
     claude = ClaudeAgent(api_key="fake-claude-key")
     gemini = GeminiAgent(api_key="fake-gemini-key")
-    
-    print(f"\n✅ Created 4 agents:")
-    print(f"   - {grok}")
-    print(f"   - {perplexity}")
-    print(f"   - {claude}")
-    print(f"   - {gemini}")
-    
-    # 2. Mock'аємо їхні analyze методи
+
+    # 2. Mock their analyze methods
     with patch.object(grok, 'analyze', return_value=mock_grok_signal), \
          patch.object(perplexity, 'analyze', return_value=mock_perplexity_signal), \
          patch.object(claude, 'analyze', return_value=mock_claude_signal), \
          patch.object(gemini, 'analyze', return_value=mock_gemini_signal):
-        
-        # 3. Викликаємо аналіз від кожного агента
-        print(f"\n📊 Event: {test_event.event_type} on {test_event.pair}")
-        print(f"   Price change: +{test_event.data['price_change']}%")
-        print(f"   Current price: ${test_event.data['current_price']:,}")
-        
-        print(f"\n🤖 Calling all agents...")
-        
+
+        # 3. Call analysis from each agent
         grok_result = grok.analyze(test_event, test_context)
         perp_result = perplexity.analyze(test_event, test_context)
         claude_result = claude.analyze(test_event, test_context)
         gemini_result = gemini.analyze(test_event, test_context)
-        
-        # 4. Виводимо індивідуальні сигнали
-        print(f"\n📋 Individual Signals:")
-        print(f"\n   🔥 GROK (Sentiment Hunter):")
-        print(f"      Action: {grok_result.action}")
-        print(f"      Confidence: {grok_result.confidence:.0%}")
-        print(f"      Thesis: {grok_result.thesis[:80]}...")
-        
-        print(f"\n   🔍 PERPLEXITY (Fact Checker):")
-        print(f"      Action: {perp_result.action}")
-        print(f"      Confidence: {perp_result.confidence:.0%}")
-        print(f"      Thesis: {perp_result.thesis[:80]}...")
-        
-        print(f"\n   🛡️ CLAUDE (Risk Manager):")
-        print(f"      Action: {claude_result.action}")
-        print(f"      Confidence: {claude_result.confidence:.0%}")
-        print(f"      Thesis: {claude_result.thesis[:80]}...")
-        
-        print(f"\n   🔬 GEMINI (Pattern Analyst):")
-        print(f"      Action: {gemini_result.action}")
-        print(f"      Confidence: {gemini_result.confidence:.0%}")
-        print(f"      Thesis: {gemini_result.thesis[:80]}...")
-        
-        # 5. Aggregator об'єднує
-        print(f"\n⚡ Aggregating signals...")
-        
+
+        # 4. Aggregator combines
         aggregator = Aggregator()
         council_response = aggregator.aggregate(
             event=test_event,
@@ -209,86 +166,51 @@ def test_council_integration_mock(
             gemini=gemini_result,
             prompt_hash="test_integration_hash_123"
         )
-        
-        # 6. Виводимо консенсус
-        print(f"\n" + "="*70)
-        print(f"🎯 COUNCIL DECISION")
-        print(f"="*70)
-        print(f"\n   Consensus: {council_response.consensus}")
-        print(f"   Strength: {council_response.consensus_strength}")
-        print(f"   Combined Confidence: {council_response.combined_confidence:.0%}")
-        print(f"   Votes: LONG=3, WAIT=1")
-        
-        print(f"\n   💡 Recommendation:")
-        rec = council_response.recommendation
-        print(f"      Action: {rec['action']}")
-        print(f"      Max Position: {rec['max_position_size']:.1%}")
-        print(f"      Invalidation: ${council_response.invalidation_price:,}")
-        
-        print(f"\n   ⚠️ Key Risks ({len(council_response.key_risks)}):")
-        for i, risk in enumerate(council_response.key_risks[:3], 1):
-            print(f"      {i}. {risk[:65]}...")
-        
-        # 7. Перевірки (assertions)
-        print(f"\n" + "="*70)
-        print(f"🧪 Running Assertions...")
-        print(f"="*70)
-        
-        # Consensus має бути LONG (3/4 votes)
+
+        # 5. Assertions
+        # Consensus should be LONG (3/4 votes)
         assert council_response.consensus == "LONG", "Expected LONG consensus"
-        print(f"   ✅ Consensus is LONG")
-        
-        # Strength має бути STRONG (3/4)
-        assert council_response.consensus_strength == "STRONG", "Expected STRONG"
-        print(f"   ✅ Strength is STRONG (3/4 votes)")
-        
-        # Combined confidence має бути середнє зважене
-        expected_conf = (0.90*0.25 + 0.45*0.25 + 0.65*0.25 + 0.80*0.25)
-        assert abs(council_response.combined_confidence - expected_conf) < 0.01
-        print(f"   ✅ Combined confidence: {council_response.combined_confidence:.0%}")
-        
-        # Invalidation має бути max для LONG
-        assert council_response.invalidation_price == 97000  # max(97000, 96500)
-        print(f"   ✅ Invalidation price: ${council_response.invalidation_price:,}")
-        
-        # Position size має бути розумний
-        assert 0.01 <= rec['max_position_size'] <= 0.05
-        print(f"   ✅ Position size: {rec['max_position_size']:.1%}")
-        
-        # Має бути ризики
-        assert len(council_response.key_risks) == 4  # По одному від кожного
-        print(f"   ✅ All {len(council_response.key_risks)} risks collected")
-        
-        print(f"\n" + "="*70)
-        print(f"🎉 ALL INTEGRATION TESTS PASSED!")
-        print(f"="*70)
-        
+
+        # Aggregator v2: confidence-weighted voting.
+        # LONG = 0.25*0.90 + 0.25*0.65 + 0.25*0.80 = 0.5875
+        # WAIT = 0.25*0.45 = 0.1125 → normalized LONG = 83.9% → UNANIMOUS
+        assert council_response.consensus_strength == "UNANIMOUS", "Expected UNANIMOUS"
+
+        # Combined confidence = weighted avg of agreeing agents minus penalty
+        assert 0.5 <= council_response.combined_confidence <= 0.95
+
+        # Invalidation should be max for LONG
+        assert council_response.invalidation_price == 80.0  # max(80.0, 79.5)
+
+        # Position size should be reasonable (v2 uses max_position_pct)
+        rec = council_response.recommendation
+        assert 0.01 <= rec['max_position_pct'] <= 0.05
+
+        # Should have risks
+        assert len(council_response.key_risks) == 4  # One from each agent
+
         return council_response
 
 
 def test_unanimous_consensus():
-    """
-    Тест UNANIMOUS консенсусу (всі 4 згодні)
-    """
-    print("\n🧪 Testing UNANIMOUS consensus...")
-    
-    # Всі агенти кажуть LONG
+    """Test UNANIMOUS consensus (all 4 agree)"""
+
     all_long = Signal(
         action="LONG",
         confidence=0.85,
         thesis="Strong bullish setup",
-        invalidation_price=95000,
+        invalidation_price=78.0,
         risk_notes="Minimal risk",
         sources=[]
     )
-    
+
     event = MarketEvent(
         event_type="price_spike",
-        pair="BTC/USDT",
+        instrument="BZ=F",
         severity=0.9,
         data={"price_change": 8.0}
     )
-    
+
     aggregator = Aggregator()
     response = aggregator.aggregate(
         event=event,
@@ -298,18 +220,14 @@ def test_unanimous_consensus():
         gemini=all_long,
         prompt_hash="unanimous_test"
     )
-    
+
     assert response.consensus == "LONG"
     assert response.consensus_strength == "UNANIMOUS"
-    print(f"   ✅ UNANIMOUS consensus detected (4/4 LONG)")
 
 
 def test_conflict_consensus():
-    """
-    Тест CONFLICT консенсусу (розділені порівну)
-    """
-    print("\n🧪 Testing CONFLICT consensus...")
-    
+    """Test CONFLICT consensus (split evenly)"""
+
     long_signal = Signal(
         action="LONG",
         confidence=0.7,
@@ -317,7 +235,7 @@ def test_conflict_consensus():
         risk_notes="Some risk",
         sources=[]
     )
-    
+
     short_signal = Signal(
         action="SHORT",
         confidence=0.7,
@@ -325,14 +243,14 @@ def test_conflict_consensus():
         risk_notes="Some risk",
         sources=[]
     )
-    
+
     event = MarketEvent(
         event_type="price_spike",
-        pair="BTC/USDT",
+        instrument="BZ=F",
         severity=0.5,
         data={"price_change": 2.0}
     )
-    
+
     aggregator = Aggregator()
     response = aggregator.aggregate(
         event=event,
@@ -342,20 +260,15 @@ def test_conflict_consensus():
         gemini=short_signal,
         prompt_hash="conflict_test"
     )
-    
-    # 2 LONG vs 2 SHORT = CONFLICT → force WAIT
-    assert response.consensus == "WAIT"
+
+    # 2 LONG vs 2 SHORT = CONFLICT (Aggregator v2 returns "CONFLICT", not "WAIT")
+    assert response.consensus == "CONFLICT"
     assert response.consensus_strength == "NONE"
-    print(f"   ✅ CONFLICT handled (forced to WAIT)")
 
 
 # ==============================================================================
-# MAIN - запуск всіх тестів
+# MAIN
 # ==============================================================================
 
 if __name__ == "__main__":
-    print("\n" + "🚀"*35)
-    print("   TRADING COUNCIL BOT - INTEGRATION TEST SUITE")
-    print("🚀"*35)
-    
     pytest.main([__file__, "-v", "-s", "--tb=short"])

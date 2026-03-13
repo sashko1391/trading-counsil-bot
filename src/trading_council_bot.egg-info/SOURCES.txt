@@ -13,5 +13,8 @@ src/trading_council_bot.egg-info/SOURCES.txt
 src/trading_council_bot.egg-info/dependency_links.txt
 src/trading_council_bot.egg-info/requires.txt
 src/trading_council_bot.egg-info/top_level.txt
+src/watchers/__init__.py
+src/watchers/market_watcher.py
 tests/test_claude_agent.py
 tests/test_integration.py
+tests/test_market_watcher.py

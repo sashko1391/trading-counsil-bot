@@ -1,6 +1,6 @@
 """
-Claude Agent - Risk Manager 🛡️
-Фокусується на управлінні ризиками та виявленні проблем
+Claude Agent — Risk Assessment CFO for Oil Markets
+Uses Anthropic SDK with manual JSON parsing
 """
 
 import json
@@ -8,172 +8,83 @@ from anthropic import Anthropic
 from council.base_agent import BaseAgent
 from models.schemas import Signal, MarketEvent
 from config.prompts import CLAUDE_SYSTEM_PROMPT, format_user_prompt
-import instructor
-from typing import Optional
 
 
 class ClaudeAgent(BaseAgent):
     """
-    Claude як менеджер ризиків
-    
-    🧒 ЩО ЦЕ:
-    - Наслідується від BaseAgent
-    - Використовує Anthropic SDK
-    - Instructor для structured output
-    - Sync версія (без async) для простоти тестування
+    Claude as Chief Risk Officer of the oil trading council.
+
+    - Focus: contango risk, crack spreads, OPEC compliance, geopolitical premium,
+      demand destruction, invalidation scenarios
+    - API: Anthropic SDK
+    - Model: configurable via settings.CLAUDE_MODEL
     """
-    
-    def __init__(self, api_key: str):
-        """
-        Ініціалізація Claude агента
-        
-        Args:
-            api_key: Anthropic API ключ
-        """
+
+    def __init__(self, api_key: str, model: str = "claude-sonnet-4-20250514"):
         super().__init__(api_key, "Claude")
-        
-        # Створюємо клієнта Anthropic
+
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY is empty — cannot initialise ClaudeAgent")
+
+        self.model_name = model
         self.client = Anthropic(api_key=api_key)
-        
-        # Патчимо instructor'ом для structured output
-        self.client = instructor.from_anthropic(self.client)
-    
+
     def analyze(self, event: MarketEvent, context: dict) -> Signal:
-        """
-        Аналізує подію з фокусом на ризики
-        
-        Args:
-            event: Подія на ринку
-            context: Додатковий контекст
-        
-        Returns:
-            Signal з рекомендацією
-        
-        🔧 ФІКС: Sync метод (без async) для простоти
-        """
-        
-        # Формуємо user prompt
         user_prompt = format_user_prompt(
             event_type=event.event_type,
-            pair=event.pair,
+            instrument=event.instrument,
             market_data=event.data,
-            news=context.get('news', 'No recent news'),
-            indicators=context.get('indicators', {})
+            news=context.get("news", "No recent news"),
+            indicators=context.get("indicators", {}),
         )
-        
+
+        # Ask for single instrument signal only
+        user_prompt += f"""
+
+IMPORTANT: Return a SINGLE JSON object (not an array) for instrument {event.instrument} only.
+Use this exact schema:
+{{
+    "action": "LONG" | "SHORT" | "WAIT",
+    "confidence": 0.0-1.0,
+    "thesis": "max 500 chars",
+    "invalidation_price": number or null,
+    "risk_notes": "what could go wrong",
+    "sources": ["url1"]
+}}
+Pure JSON only — no markdown, no preamble."""
+
         try:
-            # Викликаємо Claude API (sync)
             response = self.client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model=self.model_name,
                 max_tokens=1000,
                 system=CLAUDE_SYSTEM_PROMPT,
-                messages=[
-                    {"role": "user", "content": user_prompt}
-                ],
-                response_model=Signal  # Instructor примусить Signal схему
+                messages=[{"role": "user", "content": user_prompt}],
+                temperature=0.2,
             )
-            
-            # Instructor повертає готовий Signal!
-            return response
-            
+
+            response_text = response.content[0].text
+            json_data = self.extract_json_from_response(response_text)
+            return self.validate_output(json_data)
+
         except Exception as e:
-            # Fallback з короткою thesis
-            print(f"❌ Claude analysis failed: {e}")
-            
+            print(f"Claude analysis failed: {e}")
             return Signal(
                 action="WAIT",
                 confidence=0.0,
-                thesis="Analysis error",  # 🔧 ФІКС: коротка thesis
+                thesis="Analysis error",
                 risk_notes="Technical error",
-                sources=[]
+                sources=[],
             )
-    
+
     def test_connection(self) -> bool:
-        """
-        Тестує з'єднання з Anthropic API
-        
-        Returns:
-            True якщо API працює
-        """
         try:
-            # Простий тестовий запит
-            response = self.client.messages.create(
-                model="claude-sonnet-4-20250514",
+            self.client.messages.create(
+                model=self.model_name,
                 max_tokens=50,
-                messages=[
-                    {"role": "user", "content": "Reply with: OK"}
-                ]
+                messages=[{"role": "user", "content": "Reply with: OK"}],
+                temperature=0.0,
             )
-            
             return True
-            
         except Exception as e:
-            print(f"❌ Claude connection test failed: {e}")
+            print(f"Claude connection test failed: {e}")
             return False
-
-
-# ==============================================================================
-# ТЕСТУВАННЯ
-# ==============================================================================
-
-if __name__ == "__main__":
-    print("🧪 Testing ClaudeAgent...")
-    
-    # УВАГА: Для тесту потрібен справжній API ключ!
-    from config.settings import settings
-    
-    # Перевіряємо чи є API ключ
-    if "fake" in settings.ANTHROPIC_API_KEY.lower():
-        print("⚠️ Cannot test: ANTHROPIC_API_KEY is fake")
-        print("   To test, add real API key to .env")
-        print("\n💡 For mock testing, run: pytest tests/test_claude_agent.py")
-        exit(0)
-    
-    # Створюємо агента
-    claude = ClaudeAgent(api_key=settings.ANTHROPIC_API_KEY)
-    print(f"✅ ClaudeAgent created: {claude}")
-    
-    # Тест 1: Перевірка з'єднання
-    print("\n🔗 Testing API connection...")
-    if claude.test_connection():
-        print("✅ Connection successful!")
-    else:
-        print("❌ Connection failed")
-        exit(1)
-    
-    # Тест 2: Тестовий аналіз
-    print("\n🧪 Testing analysis...")
-    
-    # Створюємо тестову подію
-    test_event = MarketEvent(
-        event_type="price_spike",
-        pair="BTC/USDT",
-        severity=0.8,
-        data={
-            "price_change": 5.2,
-            "current_price": 96500,
-            "volume": 2_500_000_000,
-            "timeframe": "15min"
-        }
-    )
-    
-    test_context = {
-        "news": "Bitcoin surges on institutional buying rumors",
-        "indicators": {
-            "rsi": 78,
-            "macd": "bullish",
-            "funding_rate": 0.08
-        }
-    }
-    
-    # Запускаємо аналіз (sync)
-    signal = claude.analyze(test_event, test_context)
-    
-    print(f"\n✅ Analysis complete:")
-    print(f"   Action: {signal.action}")
-    print(f"   Confidence: {signal.confidence:.0%}")
-    print(f"   Thesis: {signal.thesis[:100]}...")
-    print(f"   Invalidation: ${signal.invalidation_price}")
-    print(f"   Risks: {signal.risk_notes[:100]}...")
-    
-    print("\n🎉 ClaudeAgent test complete!")

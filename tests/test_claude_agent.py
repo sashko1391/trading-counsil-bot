@@ -45,7 +45,7 @@ def test_claude_analyze_with_mock():
     # Створюємо тестову подію на ринку
     event = MarketEvent(
         event_type="price_spike",
-        pair="BTC/USDT",
+        instrument="BZ=F",
         severity=0.8,
         data={"price_change": 5.2, "current_price": 96500}
     )
@@ -97,7 +97,7 @@ def test_claude_error_handling():
     
     event = MarketEvent(
         event_type="price_spike",
-        pair="BTC/USDT",
+        instrument="BZ=F",
         severity=0.5,
         data={"price_change": 2.0}
     )

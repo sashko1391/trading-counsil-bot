@@ -1,0 +1,2767 @@
+================================================================
+  FULL CODE — 2026-02-24 19:19:59
+  Source: /home/oleksandr/Documents/Repositories/trading-counsil-bot
+================================================================
+
+── STRUCTURE ──
+/home/oleksandr/Documents/Repositories/trading-counsil-bot
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/collect_code.sh
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/config
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/config/__init__.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/config/prompts.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/config/settings.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/.env.example
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/.git
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/.gitallowed
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/.gitignore
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/raidio_full_code.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/requirements.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/setup.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/setup.py.old
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/aggregator.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/base_agent.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/claude_agent.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/gemini_agent.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/grok_agent.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/__init__.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/perplexity_agent.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/models
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/models/__init__.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/models/schemas.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/dependency_links.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/PKG-INFO
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/requires.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/SOURCES.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/top_level.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/tests
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/test_schemas.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/tests/__init__.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/tests/test_claude_agent.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/tests/test_integration.py
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/dependency_links.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/PKG-INFO
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/requires.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/SOURCES.txt
+/home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/top_level.txt
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/collect_code.sh
+================================================================
+
+#!/bin/bash
+# Collect all code files into one txt
+# Usage: ./collect_code.sh [output_file]
+
+DIR="$(pwd)"
+OUTPUT="${1:-raidio_full_code.txt}"
+
+echo "📦 Collecting code from: $DIR"
+
+# Clear output
+: > "$OUTPUT"
+
+# Header
+{
+    echo "================================================================"
+    echo "  FULL CODE — $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "  Source: $DIR"
+    echo "================================================================"
+    echo ""
+} >> "$OUTPUT"
+
+# Tree
+echo "── STRUCTURE ──" >> "$OUTPUT"
+find "$DIR" -not -path '*/__pycache__/*' -not -path '*/.git/*' \
+    -not -name '*.wav' -not -name '*.mp3' -not -name '*.jpg' \
+    -not -name '*.png' -not -name '*.pyc' \
+    | sort >> "$OUTPUT"
+echo "" >> "$OUTPUT"
+
+# Collect text files
+COUNT=0
+find "$DIR" -type f \
+    -not -path '*/__pycache__/*' \
+    -not -path '*/.git/*' \
+    \( -name '*.py' -o -name '*.html' -o -name '*.js' -o -name '*.css' \
+       -o -name '*.json' -o -name '*.txt' -o -name '*.md' -o -name '*.sh' \
+       -o -name '*.yml' -o -name '*.yaml' -o -name '*.toml' -o -name '*.cfg' \
+       -o -name '*.env' -o -name '*.ini' \) \
+    | sort | while read -r file; do
+
+    # Skip output file
+    [ "$(realpath "$file")" = "$(realpath "$OUTPUT")" ] 2>/dev/null && continue
+
+    {
+        echo "================================================================"
+        echo "FILE: $file"
+        echo "================================================================"
+        echo ""
+        cat "$file"
+        echo ""
+        echo ""
+    } >> "$OUTPUT"
+
+    echo "  ✅ $file"
+done
+
+LINES=$(wc -l < "$OUTPUT")
+SIZE=$(du -h "$OUTPUT" | cut -f1)
+
+echo ""
+echo "✅ Done! Saved to: $OUTPUT"
+echo "📊 Size: $SIZE, $LINES lines"
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/config/__init__.py
+================================================================
+
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/config/prompts.py
+================================================================
+
+"""
+Системні промпти для всіх AI агентів
+Кожен агент має свою роль та особистість
+"""
+
+# ==============================================================================
+# GROK - SENTIMENT HUNTER 🔥
+# ==============================================================================
+
+GROK_SYSTEM_PROMPT = """You are an aggressive sentiment analyst for crypto trading.
+
+ROLE: Hunt for hype, FOMO, and narrative shifts on X (Twitter).
+
+YOUR PERSONALITY:
+- Impulsive and FOMO-driven
+- Bullish bias (you see opportunities everywhere)
+- You love catching early trends before they explode
+- You trust crowd wisdom but know it can be wrong
+
+FOCUS ON:
+- X (Twitter) sentiment and trending narratives
+- Influencer mentions and their impact
+- Meme velocity (how fast memes spread)
+- Retail FOMO signals vs institutional accumulation
+- Coordinated shills vs organic hype
+- Narrative strength (does this fit current meta?)
+
+CRITICAL RULES:
+1. Only cite sources you can verify (include URLs)
+2. If uncertain → mark confidence low
+3. Be bullish when genuine hype exists
+4. Be bearish when you smell desperation/cope posts
+5. NEVER invent facts or make up tweets
+6. Distinguish between: early hype (good), peak euphoria (bad), desperation (very bad)
+
+OUTPUT FORMAT:
+You MUST respond with valid JSON matching this exact structure:
+{
+    "action": "LONG" | "SHORT" | "WAIT",
+    "confidence": 0.0-1.0,
+    "thesis": "max 500 chars - why this action",
+    "invalidation_price": number or null,
+    "risk_notes": "what could go wrong",
+    "sources": ["url1", "url2"]
+}
+
+EXAMPLES:
+- High confidence LONG: Organic hype from multiple credible accounts, not coordinated
+- Low confidence LONG: Hype exists but feels forced/paid
+- WAIT: Mixed signals, unclear narrative
+- SHORT: Desperation posts, "buy the dip" cope, influencers dumping on followers
+"""
+
+# ==============================================================================
+# PERPLEXITY - FACT CHECKER 🔍
+# ==============================================================================
+
+PERPLEXITY_SYSTEM_PROMPT = """You are a skeptical fact-checker for crypto trading.
+
+ROLE: Verify news, find contradictions, check primary sources.
+
+YOUR PERSONALITY:
+- Skeptical and evidence-based
+- Bearish bias (you look for reasons NOT to trade)
+- You hate fake news and misleading headlines
+- You trust only primary sources
+
+FOCUS ON:
+- Primary sources only (Bloomberg, Reuters, official announcements, on-chain data)
+- Fake news detection (old news recycled, misleading headlines)
+- Contradictory information across sources
+- Institutional moves (ETF flows, exchange reserves, regulatory filings)
+- Timeline analysis (when did this happen? is it priced in?)
+- Headline vs content mismatch
+
+CRITICAL RULES:
+1. Be conservative - if unsure → "WAIT"
+2. Always include source URLs (primary only, no Twitter/Reddit)
+3. Flag: old news, unverified claims, headline mismatch
+4. Check: is this news already priced in?
+5. NEVER rely on secondary sources or rumors
+6. Verify on-chain data when mentioned
+
+OUTPUT FORMAT:
+You MUST respond with valid JSON:
+{
+    "action": "LONG" | "SHORT" | "WAIT",
+    "confidence": 0.0-1.0,
+    "thesis": "max 500 chars",
+    "invalidation_price": number or null,
+    "risk_notes": "what could go wrong",
+    "sources": ["primary_source_url1", "primary_source_url2"]
+}
+
+EXAMPLES:
+- WAIT: News is real but 3 hours old, likely priced in
+- SHORT: Verified bad news (SEC investigation, hack confirmed)
+- LONG: Confirmed institutional buying from primary source
+- Low confidence: Only secondary sources, can't verify
+"""
+
+# ==============================================================================
+# CLAUDE - RISK MANAGER 🛡️
+# ==============================================================================
+
+CLAUDE_SYSTEM_PROMPT = """You are a risk-focused analyst for crypto trading.
+
+ROLE: Identify what can go wrong and prevent stupid losses.
+
+YOUR PERSONALITY:
+- Cautious and paranoid (in a good way)
+- What-if thinker (always considering scenarios)
+- Neutral bias (neither bullish nor bearish, only risk-aware)
+- You sleep well at night because you manage risk properly
+
+FOCUS ON:
+- Risk scenarios (regulatory, technical, liquidity)
+- Market structure (funding rates, open interest, liquidation levels)
+- Technical invalidation levels (where does the thesis break?)
+- Position sizing recommendations based on risk/reward
+- Narrative sustainability (is this hype temporary or lasting?)
+- Overleveraged positions (longs or shorts)
+
+CRITICAL RULES:
+1. Be the voice of caution in the council
+2. ALWAYS provide invalidation_price (where thesis breaks)
+3. Consider: what if I'm wrong? What's the downside?
+4. Flag: low liquidity, high leverage, overleveraged positions
+5. Recommend max position size based on risk (usually 1-5%)
+6. Think about TIME: does this trade need to work fast or can it take weeks?
+
+OUTPUT FORMAT:
+You MUST respond with valid JSON:
+{
+    "action": "LONG" | "SHORT" | "WAIT" | "LONG_SMALL" | "SHORT_SMALL",
+    "confidence": 0.0-1.0,
+    "thesis": "max 500 chars",
+    "invalidation_price": REQUIRED - price where thesis breaks,
+    "risk_notes": "detailed: what could go wrong, position size, time limits",
+    "sources": ["url1", "url2"]
+}
+
+SPECIAL ACTIONS:
+- LONG_SMALL: bullish but risky, max 2% position
+- SHORT_SMALL: bearish but risky, max 2% position
+
+EXAMPLES:
+- LONG_SMALL: Good setup but funding rate high (overleveraged longs)
+- WAIT: Too much uncertainty, wait for confirmation
+- Invalidation: "If BTC drops below $95,200 (4H support), thesis breaks"
+"""
+
+# ==============================================================================
+# GEMINI - PATTERN ANALYST 🔬
+# ==============================================================================
+
+GEMINI_SYSTEM_PROMPT = """You are a scientific pattern analyst for crypto trading.
+
+ROLE: Find historical patterns and statistical edges.
+
+YOUR PERSONALITY:
+- Analytical and data-driven
+- Pattern-focused (you see history repeating)
+- Neutral bias (let the data speak)
+- You trust math and statistics over narratives
+
+FOCUS ON:
+- Historical pattern matching (similar past events)
+- Chart analysis (rising wedge, head & shoulders, support/resistance)
+- Statistical correlations (funding vs price, volume vs moves)
+- Regime detection (bull market, bear market, sideways)
+- Anomaly detection (unusual patterns that don't fit)
+- Success rate of similar setups in the past
+
+CRITICAL RULES:
+1. Back claims with historical examples (dates, outcomes)
+2. Provide statistical confidence (e.g., "worked 8/10 times")
+3. Avoid overfitting (don't see patterns where there are none)
+4. Consider: is this time different? (black swan events)
+5. Use chart analysis when relevant
+6. Think probabilistically (nothing is 100%)
+
+OUTPUT FORMAT:
+You MUST respond with valid JSON:
+{
+    "action": "LONG" | "SHORT" | "WAIT",
+    "confidence": 0.0-1.0,
+    "thesis": "max 500 chars - include historical examples and stats",
+    "invalidation_price": number or null,
+    "risk_notes": "what could invalidate the pattern",
+    "sources": ["data source 1", "historical example 1"]
+}
+
+EXAMPLES:
+- HIGH confidence: "This setup matches 3 past cases (2024-03-15, 2024-07-22, 2025-11-03), all resulted in 5-8% drop within 24h. Pattern: weekend pump + low volume + funding >0.1%. Success rate: 8/10."
+- LOW confidence: "Similar pattern exists but only 2 historical cases, not statistically significant"
+- WAIT: "Current market regime (sideways) doesn't match historical pattern (bull market)"
+"""
+
+# ==============================================================================
+# USER PROMPT TEMPLATE (для всіх агентів)
+# ==============================================================================
+
+USER_PROMPT_TEMPLATE = """
+# Market Event Detected
+
+## Event Type
+{event_type}
+
+## Pair
+{pair}
+
+## Market Data
+{market_data}
+
+## Recent News (if available)
+{news}
+
+## Technical Indicators
+{indicators}
+
+## Your Task
+Analyze this event and provide a trading recommendation.
+
+Consider:
+1. Is this a genuine opportunity or just noise?
+2. What's the risk/reward ratio?
+3. What could invalidate this thesis?
+4. How does this fit into the current market context?
+
+Remember your role and personality.
+Respond ONLY with valid JSON matching the Signal schema.
+No preamble, no markdown, just pure JSON.
+"""
+
+# ==============================================================================
+# HELPER FUNCTIONS
+# ==============================================================================
+
+def get_agent_prompt(agent_name: str) -> str:
+    """
+    Отримати системний промпт для конкретного агента
+    
+    Args:
+        agent_name: "grok" | "perplexity" | "claude" | "gemini"
+    
+    Returns:
+        Системний промпт
+    """
+    prompts = {
+        "grok": GROK_SYSTEM_PROMPT,
+        "perplexity": PERPLEXITY_SYSTEM_PROMPT,
+        "claude": CLAUDE_SYSTEM_PROMPT,
+        "gemini": GEMINI_SYSTEM_PROMPT
+    }
+    
+    return prompts.get(agent_name.lower(), "")
+
+
+def format_user_prompt(
+    event_type: str,
+    pair: str,
+    market_data: dict,
+    news: str = "No recent news available",
+    indicators: dict = None
+) -> str:
+    """
+    Форматує user prompt з даними
+    
+    Args:
+        event_type: Тип події ("price_spike", "whale_transfer", etc.)
+        pair: Торгова пара ("BTC/USDT")
+        market_data: Дані про подію
+        news: Останні новини (опціонально)
+        indicators: Технічні індикатори (опціонально)
+    
+    Returns:
+        Відформатований промпт
+    """
+    import json
+    
+    if indicators is None:
+        indicators = {}
+    
+    return USER_PROMPT_TEMPLATE.format(
+        event_type=event_type,
+        pair=pair,
+        market_data=json.dumps(market_data, indent=2),
+        news=news,
+        indicators=json.dumps(indicators, indent=2)
+    )
+
+
+# ==============================================================================
+# ТЕСТ
+# ==============================================================================
+
+if __name__ == "__main__":
+    print("🧪 Testing prompts...")
+    
+    # Тест 1: Отримання промптів
+    for agent in ["grok", "perplexity", "claude", "gemini"]:
+        prompt = get_agent_prompt(agent)
+        print(f"\n✅ {agent.upper()}: {len(prompt)} characters")
+        print(f"   First 100 chars: {prompt[:100]}...")
+    
+    # Тест 2: Форматування user prompt
+    test_prompt = format_user_prompt(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        market_data={"price_change": 5.2, "volume": 1_000_000},
+        news="Bitcoin surges on institutional buying",
+        indicators={"rsi": 78, "macd": "bullish"}
+    )
+    
+    print(f"\n✅ User prompt formatted: {len(test_prompt)} characters")
+    print(test_prompt[:200] + "...")
+    
+    print("\n🎉 All prompts loaded successfully!")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/config/settings.py
+================================================================
+
+"""
+Налаштування проєкту
+Читає значення з .env файлу
+"""
+
+import os
+from pathlib import Path
+from pydantic_settings import BaseSettings
+from typing import Optional
+
+
+class Settings(BaseSettings):
+    """Налаштування додатку з environment variables"""
+    
+    # ===== БІРЖА =====
+    BINANCE_API_KEY: str
+    BINANCE_API_SECRET: str
+    BINANCE_TESTNET: bool = True
+    
+    # ===== AI APIs =====
+    ANTHROPIC_API_KEY: str
+    OPENAI_API_KEY: str
+    GEMINI_API_KEY: str
+    
+    # ===== TELEGRAM =====
+    TELEGRAM_BOT_TOKEN: str
+    TELEGRAM_CHAT_ID: str
+    
+    # ===== РИЗИК-МЕНЕДЖМЕНТ =====
+    MAX_POSITION_SIZE: float = 0.05
+    MAX_DAILY_LOSS: float = 0.02
+    MIN_LIQUIDITY: float = 1_000_000
+    MAX_VOLATILITY: float = 0.10
+    
+    # ===== ШЛЯХИ ДО ФАЙЛІВ =====
+    JOURNAL_PATH: Path = Path("data/trades.json")
+    LOG_LEVEL: str = "INFO"
+    
+    # ===== ПАРИ ДЛЯ МОНІТОРИНГУ =====
+    WATCH_PAIRS: list[str] = ["BTC/USDT", "ETH/USDT", "SOL/USDT"]
+    
+    # ===== ПОРОГИ ДЛЯ ДЕТЕКТОРІВ =====
+    PRICE_SPIKE_THRESHOLD: float = 0.02
+    WHALE_THRESHOLD: float = 1_000_000
+    FUNDING_RATE_EXTREME: float = 0.001
+    
+    # ===== ВАГИ ДЛЯ АГЕНТІВ =====
+    COUNCIL_WEIGHTS: dict = {
+        "grok": 0.25,
+        "perplexity": 0.25,
+        "claude": 0.25,
+        "gemini": 0.25
+    }
+    
+    class Config:
+        """Конфігурація Pydantic"""
+        env_file = ".env"
+        case_sensitive = True
+
+
+# Створюємо глобальний об'єкт settings
+settings = Settings()
+
+# Створюємо папки
+settings.JOURNAL_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+# Виводимо підтвердження
+print("✅ Settings loaded successfully!")
+print(f"📊 Watching pairs: {settings.WATCH_PAIRS}")
+print(f"🛡️ Max position size: {settings.MAX_POSITION_SIZE * 100}%")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/requirements.txt
+================================================================
+
+# Основні залежності
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Біржа та ринкові дані
+ccxt>=4.5.0  # 🧒 >= означає "4.5.0 або новіша"
+python-binance==1.0.19
+
+# AI/LLM APIs
+anthropic>=0.18.0
+openai>=1.12.0
+google-genai>=0.3.0
+
+# Обробка даних
+pandas>=2.1.0
+numpy>=1.26.0
+
+# Повідомлення
+python-telegram-bot>=20.7
+
+# Асинхронність
+aiohttp>=3.9.0
+
+# Structured output
+instructor>=0.4.0
+
+# Логування
+loguru>=0.7.0
+
+# Тестування
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/setup.py
+================================================================
+
+"""
+Setup file для встановлення проєкту як пакету
+"""
+
+from setuptools import setup, find_packages
+
+setup(
+    name="trading-council-bot",
+    version="0.1.0",
+    
+    # 🔧 ФІКС: Каже де шукати пакети
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
+    
+    # 🔧 ФІКС: Оновлена залежність для Gemini
+    install_requires=[
+        "python-dotenv>=1.0.0",
+        "pydantic>=2.5.0",
+        "pydantic-settings>=2.1.0",
+        "ccxt>=4.5.0",
+        "anthropic>=0.18.0",
+        "openai>=1.12.0",
+        "google-genai>=0.3.0",  # 🔧 ЗМІНИЛИ: було google-generativeai
+        "instructor>=0.4.0",
+        "pytest>=7.4.0",
+        "pytest-asyncio>=0.21.0",
+    ],
+    
+    python_requires=">=3.10",
+)
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/aggregator.py
+================================================================
+
+"""
+Aggregator - об'єднує сигнали від всіх агентів
+Це НЕ AI, а детермінований Python код
+
+🧒 ЧОМУ НЕ AI:
+- Transparent (зрозумілий алгоритм)
+- Fast (< 1ms)
+- No hallucinations
+- Free (без API costs)
+"""
+
+from models.schemas import Signal, CouncilResponse, MarketEvent
+from typing import Dict, List, Literal, Tuple
+from datetime import datetime
+import hashlib
+
+
+class Aggregator:
+    """
+    Агрегатор сигналів від ради AI агентів
+    
+    🧒 ЩО РОБИТЬ:
+    1. Збирає сигнали від всіх 4 агентів
+    2. Рахує consensus (голосування)
+    3. Рахує combined confidence (зважена середня)
+    4. Визначає invalidation price
+    5. Збирає всі ризики
+    6. Генерує рекомендацію
+    """
+    
+    def __init__(self, weights: dict = None):
+        """
+        Ініціалізація агрегатора
+        
+        Args:
+            weights: Ваги для агентів (за замовчуванням рівні)
+        """
+        self.weights = weights or {
+            "grok": 0.25,
+            "perplexity": 0.25,
+            "claude": 0.25,
+            "gemini": 0.25
+        }
+        
+        # Перевіряємо що ваги в сумі дають 1.0
+        total = sum(self.weights.values())
+        assert abs(total - 1.0) < 0.01, f"Weights must sum to 1.0, got {total}"
+    
+    def aggregate(
+        self,
+        event: MarketEvent,
+        grok: Signal,
+        perplexity: Signal,
+        claude: Signal,
+        gemini: Signal,
+        prompt_hash: str
+    ) -> CouncilResponse:
+        """
+        Об'єднує сигнали від всіх агентів
+        
+        Args:
+            event: Подія що тригернула аналіз
+            grok: Сигнал від Grok
+            perplexity: Сигнал від Perplexity
+            claude: Сигнал від Claude
+            gemini: Сигнал від Gemini
+            prompt_hash: Hash промптів для auditability
+        
+        Returns:
+            CouncilResponse з консенсусом та рекомендацією
+        """
+        
+        signals = {
+            "grok": grok,
+            "perplexity": perplexity,
+            "claude": claude,
+            "gemini": gemini
+        }
+        
+        # 1. Визначаємо consensus
+        consensus, strength = self._calculate_consensus(signals)
+        
+        # 2. Рахуємо combined confidence
+        combined_conf = self._calculate_combined_confidence(signals)
+        
+        # 3. Збираємо всі ризики
+        key_risks = self._collect_risks(signals)
+        
+        # 4. Визначаємо invalidation price
+        invalidation = self._calculate_invalidation_price(signals, consensus)
+        
+        # 5. Генеруємо рекомендацію
+        recommendation = self._generate_recommendation(
+            consensus, 
+            strength, 
+            combined_conf,
+            invalidation,
+            signals
+        )
+        
+        # Створюємо відповідь
+        return CouncilResponse(
+            timestamp=datetime.now(),
+            event_type=event.event_type,
+            pair=event.pair,
+            grok=grok,
+            perplexity=perplexity,
+            claude=claude,
+            gemini=gemini,
+            consensus=consensus,
+            consensus_strength=strength,
+            combined_confidence=combined_conf,
+            key_risks=key_risks,
+            invalidation_price=invalidation,
+            recommendation=recommendation,
+            prompt_hash=prompt_hash
+        )
+    
+    def _calculate_consensus(
+        self, 
+        signals: Dict[str, Signal]
+    ) -> Tuple[Literal["LONG", "SHORT", "WAIT", "CONFLICT"], 
+               Literal["UNANIMOUS", "STRONG", "WEAK", "NONE"]]:
+        """
+        Рахує consensus через голосування
+        
+        Returns:
+            (consensus_action, consensus_strength)
+        
+        🧒 ПРАВИЛА:
+        - 4/4 = UNANIMOUS (всі згодні)
+        - 3/4 = STRONG (сильна більшість)
+        - 2/4 = WEAK (слабка більшість)
+        - 1/4 або розділені = CONFLICT → WAIT (безпечно)
+        """
+        
+        # Рахуємо голоси
+        votes = {"LONG": 0, "SHORT": 0, "WAIT": 0}
+        
+        for signal in signals.values():
+            votes[signal.action] += 1
+        
+        # Знаходимо переможця
+        max_votes = max(votes.values())
+        winners = [action for action, count in votes.items() if count == max_votes]
+        
+        # Визначаємо consensus
+        if len(winners) > 1:
+            # Розділені голоси - конфлікт → БЕЗПЕЧНИЙ WAIT
+            return "WAIT", "NONE"  # 🔧 ФІКС: одразу повертаємо WAIT
+        
+        consensus = winners[0]
+        
+        # Визначаємо силу
+        if max_votes == 4:
+            strength = "UNANIMOUS"
+        elif max_votes == 3:
+            strength = "STRONG"
+        elif max_votes == 2:
+            strength = "WEAK"
+        else:
+            strength = "NONE"
+        
+        return consensus, strength
+    
+    def _calculate_combined_confidence(self, signals: Dict[str, Signal]) -> float:
+        """
+        Рахує зважену середню confidence
+        
+        Returns:
+            Combined confidence (0.0-1.0)
+        
+        🧒 ФОРМУЛА:
+        grok * 0.25 + perp * 0.25 + claude * 0.25 + gemini * 0.25
+        """
+        combined = 0.0
+        
+        for name, signal in signals.items():
+            weight = self.weights.get(name, 0.25)
+            combined += signal.confidence * weight
+        
+        return round(combined, 2)
+    
+    def _collect_risks(self, signals: Dict[str, Signal]) -> List[str]:
+        """
+        Збирає всі унікальні ризики від агентів
+        
+        Returns:
+            Список ризиків
+        """
+        risks = []
+        
+        for name, signal in signals.items():
+            if signal.risk_notes and signal.risk_notes not in risks:
+                # Додаємо з префіксом агента
+                risk = f"[{name.upper()}] {signal.risk_notes}"
+                risks.append(risk)
+        
+        return risks
+    
+    def _calculate_invalidation_price(
+        self, 
+        signals: Dict[str, Signal],
+        consensus: str
+    ) -> float:
+        """
+        Визначає invalidation price
+        
+        🧒 ЛОГІКА:
+        - LONG → бере МАКСИМАЛЬНИЙ invalidation (найобережніший)
+        - SHORT → бере МІНІМАЛЬНИЙ invalidation (найобережніший)
+        - WAIT/CONFLICT → None
+        """
+        
+        if consensus in ["WAIT", "CONFLICT"]:
+            return None
+        
+        # Збираємо всі invalidation prices
+        prices = [
+            s.invalidation_price 
+            for s in signals.values() 
+            if s.invalidation_price is not None
+        ]
+        
+        if not prices:
+            return None
+        
+        # LONG → максимальний (найвищий stop-loss)
+        # SHORT → мінімальний (найнижчий stop-loss)
+        if consensus == "LONG":
+            return max(prices)
+        else:  # SHORT
+            return min(prices)
+    
+    def _generate_recommendation(
+        self,
+        consensus: str,
+        strength: str,
+        confidence: float,
+        invalidation: float,
+        signals: Dict[str, Signal]
+    ) -> dict:
+        """
+        Генерує структуровану рекомендацію
+        
+        Returns:
+            Dict з рекомендацією
+        """
+        
+        # Базова рекомендація
+        rec = {
+            "action": consensus,
+            "strength": strength,
+            "confidence": confidence
+        }
+        
+        # Якщо WAIT або CONFLICT - тільки базова інфа
+        if consensus in ["WAIT", "CONFLICT"]:
+            rec["reason"] = "Insufficient consensus or high uncertainty"
+            return rec
+        
+        # Для LONG/SHORT додаємо деталі
+        rec["invalidation_price"] = invalidation
+        
+        # Position sizing на основі strength + confidence
+        if strength == "UNANIMOUS" and confidence >= 0.8:
+            max_position = 0.05  # 5% (максимум)
+        elif strength == "STRONG" and confidence >= 0.7:
+            max_position = 0.03  # 3%
+        elif strength in ["STRONG", "WEAK"] and confidence >= 0.6:
+            max_position = 0.02  # 2%
+        else:
+            max_position = 0.01  # 1% (мінімум)
+        
+        rec["max_position_size"] = max_position
+        
+        # Збираємо ключові insights
+        insights = []
+        for name, signal in signals.items():
+            if signal.action == consensus:
+                # Якщо агент згоден з консенсусом - додаємо його thesis
+                insight = f"{name.upper()}: {signal.thesis[:100]}"
+                insights.append(insight)
+        
+        rec["key_insights"] = insights
+        
+        return rec
+
+
+# ==============================================================================
+# ТЕСТУВАННЯ
+# ==============================================================================
+
+if __name__ == "__main__":
+    print("🧪 Testing Aggregator...")
+    
+    # Створюємо тестові сигнали
+    grok_signal = Signal(
+        action="LONG",
+        confidence=0.85,
+        thesis="Massive FOMO on X, retail buying heavily",
+        invalidation_price=95000,
+        risk_notes="Could be fake hype",
+        sources=["https://x.com/example"]
+    )
+    
+    perp_signal = Signal(
+        action="WAIT",
+        confidence=0.4,
+        thesis="Can't verify the news from primary sources",
+        invalidation_price=None,
+        risk_notes="Unverified information",
+        sources=[]
+    )
+    
+    claude_signal = Signal(
+        action="LONG",
+        confidence=0.6,
+        thesis="Risk/reward is acceptable if stop at $95k",
+        invalidation_price=95000,
+        risk_notes="High volatility, small position recommended",
+        sources=[]
+    )
+    
+    gemini_signal = Signal(
+        action="LONG",
+        confidence=0.75,
+        thesis="Similar pattern in March 2024 led to +12% move",
+        invalidation_price=94500,
+        risk_notes="Pattern could fail if volume drops",
+        sources=["https://tradingview.com/example"]
+    )
+    
+    # Створюємо тестову подію
+    test_event = MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.8,
+        data={"price_change": 5.2}
+    )
+    
+    # Створюємо aggregator
+    agg = Aggregator()
+    
+    # Агрегуємо
+    response = agg.aggregate(
+        event=test_event,
+        grok=grok_signal,
+        perplexity=perp_signal,
+        claude=claude_signal,
+        gemini=gemini_signal,
+        prompt_hash="test_hash_123"
+    )
+    
+    # Перевірки
+    print(f"\n✅ Aggregation complete:")
+    print(f"   Consensus: {response.consensus} ({response.consensus_strength})")
+    print(f"   Combined confidence: {response.combined_confidence:.0%}")
+    print(f"   Votes: LONG=3, WAIT=1 → Should be STRONG")
+    assert response.consensus == "LONG"
+    assert response.consensus_strength == "STRONG"
+    
+    print(f"\n   Invalidation: ${response.invalidation_price}")
+    print(f"   Should be max(95000, 94500) = 95000 for LONG")
+    assert response.invalidation_price == 95000
+    
+    print(f"\n   Key risks ({len(response.key_risks)}):")
+    for risk in response.key_risks:
+        print(f"      - {risk[:60]}...")
+    
+    print(f"\n   Recommendation:")
+    print(f"      Action: {response.recommendation['action']}")
+    print(f"      Max position: {response.recommendation['max_position_size']:.1%}")
+    
+    print("\n🎉 All Aggregator tests passed!")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/base_agent.py
+================================================================
+
+"""
+Базовий клас для всіх AI агентів
+Всі агенти (Grok, Perplexity, Claude, Gemini) наслідуються від BaseAgent
+"""
+
+from abc import ABC, abstractmethod
+from models.schemas import Signal, MarketEvent
+import hashlib
+import json
+from typing import Optional
+
+
+class BaseAgent(ABC):
+    """
+    Абстрактний базовий клас для агентів ради
+    
+    🧒 ЩО ЦЕ:
+    - ABC = Abstract Base Class (абстрактний базовий клас)
+    - "Абстрактний" означає що цей клас - це шаблон, а не готовий агент
+    - Всі агенти (Claude, Grok, Gemini, Perplexity) будуть створені за цим шаблоном
+    
+    🧒 АНАЛОГІЯ:
+    - Це як форма для печива - сама форма не є печивом
+    - Але з неї можна зробити багато печив (агентів)
+    """
+    
+    def __init__(self, api_key: str, name: str):
+        """
+        Ініціалізація агента
+        
+        Args:
+            api_key: API ключ для AI сервісу
+            name: Ім'я агента ("Grok", "Claude", etc.)
+        """
+        self.api_key = api_key
+        self.name = name
+    
+    @abstractmethod
+    def analyze(self, event: MarketEvent, context: dict) -> Signal:
+        """
+        Аналізує подію на ринку та повертає сигнал
+        
+        Args:
+            event: Подія на ринку (MarketEvent)
+            context: Додатковий контекст (новини, індикатори, тощо)
+        
+        Returns:
+            Signal з рекомендацією
+        
+        🧒 ПОЯСНЕННЯ:
+        - @abstractmethod = "абстрактний метод"
+        - Це означає: кожен агент ОБОВ'ЯЗКОВО має реалізувати цей метод
+        - Прибрали async - буде sync для простоти
+        """
+        pass
+    
+    def hash_prompt(self, prompt: str) -> str:
+        """
+        Генерує SHA256 hash промпту для auditability
+        
+        Args:
+            prompt: Текст промпту
+        
+        Returns:
+            Hex string з hash
+        """
+        return hashlib.sha256(prompt.encode()).hexdigest()
+    
+    def validate_output(self, output: dict) -> Signal:
+        """
+        Перевіряє що вивід LLM відповідає схемі Signal
+        
+        Args:
+            output: Словник з відповіддю LLM
+        
+        Returns:
+            Валідний Signal або fallback Signal якщо помилка
+        """
+        try:
+            # Спробувати створити Signal з output
+            return Signal(**output)
+        except Exception as e:
+            # Якщо помилка - повернути безпечний fallback
+            print(f"⚠️ {self.name} output validation failed: {e}")
+            return Signal(
+                action="WAIT",
+                confidence=0.0,
+                thesis=f"Parse error in {self.name}",  # 🔧 ФІКС: коротка thesis
+                risk_notes="Technical error in agent",
+                sources=[]
+            )
+    
+    def extract_json_from_response(self, response_text: str) -> dict:
+        """
+        Витягує JSON з відповіді LLM
+        
+        Args:
+            response_text: Текст відповіді від LLM
+        
+        Returns:
+            Словник з JSON
+        """
+        # Видалити markdown code blocks якщо є
+        text = response_text.strip()
+        
+        if text.startswith("```json"):
+            text = text.replace("```json", "").replace("```", "").strip()
+        elif text.startswith("```"):
+            text = text.replace("```", "").strip()
+        
+        # Знайти перший { та останній }
+        start = text.find("{")
+        end = text.rfind("}") + 1
+        
+        if start != -1 and end > start:
+            json_text = text[start:end]
+            try:
+                return json.loads(json_text)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Invalid JSON: {e}")
+        else:
+            raise ValueError("No JSON found in response")
+    
+    def format_context(self, context: dict) -> str:
+        """
+        Форматує context в читабельний текст
+        
+        Args:
+            context: Словник з контекстом
+        
+        Returns:
+            Відформатований текст
+        """
+        formatted = []
+        
+        for key, value in context.items():
+            if isinstance(value, dict):
+                formatted.append(f"{key.upper()}:")
+                for k, v in value.items():
+                    formatted.append(f"  - {k}: {v}")
+            else:
+                formatted.append(f"{key.upper()}: {value}")
+        
+        return "\n".join(formatted)
+    
+    def __repr__(self) -> str:
+        """Строкове представлення агента"""
+        return f"{self.__class__.__name__}(name={self.name})"
+
+
+# ==============================================================================
+# ТЕСТУВАННЯ
+# ==============================================================================
+
+if __name__ == "__main__":
+    print("🧪 Testing BaseAgent...")
+    
+    # Створимо тестовий агент
+    class TestAgent(BaseAgent):
+        """Тестовий агент для перевірки BaseAgent"""
+        
+        def analyze(self, event: MarketEvent, context: dict) -> Signal:
+            """Проста реалізація для тесту"""
+            return Signal(
+                action="WAIT",
+                confidence=0.5,
+                thesis="Test analysis",
+                risk_notes="Test risk",
+                sources=[]
+            )
+    
+    # Тест 1: Створення агента
+    agent = TestAgent(api_key="test_key", name="TestAgent")
+    print(f"✅ Agent created: {agent}")
+    
+    # Тест 2: Hash промпту
+    hash1 = agent.hash_prompt("Hello World")
+    hash2 = agent.hash_prompt("Hello World!")
+    print(f"✅ Hash test:")
+    print(f"   'Hello World':  {hash1[:16]}...")
+    print(f"   'Hello World!': {hash2[:16]}...")
+    print(f"   Are different: {hash1 != hash2}")
+    
+    # Тест 3: Валідація output
+    valid_output = {
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis",
+        "risk_notes": "Test risk",
+        "sources": ["https://example.com"]
+    }
+    signal = agent.validate_output(valid_output)
+    print(f"✅ Valid output: {signal.action} ({signal.confidence})")
+    
+    # Тест 4: Невалідний output (fallback)
+    invalid_output = {"invalid": "data"}
+    fallback_signal = agent.validate_output(invalid_output)
+    print(f"✅ Invalid output fallback: {fallback_signal.action}")
+    print(f"   Thesis length: {len(fallback_signal.thesis)} chars (must be <500)")
+    
+    # Тест 5: Витяг JSON з тексту
+    messy_response = """
+    Here's my analysis:
+    ```json
+    {"action": "LONG", "confidence": 0.7, "thesis": "Good setup", "risk_notes": "Some risk", "sources": []}
+    ```
+    """
+    extracted = agent.extract_json_from_response(messy_response)
+    print(f"✅ JSON extracted: {extracted['action']}")
+    
+    print("\n🎉 All BaseAgent tests passed!")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/claude_agent.py
+================================================================
+
+"""
+Claude Agent - Risk Manager 🛡️
+Фокусується на управлінні ризиками та виявленні проблем
+"""
+
+import json
+from anthropic import Anthropic
+from council.base_agent import BaseAgent
+from models.schemas import Signal, MarketEvent
+from config.prompts import CLAUDE_SYSTEM_PROMPT, format_user_prompt
+import instructor
+from typing import Optional
+
+
+class ClaudeAgent(BaseAgent):
+    """
+    Claude як менеджер ризиків
+    
+    🧒 ЩО ЦЕ:
+    - Наслідується від BaseAgent
+    - Використовує Anthropic SDK
+    - Instructor для structured output
+    - Sync версія (без async) для простоти тестування
+    """
+    
+    def __init__(self, api_key: str):
+        """
+        Ініціалізація Claude агента
+        
+        Args:
+            api_key: Anthropic API ключ
+        """
+        super().__init__(api_key, "Claude")
+        
+        # Створюємо клієнта Anthropic
+        self.client = Anthropic(api_key=api_key)
+        
+        # Патчимо instructor'ом для structured output
+        self.client = instructor.from_anthropic(self.client)
+    
+    def analyze(self, event: MarketEvent, context: dict) -> Signal:
+        """
+        Аналізує подію з фокусом на ризики
+        
+        Args:
+            event: Подія на ринку
+            context: Додатковий контекст
+        
+        Returns:
+            Signal з рекомендацією
+        
+        🔧 ФІКС: Sync метод (без async) для простоти
+        """
+        
+        # Формуємо user prompt
+        user_prompt = format_user_prompt(
+            event_type=event.event_type,
+            pair=event.pair,
+            market_data=event.data,
+            news=context.get('news', 'No recent news'),
+            indicators=context.get('indicators', {})
+        )
+        
+        try:
+            # Викликаємо Claude API (sync)
+            response = self.client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1000,
+                system=CLAUDE_SYSTEM_PROMPT,
+                messages=[
+                    {"role": "user", "content": user_prompt}
+                ],
+                response_model=Signal  # Instructor примусить Signal схему
+            )
+            
+            # Instructor повертає готовий Signal!
+            return response
+            
+        except Exception as e:
+            # Fallback з короткою thesis
+            print(f"❌ Claude analysis failed: {e}")
+            
+            return Signal(
+                action="WAIT",
+                confidence=0.0,
+                thesis="Analysis error",  # 🔧 ФІКС: коротка thesis
+                risk_notes="Technical error",
+                sources=[]
+            )
+    
+    def test_connection(self) -> bool:
+        """
+        Тестує з'єднання з Anthropic API
+        
+        Returns:
+            True якщо API працює
+        """
+        try:
+            # Простий тестовий запит
+            response = self.client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=50,
+                messages=[
+                    {"role": "user", "content": "Reply with: OK"}
+                ]
+            )
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ Claude connection test failed: {e}")
+            return False
+
+
+# ==============================================================================
+# ТЕСТУВАННЯ
+# ==============================================================================
+
+if __name__ == "__main__":
+    print("🧪 Testing ClaudeAgent...")
+    
+    # УВАГА: Для тесту потрібен справжній API ключ!
+    from config.settings import settings
+    
+    # Перевіряємо чи є API ключ
+    if "fake" in settings.ANTHROPIC_API_KEY.lower():
+        print("⚠️ Cannot test: ANTHROPIC_API_KEY is fake")
+        print("   To test, add real API key to .env")
+        print("\n💡 For mock testing, run: pytest tests/test_claude_agent.py")
+        exit(0)
+    
+    # Створюємо агента
+    claude = ClaudeAgent(api_key=settings.ANTHROPIC_API_KEY)
+    print(f"✅ ClaudeAgent created: {claude}")
+    
+    # Тест 1: Перевірка з'єднання
+    print("\n🔗 Testing API connection...")
+    if claude.test_connection():
+        print("✅ Connection successful!")
+    else:
+        print("❌ Connection failed")
+        exit(1)
+    
+    # Тест 2: Тестовий аналіз
+    print("\n🧪 Testing analysis...")
+    
+    # Створюємо тестову подію
+    test_event = MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.8,
+        data={
+            "price_change": 5.2,
+            "current_price": 96500,
+            "volume": 2_500_000_000,
+            "timeframe": "15min"
+        }
+    )
+    
+    test_context = {
+        "news": "Bitcoin surges on institutional buying rumors",
+        "indicators": {
+            "rsi": 78,
+            "macd": "bullish",
+            "funding_rate": 0.08
+        }
+    }
+    
+    # Запускаємо аналіз (sync)
+    signal = claude.analyze(test_event, test_context)
+    
+    print(f"\n✅ Analysis complete:")
+    print(f"   Action: {signal.action}")
+    print(f"   Confidence: {signal.confidence:.0%}")
+    print(f"   Thesis: {signal.thesis[:100]}...")
+    print(f"   Invalidation: ${signal.invalidation_price}")
+    print(f"   Risks: {signal.risk_notes[:100]}...")
+    
+    print("\n🎉 ClaudeAgent test complete!")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/gemini_agent.py
+================================================================
+
+"""
+Gemini Agent - Pattern Analyst 🔬
+Шукає історичні паттерни та статистичні закономірності
+"""
+
+from google import genai  # 🔧 ФІКС: Новий SDK
+from google.genai import types
+from council.base_agent import BaseAgent
+from models.schemas import Signal, MarketEvent
+from config.prompts import GEMINI_SYSTEM_PROMPT, format_user_prompt
+import json
+
+
+class GeminiAgent(BaseAgent):
+    """
+    Gemini як аналітик паттернів
+    
+    🧒 ЩО ЦЕ:
+    - Фокус: Історичні паттерни, статистика, графіки
+    - Особистість: Аналітичний, data-driven
+    - API: Google Gemini (новий SDK)
+    """
+    
+    def __init__(self, api_key: str):
+        """
+        Ініціалізація Gemini агента
+        
+        Args:
+            api_key: Google AI Studio API ключ
+        """
+        super().__init__(api_key, "Gemini")
+        
+        # 🔧 ФІКС: Новий спосіб ініціалізації
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = "gemini-2.0-flash-exp"
+    
+    def analyze(self, event: MarketEvent, context: dict) -> Signal:
+        """
+        Аналізує подію з фокусом на паттерни
+        
+        Args:
+            event: Подія на ринку
+            context: Контекст (історичні дані)
+        
+        Returns:
+            Signal з рекомендацією
+        """
+        
+        # Формуємо prompt
+        user_prompt = format_user_prompt(
+            event_type=event.event_type,
+            pair=event.pair,
+            market_data=event.data,
+            news=context.get('news', 'No recent news'),
+            indicators=context.get('indicators', {})
+        )
+        
+        # Додаємо інструкцію для JSON
+        full_prompt = f"""{GEMINI_SYSTEM_PROMPT}
+
+{user_prompt}
+
+Respond ONLY with valid JSON matching this exact structure (no markdown, no preamble):
+{{
+    "action": "LONG" | "SHORT" | "WAIT",
+    "confidence": 0.0-1.0,
+    "thesis": "max 500 chars with historical examples",
+    "invalidation_price": number or null,
+    "risk_notes": "what could invalidate the pattern",
+    "sources": ["url1", "url2"]
+}}"""
+        
+        try:
+            # 🔧 ФІКС: Новий спосіб виклику API
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=full_prompt
+            )
+            
+            # Витягуємо текст
+            response_text = response.text
+            
+            # Витягуємо JSON з відповіді
+            json_data = self.extract_json_from_response(response_text)
+            
+            # Валідуємо
+            return self.validate_output(json_data)
+            
+        except Exception as e:
+            print(f"❌ Gemini analysis failed: {e}")
+            
+            return Signal(
+                action="WAIT",
+                confidence=0.0,
+                thesis="Gemini analysis error",
+                risk_notes="Technical error",
+                sources=[]
+            )
+    
+    def test_connection(self) -> bool:
+        """Тестує з'єднання з Gemini API"""
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents="Reply with: OK"
+            )
+            return "OK" in response.text
+        except Exception as e:
+            print(f"❌ Gemini connection test failed: {e}")
+            return False
+
+
+# ==============================================================================
+# ТЕСТУВАННЯ
+# ==============================================================================
+
+if __name__ == "__main__":
+    print("🧪 Testing GeminiAgent...")
+    
+    from config.settings import settings
+    
+    # Перевіряємо API ключ
+    if "fake" in settings.GEMINI_API_KEY.lower():
+        print("⚠️ Cannot test: GEMINI_API_KEY is fake")
+        print("   To test, add real Google AI Studio key to .env")
+        print("\n💡 Get free key: https://aistudio.google.com/apikey")
+        print("   For mock testing, run: pytest tests/")
+        exit(0)
+    
+    # Створюємо агента
+    gemini = GeminiAgent(api_key=settings.GEMINI_API_KEY)
+    print(f"✅ GeminiAgent created: {gemini}")
+    
+    # Тест з'єднання
+    print("\n🔗 Testing API connection...")
+    if gemini.test_connection():
+        print("✅ Connection successful!")
+    else:
+        print("❌ Connection failed")
+        exit(1)
+    
+    # Тестовий аналіз
+    print("\n🧪 Testing analysis...")
+    
+    test_event = MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.75,
+        data={
+            "price_change": 4.2,
+            "current_price": 97000,
+            "volume": 3_000_000_000,
+            "pattern": "rising wedge"
+        }
+    )
+    
+    test_context = {
+        "news": "Similar pattern seen in March 2024",
+        "indicators": {
+            "rsi": 72,
+            "volume_profile": "decreasing",
+            "historical_success_rate": 0.75
+        }
+    }
+    
+    signal = gemini.analyze(test_event, test_context)
+    
+    print(f"\n✅ Analysis complete:")
+    print(f"   Action: {signal.action}")
+    print(f"   Confidence: {signal.confidence:.0%}")
+    print(f"   Thesis: {signal.thesis[:100]}...")
+    
+    print("\n🎉 GeminiAgent test complete!")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/grok_agent.py
+================================================================
+
+"""
+Grok Agent - Sentiment Hunter 🔥
+Ловить хайп та FOMO на X (Twitter)
+"""
+
+from openai import OpenAI
+from council.base_agent import BaseAgent
+from models.schemas import Signal, MarketEvent
+from config.prompts import GROK_SYSTEM_PROMPT, format_user_prompt
+import instructor
+import json
+
+
+class GrokAgent(BaseAgent):
+    """
+    Grok як мисливець за sentiment
+    
+    🧒 ЩО ЦЕ:
+    - Фокус: X/Twitter trending, memes, retail FOMO
+    - Особистість: Агресивний, bullish bias
+    - API: xAI через OpenAI SDK
+    """
+    
+    def __init__(self, api_key: str):
+        """
+        Ініціалізація Grok агента
+        
+        Args:
+            api_key: xAI API ключ
+        """
+        super().__init__(api_key, "Grok")
+        
+        # Створюємо OpenAI клієнта для xAI
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.x.ai/v1"  # xAI endpoint
+        )
+        
+        # Патчимо instructor'ом
+        self.client = instructor.from_openai(self.client)
+    
+    def analyze(self, event: MarketEvent, context: dict) -> Signal:
+        """
+        Аналізує подію з фокусом на sentiment
+        
+        Args:
+            event: Подія на ринку
+            context: Контекст (новини, тренди)
+        
+        Returns:
+            Signal з рекомендацією
+        """
+        
+        # Формуємо prompt
+        user_prompt = format_user_prompt(
+            event_type=event.event_type,
+            pair=event.pair,
+            market_data=event.data,
+            news=context.get('news', 'No recent news'),
+            indicators=context.get('indicators', {})
+        )
+        
+        try:
+            # Викликаємо Grok API
+            response = self.client.chat.completions.create(
+                model="grok-beta",  # xAI model
+                messages=[
+                    {"role": "system", "content": GROK_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt}
+                ],
+                response_model=Signal,
+                max_tokens=1000
+            )
+            
+            return response
+            
+        except Exception as e:
+            print(f"❌ Grok analysis failed: {e}")
+            
+            return Signal(
+                action="WAIT",
+                confidence=0.0,
+                thesis="Grok analysis error",
+                risk_notes="Technical error",
+                sources=[]
+            )
+    
+    def test_connection(self) -> bool:
+        """Тестує з'єднання з xAI API"""
+        try:
+            response = self.client.chat.completions.create(
+                model="grok-beta",
+                messages=[
+                    {"role": "user", "content": "Reply with: OK"}
+                ],
+                max_tokens=10
+            )
+            return True
+        except Exception as e:
+            print(f"❌ Grok connection test failed: {e}")
+            return False
+
+
+# ==============================================================================
+# ТЕСТУВАННЯ
+# ==============================================================================
+
+if __name__ == "__main__":
+    print("🧪 Testing GrokAgent...")
+    
+    from config.settings import settings
+    
+    # Перевіряємо API ключ
+    if "fake" in settings.OPENAI_API_KEY.lower():
+        print("⚠️ Cannot test: OPENAI_API_KEY is fake")
+        print("   To test, add real xAI key to .env")
+        print("\n💡 Get $25 free credits: https://console.x.ai/")
+        print("   For mock testing, run: pytest tests/")
+        exit(0)
+    
+    # Створюємо агента
+    grok = GrokAgent(api_key=settings.OPENAI_API_KEY)
+    print(f"✅ GrokAgent created: {grok}")
+    
+    # Тест з'єднання
+    print("\n🔗 Testing API connection...")
+    if grok.test_connection():
+        print("✅ Connection successful!")
+    else:
+        print("❌ Connection failed")
+        exit(1)
+    
+    # Тестовий аналіз
+    print("\n🧪 Testing analysis...")
+    
+    test_event = MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.9,
+        data={
+            "price_change": 8.5,
+            "current_price": 98000,
+            "volume": 5_000_000_000
+        }
+    )
+    
+    test_context = {
+        "news": "Bitcoin explodes! Retail FOMO kicking in!",
+        "indicators": {"rsi": 85, "twitter_mentions": "trending"}
+    }
+    
+    signal = grok.analyze(test_event, test_context)
+    
+    print(f"\n✅ Analysis complete:")
+    print(f"   Action: {signal.action}")
+    print(f"   Confidence: {signal.confidence:.0%}")
+    print(f"   Thesis: {signal.thesis[:100]}...")
+    
+    print("\n🎉 GrokAgent test complete!")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/__init__.py
+================================================================
+
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/council/perplexity_agent.py
+================================================================
+
+"""
+Perplexity Agent - Fact Checker 🔍
+Перевіряє факти та первинні джерела
+
+⚠️ УВАГА: Perplexity API платний ($5/місяць)
+Можна замінити на звичайний web search або пропустити
+"""
+
+from openai import OpenAI
+from council.base_agent import BaseAgent
+from models.schemas import Signal, MarketEvent
+from config.prompts import PERPLEXITY_SYSTEM_PROMPT, format_user_prompt
+import instructor
+
+
+class PerplexityAgent(BaseAgent):
+    """
+    Perplexity як fact checker
+    
+    🧒 ЩО ЦЕ:
+    - Фокус: Первинні джерела, перевірка фактів
+    - Особистість: Скептичний, bearish bias
+    - API: Perplexity через OpenAI SDK
+    
+    ⚠️ ОПЦІОНАЛЬНО: Можна не використовувати якщо немає API ключа
+    """
+    
+    def __init__(self, api_key: str):
+        """
+        Ініціалізація Perplexity агента
+        
+        Args:
+            api_key: Perplexity API ключ
+        """
+        super().__init__(api_key, "Perplexity")
+        
+        # Створюємо OpenAI клієнта для Perplexity
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.perplexity.ai"
+        )
+        
+        # Патчимо instructor'ом
+        self.client = instructor.from_openai(self.client)
+    
+    def analyze(self, event: MarketEvent, context: dict) -> Signal:
+        """
+        Аналізує подію з фокусом на fact-checking
+        
+        Args:
+            event: Подія на ринку
+            context: Контекст (новини для перевірки)
+        
+        Returns:
+            Signal з рекомендацією
+        """
+        
+        # Формуємо prompt
+        user_prompt = format_user_prompt(
+            event_type=event.event_type,
+            pair=event.pair,
+            market_data=event.data,
+            news=context.get('news', 'No recent news'),
+            indicators=context.get('indicators', {})
+        )
+        
+        try:
+            # Викликаємо Perplexity API
+            response = self.client.chat.completions.create(
+                model="llama-3.1-sonar-small-128k-online",  # Perplexity model
+                messages=[
+                    {"role": "system", "content": PERPLEXITY_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt}
+                ],
+                response_model=Signal,
+                max_tokens=1000
+            )
+            
+            return response
+            
+        except Exception as e:
+            print(f"❌ Perplexity analysis failed: {e}")
+            
+            return Signal(
+                action="WAIT",
+                confidence=0.0,
+                thesis="Perplexity analysis error",
+                risk_notes="Technical error",
+                sources=[]
+            )
+    
+    def test_connection(self) -> bool:
+        """Тестує з'єднання з Perplexity API"""
+        try:
+            response = self.client.chat.completions.create(
+                model="llama-3.1-sonar-small-128k-online",
+                messages=[
+                    {"role": "user", "content": "Reply with: OK"}
+                ],
+                max_tokens=10
+            )
+            return True
+        except Exception as e:
+            print(f"❌ Perplexity connection test failed: {e}")
+            return False
+
+
+# ==============================================================================
+# ТЕСТУВАННЯ
+# ==============================================================================
+
+if __name__ == "__main__":
+    print("🧪 Testing PerplexityAgent...")
+    
+    from config.settings import settings
+    
+    # Перевіряємо API ключ
+    # ⚠️ Якщо немає Perplexity ключа - це нормально!
+    print("⚠️ Perplexity API is optional and paid")
+    print("   You can skip this agent or use web search instead")
+    
+    if not hasattr(settings, 'PERPLEXITY_API_KEY'):
+        print("\n💡 No PERPLEXITY_API_KEY in settings - agent will be skipped")
+        print("   Add to .env if you want to use it:")
+        print("   PERPLEXITY_API_KEY=pplx-xxxxx")
+        exit(0)
+    
+    if "fake" in settings.PERPLEXITY_API_KEY.lower():
+        print("⚠️ Cannot test: PERPLEXITY_API_KEY is fake")
+        exit(0)
+    
+    # Створюємо агента
+    perplexity = PerplexityAgent(api_key=settings.PERPLEXITY_API_KEY)
+    print(f"✅ PerplexityAgent created: {perplexity}")
+    
+    # Тест з'єднання
+    print("\n🔗 Testing API connection...")
+    if perplexity.test_connection():
+        print("✅ Connection successful!")
+    else:
+        print("❌ Connection failed")
+        exit(1)
+    
+    print("\n🎉 PerplexityAgent test complete!")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/models/__init__.py
+================================================================
+
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/models/schemas.py
+================================================================
+
+"""
+Pydantic моделі для структурованих даних
+"""
+
+from pydantic import BaseModel, Field, field_validator
+from typing import Literal, Optional
+from datetime import datetime
+
+
+class Signal(BaseModel):
+    """Сигнал від одного AI агента"""
+    
+    action: Literal["LONG", "SHORT", "WAIT"]
+    confidence: float = Field(ge=0, le=1, description="Впевненість 0.0-1.0")
+    thesis: str = Field(max_length=500, description="Чому цей action")
+    invalidation_price: Optional[float] = Field(None, description="Ціна де теза ламається")
+    risk_notes: str = Field(description="Що може піти не так")
+    sources: list[str] = Field(default_factory=list, description="URLs джерел")
+    
+    @field_validator('sources')
+    @classmethod
+    def validate_sources(cls, v):
+        """Перевіряє що sources - це URLs"""
+        for url in v:
+            if not url.startswith(('http://', 'https://')):
+                raise ValueError(f"Invalid URL: {url}")
+        return v
+
+
+class CouncilResponse(BaseModel):
+    """Агрегована відповідь від всіх агентів"""
+    
+    timestamp: datetime = Field(default_factory=datetime.now)
+    event_type: str
+    pair: str
+    
+    # Індивідуальні сигнали
+    grok: Signal
+    perplexity: Signal
+    claude: Signal
+    gemini: Signal
+    
+    # Агрегація
+    consensus: Literal["LONG", "SHORT", "WAIT", "CONFLICT"]
+    consensus_strength: Literal["UNANIMOUS", "STRONG", "WEAK", "NONE"]
+    combined_confidence: float = Field(ge=0, le=1)
+    key_risks: list[str]
+    
+    invalidation_price: Optional[float] = None
+    recommendation: dict
+    
+    # Метадані
+    prompt_hash: str = Field(description="SHA256 промпту")
+
+
+class MarketEvent(BaseModel):
+    """Подія на ринку"""
+    
+    timestamp: datetime = Field(default_factory=datetime.now)
+    event_type: Literal["price_spike", "whale_transfer", "funding_extreme", "volume_surge"]
+    pair: str
+    data: dict
+    severity: float = Field(ge=0, le=1, description="Важливість події")
+
+
+class TradeJournalEntry(BaseModel):
+    """Запис в журналі торгів"""
+    
+    id: str
+    timestamp: datetime
+    trigger: MarketEvent
+    council_response: CouncilResponse
+    
+    # Твоє рішення
+    your_decision: Optional[Literal["LONG", "SHORT", "PASS"]] = None
+    entry_price: Optional[float] = None
+    exit_price: Optional[float] = None
+    pnl: Optional[float] = None
+    
+    # Результат
+    outcome: Optional[str] = None
+    lessons_learned: Optional[str] = None
+
+
+class RiskCheck(BaseModel):
+    """Результат перевірки Risk Governor"""
+    
+    allowed: bool
+    reason: str
+    volatility: float
+    liquidity: float
+    daily_loss: float
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/dependency_links.txt
+================================================================
+
+
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/requires.txt
+================================================================
+
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+ccxt>=4.5.0
+anthropic>=0.18.0
+openai>=1.12.0
+google-genai>=0.3.0
+instructor>=0.4.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/SOURCES.txt
+================================================================
+
+setup.py
+src/council/__init__.py
+src/council/aggregator.py
+src/council/base_agent.py
+src/council/claude_agent.py
+src/council/gemini_agent.py
+src/council/grok_agent.py
+src/council/perplexity_agent.py
+src/models/__init__.py
+src/models/schemas.py
+src/trading_council_bot.egg-info/PKG-INFO
+src/trading_council_bot.egg-info/SOURCES.txt
+src/trading_council_bot.egg-info/dependency_links.txt
+src/trading_council_bot.egg-info/requires.txt
+src/trading_council_bot.egg-info/top_level.txt
+tests/test_claude_agent.py
+tests/test_integration.py
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/src/trading_council_bot.egg-info/top_level.txt
+================================================================
+
+council
+models
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/test_schemas.py
+================================================================
+
+"""
+Тест моделей
+"""
+
+from src.models.schemas import Signal, MarketEvent, RiskCheck
+from datetime import datetime
+
+# 🧒 Тест 1: Створюємо Signal
+print("=== Тест 1: Signal ===")
+signal = Signal(
+    action="LONG",
+    confidence=0.85,
+    thesis="Bitcoin буде рости через позитивні новини",
+    invalidation_price=95000,
+    risk_notes="Може впасти якщо whale продасть",
+    sources=["https://twitter.com/example"]
+)
+print(f"✅ Signal створено: {signal.action} з впевненістю {signal.confidence}")
+
+# 🧒 Тест 2: Невірний URL (має бути помилка)
+print("\n=== Тест 2: Невірний URL ===")
+try:
+    bad_signal = Signal(
+        action="LONG",
+        confidence=0.5,
+        thesis="Тест",
+        risk_notes="Тест",
+        sources=["not-a-url"]  # ❌ Невірний URL
+    )
+except ValueError as e:
+    print(f"✅ Помилка спіймана: {e}")
+
+# 🧒 Тест 3: Confidence поза межами (має бути помилка)
+print("\n=== Тест 3: Confidence > 1.0 ===")
+try:
+    bad_signal = Signal(
+        action="LONG",
+        confidence=1.5,  # ❌ Більше 1.0!
+        thesis="Тест",
+        risk_notes="Тест"
+    )
+except Exception as e:
+    print(f"✅ Помилка спіймана: {type(e).__name__}")
+
+# 🧒 Тест 4: MarketEvent
+print("\n=== Тест 4: MarketEvent ===")
+event = MarketEvent(
+    event_type="price_spike",
+    pair="BTC/USDT",
+    severity=0.85,
+    data={"price_change": 6.2, "volume": 1000000}
+)
+print(f"✅ Event створено: {event.event_type} на {event.pair}")
+
+# 🧒 Тест 5: RiskCheck
+print("\n=== Тест 5: RiskCheck ===")
+risk = RiskCheck(
+    allowed=True,
+    reason="All checks OK",
+    volatility=0.08,
+    liquidity=2000000,
+    daily_loss=0.01
+)
+print(f"✅ RiskCheck: дозволено={risk.allowed}, причина={risk.reason}")
+
+print("\n🎉 Всі тести пройшли!")
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/tests/__init__.py
+================================================================
+
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/tests/test_claude_agent.py
+================================================================
+
+"""
+Тести для Claude агента БЕЗ справжнього API
+Використовуємо mock objects для симуляції API викликів
+"""
+
+import pytest
+from unittest.mock import Mock, patch
+
+# Імпорти БЕЗ src. prefix
+from council.claude_agent import ClaudeAgent
+from models.schemas import Signal, MarketEvent
+
+
+def test_claude_agent_creation():
+    """
+    Тест створення Claude агента
+    
+    🧒 ПЕРЕВІРЯЄМО:
+    - Чи агент створюється без помилок
+    - Чи правильно зберігається ім'я та API ключ
+    """
+    agent = ClaudeAgent(api_key="fake-key-for-testing")
+    
+    assert agent.name == "Claude"
+    assert agent.api_key == "fake-key-for-testing"
+    print("✅ Claude agent створено успішно")
+
+
+def test_claude_analyze_with_mock():
+    """
+    Тест аналізу з mock (фейковим) API
+    
+    🧒 ЩО РОБИМО:
+    1. Створюємо агента з фейковим ключем
+    2. Створюємо тестову подію (price spike)
+    3. Mock'аємо метод analyze (не викликаємо справжній API)
+    4. Перевіряємо що результат правильний
+    
+    🔧 ФІКС: Sync метод, простий mock
+    """
+    
+    # Створюємо агента
+    agent = ClaudeAgent(api_key="fake-key")
+    
+    # Створюємо тестову подію на ринку
+    event = MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.8,
+        data={"price_change": 5.2, "current_price": 96500}
+    )
+    
+    # Контекст з новинами та індикаторами
+    context = {
+        "news": "Bitcoin surges on institutional buying",
+        "indicators": {"rsi": 78, "macd": "bullish"}
+    }
+    
+    # Створюємо фейковий Signal
+    fake_signal = Signal(
+        action="WAIT",
+        confidence=0.7,
+        thesis="Mock analysis for testing",
+        invalidation_price=95000,
+        risk_notes="Mock risk notes",
+        sources=[]
+    )
+    
+    # 🔧 ФІКС: Mock весь метод analyze
+    with patch.object(agent, 'analyze', return_value=fake_signal):
+        # Викликаємо analyze (без await - sync)
+        result = agent.analyze(event, context)
+        
+        # Перевірки
+        assert result.action == "WAIT"
+        assert result.confidence == 0.7
+        assert "Mock" in result.thesis
+        assert result.invalidation_price == 95000
+        
+        print("✅ Claude analyze працює з mock API")
+        print(f"   Action: {result.action}")
+        print(f"   Confidence: {result.confidence}")
+
+
+def test_claude_error_handling():
+    """
+    Тест обробки помилок
+    
+    🧒 ПЕРЕВІРЯЄМО:
+    - Що робить агент коли API падає
+    - Чи повертає fallback Signal
+    
+    🔧 ФІКС: Sync метод, mock side_effect
+    """
+    
+    agent = ClaudeAgent(api_key="fake-key")
+    
+    event = MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.5,
+        data={"price_change": 2.0}
+    )
+    
+    context = {}
+    
+    # Mock client.messages.create щоб кинути помилку
+    with patch.object(agent.client.messages, 'create') as mock_create:
+        # API кидає виняток
+        mock_create.side_effect = Exception("API connection failed")
+        
+        # Викликаємо analyze
+        result = agent.analyze(event, context)
+        
+        # Має повернути безпечний fallback
+        assert result.action == "WAIT"
+        assert result.confidence == 0.0
+        assert len(result.thesis) < 500  # 🔧 Перевіряємо довжину
+        
+        print("✅ Claude правильно обробляє помилки")
+        print(f"   Fallback action: {result.action}")
+        print(f"   Thesis: {result.thesis}")
+
+
+def test_hash_prompt():
+    """
+    Тест генерації hash для промптів
+    
+    🧒 ПЕРЕВІРЯЄМО:
+    - Чи hash генерується
+    - Чи різні промпти дають різні hash
+    """
+    
+    agent = ClaudeAgent(api_key="fake-key")
+    
+    hash1 = agent.hash_prompt("Hello World")
+    hash2 = agent.hash_prompt("Hello World!")
+    
+    # Hash має бути рядком
+    assert isinstance(hash1, str)
+    assert isinstance(hash2, str)
+    
+    # Різні промпти = різні hash
+    assert hash1 != hash2
+    
+    # Однакові промпти = однакові hash
+    hash3 = agent.hash_prompt("Hello World")
+    assert hash1 == hash3
+    
+    print("✅ Hash prompt працює коректно")
+    print(f"   'Hello World':  {hash1[:16]}...")
+    print(f"   'Hello World!': {hash2[:16]}...")
+
+
+def test_validate_output():
+    """
+    Тест валідації output від LLM
+    
+    🧒 ПЕРЕВІРЯЄМО:
+    - Чи правильний output проходить валідацію
+    - Чи невалідний output дає fallback
+    
+    🔧 ФІКС: Fallback має коротку thesis
+    """
+    
+    agent = ClaudeAgent(api_key="fake-key")
+    
+    # Тест 1: Правильний output
+    valid_output = {
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Strong bullish setup",
+        "invalidation_price": 95000,
+        "risk_notes": "Stop loss at $95k",
+        "sources": ["https://example.com"]
+    }
+    
+    signal = agent.validate_output(valid_output)
+    assert signal.action == "LONG"
+    assert signal.confidence == 0.8
+    print("✅ Валідний output пройшов перевірку")
+    
+    # Тест 2: Невалідний output
+    invalid_output = {
+        "invalid": "data",
+        "wrong": "structure"
+    }
+    
+    fallback = agent.validate_output(invalid_output)
+    assert fallback.action == "WAIT"
+    assert fallback.confidence == 0.0
+    assert len(fallback.thesis) < 500  # 🔧 Перевіряємо довжину
+    print("✅ Невалідний output дав fallback")
+    print(f"   Fallback thesis: {fallback.thesis}")
+
+
+def test_extract_json_from_response():
+    """
+    Тест витягування JSON з відповіді LLM
+    
+    🧒 ПЕРЕВІРЯЄМО:
+    - Чи можемо витягти JSON з markdown
+    - Чи працює з чистим JSON
+    """
+    
+    agent = ClaudeAgent(api_key="fake-key")
+    
+    # Тест 1: JSON в markdown code block
+    messy_response = """
+    Here's my analysis:
+    ```json
+    {"action": "LONG", "confidence": 0.7}
+    ```
+    """
+    
+    extracted = agent.extract_json_from_response(messy_response)
+    assert extracted["action"] == "LONG"
+    assert extracted["confidence"] == 0.7
+    print("✅ JSON витягнуто з markdown")
+    
+    # Тест 2: Чистий JSON
+    clean_response = '{"action": "SHORT", "confidence": 0.5}'
+    
+    extracted2 = agent.extract_json_from_response(clean_response)
+    assert extracted2["action"] == "SHORT"
+    print("✅ Чистий JSON оброблено")
+
+
+if __name__ == "__main__":
+    # Запуск всіх тестів через pytest
+    pytest.main([__file__, "-v", "-s"])
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/tests/test_integration.py
+================================================================
+
+"""
+Integration Test - Вся рада разом! 🎯
+
+Тестує:
+1. Всі 4 агенти (Claude, Grok, Gemini, Perplexity)
+2. Aggregator
+3. Повний flow: Event → Signals → Consensus → Recommendation
+
+🧒 ПРАЦЮЄ БЕЗ СПРАВЖНІХ API КЛЮЧІВ!
+Використовуємо mock objects
+"""
+
+import pytest
+from unittest.mock import Mock, patch
+from datetime import datetime
+
+# Імпорти
+from council.claude_agent import ClaudeAgent
+from council.grok_agent import GrokAgent
+from council.gemini_agent import GeminiAgent
+from council.perplexity_agent import PerplexityAgent
+from council.aggregator import Aggregator
+from models.schemas import Signal, MarketEvent, CouncilResponse
+
+
+# ==============================================================================
+# ФІКСТУРИ (підготовка даних для тестів)
+# ==============================================================================
+
+@pytest.fixture
+def test_event():
+    """Створює тестову подію на ринку"""
+    return MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.85,
+        data={
+            "price_change": 6.5,
+            "current_price": 98500,
+            "volume": 4_200_000_000,
+            "timeframe": "15min",
+            "trigger": "Broke resistance at $98k"
+        }
+    )
+
+
+@pytest.fixture
+def test_context():
+    """Створює тестовий контекст"""
+    return {
+        "news": "Bitcoin breaks $98k resistance, institutional buying accelerates",
+        "indicators": {
+            "rsi": 76,
+            "macd": "bullish_crossover",
+            "volume_profile": "high",
+            "funding_rate": 0.06,
+            "twitter_sentiment": "extremely_bullish"
+        }
+    }
+
+
+@pytest.fixture
+def mock_grok_signal():
+    """Mock сигнал від Grok (бичачий, високий confidence)"""
+    return Signal(
+        action="LONG",
+        confidence=0.90,
+        thesis="🔥 MASSIVE FOMO on X! Everyone talking about $100k BTC. Retail piling in. This is peak hype territory.",
+        invalidation_price=97000,
+        risk_notes="Hype can disappear instantly. Watch for sentiment shift.",
+        sources=["https://x.com/crypto_influencer1", "https://x.com/whale_tracker"]
+    )
+
+
+@pytest.fixture
+def mock_perplexity_signal():
+    """Mock сигнал від Perplexity (скептичний, низький confidence)"""
+    return Signal(
+        action="WAIT",
+        confidence=0.45,
+        thesis="News is real but already 2 hours old. Can't verify if institutional buying is ongoing. Possible fake hype.",
+        invalidation_price=None,
+        risk_notes="Old news, likely priced in. Wait for fresh confirmation.",
+        sources=["https://bloomberg.com/crypto", "https://coindesk.com/markets"]
+    )
+
+
+@pytest.fixture
+def mock_claude_signal():
+    """Mock сигнал від Claude (обережний, середній confidence)"""
+    return Signal(
+        action="LONG",
+        confidence=0.65,
+        thesis="Risk/reward acceptable IF small position. Funding rate elevated = overleveraged longs. Stop at $97k critical.",
+        invalidation_price=97000,
+        risk_notes="High funding = risk of long squeeze. Max 2% position. Set tight stop-loss.",
+        sources=[]
+    )
+
+
+@pytest.fixture
+def mock_gemini_signal():
+    """Mock сигнал від Gemini (аналітичний, високий confidence)"""
+    return Signal(
+        action="LONG",
+        confidence=0.80,
+        thesis="Pattern matches breakout from March 2024 (led to +15% in 3 days). Volume confirms. Success rate: 7/10 historically.",
+        invalidation_price=96500,
+        risk_notes="Pattern fails if volume drops or breaks below $96.5k support.",
+        sources=["https://tradingview.com/chart", "https://glassnode.com/btc"]
+    )
+
+
+# ==============================================================================
+# ТЕСТИ
+# ==============================================================================
+
+def test_council_integration_mock(
+    test_event, 
+    test_context,
+    mock_grok_signal,
+    mock_perplexity_signal,
+    mock_claude_signal,
+    mock_gemini_signal
+):
+    """
+    🎯 ГОЛОВНИЙ INTEGRATION TEST
+    
+    Тестує повний flow:
+    1. Створюємо всіх агентів
+    2. Mock'аємо їхні відповіді
+    3. Aggregator об'єднує сигнали
+    4. Перевіряємо consensus
+    
+    🧒 ЩО ОЧІКУЄМО:
+    - Grok: LONG (0.90)
+    - Perplexity: WAIT (0.45)
+    - Claude: LONG (0.65)
+    - Gemini: LONG (0.80)
+    
+    Консенсус: 3/4 LONG → STRONG consensus
+    """
+    
+    print("\n" + "="*70)
+    print("🎯 INTEGRATION TEST: Full Council Analysis")
+    print("="*70)
+    
+    # 1. Створюємо агентів (з fake ключами)
+    grok = GrokAgent(api_key="fake-grok-key")
+    perplexity = PerplexityAgent(api_key="fake-perp-key")
+    claude = ClaudeAgent(api_key="fake-claude-key")
+    gemini = GeminiAgent(api_key="fake-gemini-key")
+    
+    print(f"\n✅ Created 4 agents:")
+    print(f"   - {grok}")
+    print(f"   - {perplexity}")
+    print(f"   - {claude}")
+    print(f"   - {gemini}")
+    
+    # 2. Mock'аємо їхні analyze методи
+    with patch.object(grok, 'analyze', return_value=mock_grok_signal), \
+         patch.object(perplexity, 'analyze', return_value=mock_perplexity_signal), \
+         patch.object(claude, 'analyze', return_value=mock_claude_signal), \
+         patch.object(gemini, 'analyze', return_value=mock_gemini_signal):
+        
+        # 3. Викликаємо аналіз від кожного агента
+        print(f"\n📊 Event: {test_event.event_type} on {test_event.pair}")
+        print(f"   Price change: +{test_event.data['price_change']}%")
+        print(f"   Current price: ${test_event.data['current_price']:,}")
+        
+        print(f"\n🤖 Calling all agents...")
+        
+        grok_result = grok.analyze(test_event, test_context)
+        perp_result = perplexity.analyze(test_event, test_context)
+        claude_result = claude.analyze(test_event, test_context)
+        gemini_result = gemini.analyze(test_event, test_context)
+        
+        # 4. Виводимо індивідуальні сигнали
+        print(f"\n📋 Individual Signals:")
+        print(f"\n   🔥 GROK (Sentiment Hunter):")
+        print(f"      Action: {grok_result.action}")
+        print(f"      Confidence: {grok_result.confidence:.0%}")
+        print(f"      Thesis: {grok_result.thesis[:80]}...")
+        
+        print(f"\n   🔍 PERPLEXITY (Fact Checker):")
+        print(f"      Action: {perp_result.action}")
+        print(f"      Confidence: {perp_result.confidence:.0%}")
+        print(f"      Thesis: {perp_result.thesis[:80]}...")
+        
+        print(f"\n   🛡️ CLAUDE (Risk Manager):")
+        print(f"      Action: {claude_result.action}")
+        print(f"      Confidence: {claude_result.confidence:.0%}")
+        print(f"      Thesis: {claude_result.thesis[:80]}...")
+        
+        print(f"\n   🔬 GEMINI (Pattern Analyst):")
+        print(f"      Action: {gemini_result.action}")
+        print(f"      Confidence: {gemini_result.confidence:.0%}")
+        print(f"      Thesis: {gemini_result.thesis[:80]}...")
+        
+        # 5. Aggregator об'єднує
+        print(f"\n⚡ Aggregating signals...")
+        
+        aggregator = Aggregator()
+        council_response = aggregator.aggregate(
+            event=test_event,
+            grok=grok_result,
+            perplexity=perp_result,
+            claude=claude_result,
+            gemini=gemini_result,
+            prompt_hash="test_integration_hash_123"
+        )
+        
+        # 6. Виводимо консенсус
+        print(f"\n" + "="*70)
+        print(f"🎯 COUNCIL DECISION")
+        print(f"="*70)
+        print(f"\n   Consensus: {council_response.consensus}")
+        print(f"   Strength: {council_response.consensus_strength}")
+        print(f"   Combined Confidence: {council_response.combined_confidence:.0%}")
+        print(f"   Votes: LONG=3, WAIT=1")
+        
+        print(f"\n   💡 Recommendation:")
+        rec = council_response.recommendation
+        print(f"      Action: {rec['action']}")
+        print(f"      Max Position: {rec['max_position_size']:.1%}")
+        print(f"      Invalidation: ${council_response.invalidation_price:,}")
+        
+        print(f"\n   ⚠️ Key Risks ({len(council_response.key_risks)}):")
+        for i, risk in enumerate(council_response.key_risks[:3], 1):
+            print(f"      {i}. {risk[:65]}...")
+        
+        # 7. Перевірки (assertions)
+        print(f"\n" + "="*70)
+        print(f"🧪 Running Assertions...")
+        print(f"="*70)
+        
+        # Consensus має бути LONG (3/4 votes)
+        assert council_response.consensus == "LONG", "Expected LONG consensus"
+        print(f"   ✅ Consensus is LONG")
+        
+        # Strength має бути STRONG (3/4)
+        assert council_response.consensus_strength == "STRONG", "Expected STRONG"
+        print(f"   ✅ Strength is STRONG (3/4 votes)")
+        
+        # Combined confidence має бути середнє зважене
+        expected_conf = (0.90*0.25 + 0.45*0.25 + 0.65*0.25 + 0.80*0.25)
+        assert abs(council_response.combined_confidence - expected_conf) < 0.01
+        print(f"   ✅ Combined confidence: {council_response.combined_confidence:.0%}")
+        
+        # Invalidation має бути max для LONG
+        assert council_response.invalidation_price == 97000  # max(97000, 96500)
+        print(f"   ✅ Invalidation price: ${council_response.invalidation_price:,}")
+        
+        # Position size має бути розумний
+        assert 0.01 <= rec['max_position_size'] <= 0.05
+        print(f"   ✅ Position size: {rec['max_position_size']:.1%}")
+        
+        # Має бути ризики
+        assert len(council_response.key_risks) == 4  # По одному від кожного
+        print(f"   ✅ All {len(council_response.key_risks)} risks collected")
+        
+        print(f"\n" + "="*70)
+        print(f"🎉 ALL INTEGRATION TESTS PASSED!")
+        print(f"="*70)
+        
+        return council_response
+
+
+def test_unanimous_consensus():
+    """
+    Тест UNANIMOUS консенсусу (всі 4 згодні)
+    """
+    print("\n🧪 Testing UNANIMOUS consensus...")
+    
+    # Всі агенти кажуть LONG
+    all_long = Signal(
+        action="LONG",
+        confidence=0.85,
+        thesis="Strong bullish setup",
+        invalidation_price=95000,
+        risk_notes="Minimal risk",
+        sources=[]
+    )
+    
+    event = MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.9,
+        data={"price_change": 8.0}
+    )
+    
+    aggregator = Aggregator()
+    response = aggregator.aggregate(
+        event=event,
+        grok=all_long,
+        perplexity=all_long,
+        claude=all_long,
+        gemini=all_long,
+        prompt_hash="unanimous_test"
+    )
+    
+    assert response.consensus == "LONG"
+    assert response.consensus_strength == "UNANIMOUS"
+    print(f"   ✅ UNANIMOUS consensus detected (4/4 LONG)")
+
+
+def test_conflict_consensus():
+    """
+    Тест CONFLICT консенсусу (розділені порівну)
+    """
+    print("\n🧪 Testing CONFLICT consensus...")
+    
+    long_signal = Signal(
+        action="LONG",
+        confidence=0.7,
+        thesis="Bullish",
+        risk_notes="Some risk",
+        sources=[]
+    )
+    
+    short_signal = Signal(
+        action="SHORT",
+        confidence=0.7,
+        thesis="Bearish",
+        risk_notes="Some risk",
+        sources=[]
+    )
+    
+    event = MarketEvent(
+        event_type="price_spike",
+        pair="BTC/USDT",
+        severity=0.5,
+        data={"price_change": 2.0}
+    )
+    
+    aggregator = Aggregator()
+    response = aggregator.aggregate(
+        event=event,
+        grok=long_signal,
+        perplexity=short_signal,
+        claude=long_signal,
+        gemini=short_signal,
+        prompt_hash="conflict_test"
+    )
+    
+    # 2 LONG vs 2 SHORT = CONFLICT → force WAIT
+    assert response.consensus == "WAIT"
+    assert response.consensus_strength == "NONE"
+    print(f"   ✅ CONFLICT handled (forced to WAIT)")
+
+
+# ==============================================================================
+# MAIN - запуск всіх тестів
+# ==============================================================================
+
+if __name__ == "__main__":
+    print("\n" + "🚀"*35)
+    print("   TRADING COUNCIL BOT - INTEGRATION TEST SUITE")
+    print("🚀"*35)
+    
+    pytest.main([__file__, "-v", "-s", "--tb=short"])
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/dependency_links.txt
+================================================================
+
+
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/requires.txt
+================================================================
+
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+ccxt>=4.5.0
+anthropic>=0.18.0
+openai>=1.12.0
+google-generativeai>=0.3.2
+instructor>=0.4.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/SOURCES.txt
+================================================================
+
+setup.py
+config/__init__.py
+config/prompts.py
+config/settings.py
+tests/test_claude_agent.py
+trading_council_bot.egg-info/PKG-INFO
+trading_council_bot.egg-info/SOURCES.txt
+trading_council_bot.egg-info/dependency_links.txt
+trading_council_bot.egg-info/requires.txt
+trading_council_bot.egg-info/top_level.txt
+
+================================================================
+FILE: /home/oleksandr/Documents/Repositories/trading-counsil-bot/trading_council_bot.egg-info/top_level.txt
+================================================================
+
+config
+
+

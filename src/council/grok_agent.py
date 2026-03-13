@@ -1,159 +1,93 @@
 """
-Grok Agent - Sentiment Hunter 🔥
-Ловить хайп та FOMO на X (Twitter)
+Grok Agent — Real-time Sentiment & News Hunter for Oil Markets
+Uses xAI API (OpenAI-compatible SDK) with manual JSON parsing
 """
 
 from openai import OpenAI
 from council.base_agent import BaseAgent
 from models.schemas import Signal, MarketEvent
 from config.prompts import GROK_SYSTEM_PROMPT, format_user_prompt
-import instructor
-import json
 
 
 class GrokAgent(BaseAgent):
     """
-    Grok як мисливець за sentiment
-    
-    🧒 ЩО ЦЕ:
-    - Фокус: X/Twitter trending, memes, retail FOMO
-    - Особистість: Агресивний, bullish bias
-    - API: xAI через OpenAI SDK
+    Grok as real-time sentiment hunter for oil markets.
+
+    - Focus: X/Twitter oil journalists, OPEC rumours, geopolitical flash points
+    - API: xAI via OpenAI-compatible SDK
+    - Model: configurable (default grok-3)
     """
-    
-    def __init__(self, api_key: str):
-        """
-        Ініціалізація Grok агента
-        
-        Args:
-            api_key: xAI API ключ
-        """
+
+    def __init__(self, api_key: str, model: str = "grok-3"):
         super().__init__(api_key, "Grok")
-        
-        # Створюємо OpenAI клієнта для xAI
+
+        if not api_key:
+            raise ValueError("XAI_API_KEY is empty — cannot initialise GrokAgent")
+
+        self.model_name = model
         self.client = OpenAI(
             api_key=api_key,
-            base_url="https://api.x.ai/v1"  # xAI endpoint
+            base_url="https://api.x.ai/v1",
         )
-        
-        # Патчимо instructor'ом
-        self.client = instructor.from_openai(self.client)
-    
+
     def analyze(self, event: MarketEvent, context: dict) -> Signal:
-        """
-        Аналізує подію з фокусом на sentiment
-        
-        Args:
-            event: Подія на ринку
-            context: Контекст (новини, тренди)
-        
-        Returns:
-            Signal з рекомендацією
-        """
-        
-        # Формуємо prompt
         user_prompt = format_user_prompt(
             event_type=event.event_type,
-            pair=event.pair,
+            instrument=event.instrument,
             market_data=event.data,
-            news=context.get('news', 'No recent news'),
-            indicators=context.get('indicators', {})
+            news=context.get("news", "No recent news"),
+            indicators=context.get("indicators", {}),
         )
-        
+
+        # Ask for single instrument signal only
+        user_prompt += f"""
+
+IMPORTANT: Return a SINGLE JSON object (not an array) for instrument {event.instrument} only.
+Use this exact schema:
+{{
+    "action": "LONG" | "SHORT" | "WAIT",
+    "confidence": 0.0-1.0,
+    "thesis": "max 500 chars",
+    "invalidation_price": number or null,
+    "risk_notes": "what could go wrong",
+    "sources": ["url1"]
+}}
+Pure JSON only — no markdown, no preamble."""
+
         try:
-            # Викликаємо Grok API
             response = self.client.chat.completions.create(
-                model="grok-beta",  # xAI model
+                model=self.model_name,
                 messages=[
                     {"role": "system", "content": GROK_SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt}
+                    {"role": "user", "content": user_prompt},
                 ],
-                response_model=Signal,
-                max_tokens=1000
+                max_tokens=1000,
+                temperature=0.2,
             )
-            
-            return response
-            
+
+            response_text = response.choices[0].message.content
+            json_data = self.extract_json_from_response(response_text)
+            return self.validate_output(json_data)
+
         except Exception as e:
-            print(f"❌ Grok analysis failed: {e}")
-            
+            print(f"Grok analysis failed: {e}")
             return Signal(
                 action="WAIT",
                 confidence=0.0,
                 thesis="Grok analysis error",
                 risk_notes="Technical error",
-                sources=[]
+                sources=[],
             )
-    
+
     def test_connection(self) -> bool:
-        """Тестує з'єднання з xAI API"""
         try:
-            response = self.client.chat.completions.create(
-                model="grok-beta",
-                messages=[
-                    {"role": "user", "content": "Reply with: OK"}
-                ],
-                max_tokens=10
+            self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": "Reply with: OK"}],
+                max_tokens=10,
+                temperature=0.0,
             )
             return True
         except Exception as e:
-            print(f"❌ Grok connection test failed: {e}")
+            print(f"Grok connection test failed: {e}")
             return False
-
-
-# ==============================================================================
-# ТЕСТУВАННЯ
-# ==============================================================================
-
-if __name__ == "__main__":
-    print("🧪 Testing GrokAgent...")
-    
-    from config.settings import settings
-    
-    # Перевіряємо API ключ
-    if "fake" in settings.OPENAI_API_KEY.lower():
-        print("⚠️ Cannot test: OPENAI_API_KEY is fake")
-        print("   To test, add real xAI key to .env")
-        print("\n💡 Get $25 free credits: https://console.x.ai/")
-        print("   For mock testing, run: pytest tests/")
-        exit(0)
-    
-    # Створюємо агента
-    grok = GrokAgent(api_key=settings.OPENAI_API_KEY)
-    print(f"✅ GrokAgent created: {grok}")
-    
-    # Тест з'єднання
-    print("\n🔗 Testing API connection...")
-    if grok.test_connection():
-        print("✅ Connection successful!")
-    else:
-        print("❌ Connection failed")
-        exit(1)
-    
-    # Тестовий аналіз
-    print("\n🧪 Testing analysis...")
-    
-    test_event = MarketEvent(
-        event_type="price_spike",
-        pair="BTC/USDT",
-        severity=0.9,
-        data={
-            "price_change": 8.5,
-            "current_price": 98000,
-            "volume": 5_000_000_000
-        }
-    )
-    
-    test_context = {
-        "news": "Bitcoin explodes! Retail FOMO kicking in!",
-        "indicators": {"rsi": 85, "twitter_mentions": "trending"}
-    }
-    
-    signal = grok.analyze(test_event, test_context)
-    
-    print(f"\n✅ Analysis complete:")
-    print(f"   Action: {signal.action}")
-    print(f"   Confidence: {signal.confidence:.0%}")
-    print(f"   Thesis: {signal.thesis[:100]}...")
-    
-    print("\n🎉 GrokAgent test complete!")

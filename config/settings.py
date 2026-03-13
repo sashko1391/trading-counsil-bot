@@ -1,5 +1,5 @@
 """
-Налаштування проєкту
+Налаштування проєкту — Oil Trading Intelligence Bot
 Читає значення з .env файлу
 """
 
@@ -11,39 +11,44 @@ from typing import Optional
 
 class Settings(BaseSettings):
     """Налаштування додатку з environment variables"""
-    
-    # ===== БІРЖА =====
-    BINANCE_API_KEY: str
-    BINANCE_API_SECRET: str
-    BINANCE_TESTNET: bool = True
-    
+
     # ===== AI APIs =====
     ANTHROPIC_API_KEY: str
-    OPENAI_API_KEY: str
-    GEMINI_API_KEY: str
-    
+    OPENAI_API_KEY: str  # used for embeddings (Pinecone)
+    GOOGLE_API_KEY: str = ""
+    GOOGLE_AI_API_KEY: str = ""
+    XAI_API_KEY: str = ""
+    PERPLEXITY_API_KEY: str = ""
+    PINECONE_API_KEY: str = ""
+
+    # ===== AI MODELS =====
+    GROK_MODEL: str = "grok-3"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    CLAUDE_MODEL: str = "claude-sonnet-4-20250514"
+    PERPLEXITY_MODEL: str = "sonar"
+
+    # ===== DATA PROVIDERS =====
+    DATA_PROVIDER: str = "yfinance"  # yfinance | ibkr
+    EIA_API_KEY: str = ""
+    NASDAQ_DATA_LINK_API_KEY: str = ""
+
     # ===== TELEGRAM =====
-    TELEGRAM_BOT_TOKEN: str
-    TELEGRAM_CHAT_ID: str
-    
-    # ===== РИЗИК-МЕНЕДЖМЕНТ =====
-    MAX_POSITION_SIZE: float = 0.05
-    MAX_DAILY_LOSS: float = 0.02
-    MIN_LIQUIDITY: float = 1_000_000
-    MAX_VOLATILITY: float = 0.10
-    
-    # ===== ШЛЯХИ ДО ФАЙЛІВ =====
-    JOURNAL_PATH: Path = Path("data/trades.json")
-    LOG_LEVEL: str = "INFO"
-    
-    # ===== ПАРИ ДЛЯ МОНІТОРИНГУ =====
-    WATCH_PAIRS: list[str] = ["BTC/USDT", "ETH/USDT", "SOL/USDT"]
-    
+    TELEGRAM_BOT_TOKEN: str = ""
+    TELEGRAM_CHAT_ID: str = ""
+
+    # ===== ІНСТРУМЕНТИ ДЛЯ МОНІТОРИНГУ =====
+    WATCH_INSTRUMENTS: list[str] = ["BZ=F", "LGO"]
+
     # ===== ПОРОГИ ДЛЯ ДЕТЕКТОРІВ =====
     PRICE_SPIKE_THRESHOLD: float = 0.02
-    WHALE_THRESHOLD: float = 1_000_000
-    FUNDING_RATE_EXTREME: float = 0.001
-    
+    VOLUME_SURGE_THRESHOLD: float = 2.0  # multiplier vs average
+    SPREAD_CHANGE_THRESHOLD: float = 0.05  # 5% crack spread change
+
+    # ===== РИЗИК-МЕНЕДЖМЕНТ =====
+    MAX_DAILY_ALERTS: int = 10
+    MIN_CONFIDENCE: float = 0.6
+    COOLDOWN_MINUTES: int = 30
+
     # ===== ВАГИ ДЛЯ АГЕНТІВ =====
     COUNCIL_WEIGHTS: dict = {
         "grok": 0.25,
@@ -51,20 +56,19 @@ class Settings(BaseSettings):
         "claude": 0.25,
         "gemini": 0.25
     }
-    
+
+    # ===== ШЛЯХИ ДО ФАЙЛІВ =====
+    JOURNAL_PATH: Path = Path("data/trades.json")
+    KNOWLEDGE_PATH: Path = Path("data/knowledge")
+    LOG_LEVEL: str = "INFO"
+
     class Config:
         """Конфігурація Pydantic"""
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
 
-# Створюємо глобальний об'єкт settings
-settings = Settings()
-
-# Створюємо папки
-settings.JOURNAL_PATH.parent.mkdir(parents=True, exist_ok=True)
-
-# Виводимо підтвердження
-print("✅ Settings loaded successfully!")
-print(f"📊 Watching pairs: {settings.WATCH_PAIRS}")
-print(f"🛡️ Max position size: {settings.MAX_POSITION_SIZE * 100}%")
+def get_settings() -> Settings:
+    """Lazy factory — не крашить імпорт якщо .env неповний"""
+    return Settings()

@@ -1,51 +1,66 @@
 """
-Aggregator - об'єднує сигнали від всіх агентів
-Це НЕ AI, а детермінований Python код
+Aggregator v2 — ABAIC Oil Trading Intelligence Bot
+Phase 3A
 
-🧒 ЧОМУ НЕ AI:
-- Transparent (зрозумілий алгоритм)
-- Fast (< 1ms)
-- No hallucinations
-- Free (без API costs)
+Changes vs v1:
+  ✦ Confidence-weighted voting (not simple majority)
+  ✦ Devil's Advocate: 5th virtual agent at 0.15 weight argues against consensus
+  ✦ Dynamic weight support (update from BrierScore tracker quarterly)
+  ✦ CONFLICT: both sides now logged in recommendation (not just WAIT)
+  ✦ Per-agent vote logged in recommendation for transparency
+  ✦ Position sizing formula improved
+
+Core principle: This is NOT AI — it is deterministic Python.
+Transparent, fast, no hallucinations, no API cost.
 """
 
-from models.schemas import Signal, CouncilResponse, MarketEvent
-from typing import Dict, List, Literal, Tuple
+import logging
+from typing import Dict, List, Literal, Optional, Tuple
 from datetime import datetime
-import hashlib
+
+from models.schemas import Signal, CouncilResponse, MarketEvent
+
+logger = logging.getLogger(__name__)
+
+# Default equal weights — updated quarterly via BrierScore tracker
+DEFAULT_WEIGHTS: Dict[str, float] = {
+    "grok": 0.25,
+    "perplexity": 0.25,
+    "claude": 0.25,
+    "gemini": 0.25,
+}
+
+# Devil's Advocate weight: high enough to surface doubt, low enough not to override
+DEVIL_WEIGHT = 0.15
 
 
 class Aggregator:
     """
-    Агрегатор сигналів від ради AI агентів
-    
-    🧒 ЩО РОБИТЬ:
-    1. Збирає сигнали від всіх 4 агентів
-    2. Рахує consensus (голосування)
-    3. Рахує combined confidence (зважена середня)
-    4. Визначає invalidation price
-    5. Збирає всі ризики
-    6. Генерує рекомендацію
+    Deterministic aggregation of AI council signals into a CouncilResponse.
+
+    Steps:
+    1. Confidence-weighted vote → consensus + strength
+    2. Weighted confidence calculation (with disagreement penalty)
+    3. Collect all risk notes
+    4. Invalidation price (most conservative)
+    5. Structured recommendation with position sizing
     """
-    
-    def __init__(self, weights: dict = None):
-        """
-        Ініціалізація агрегатора
-        
-        Args:
-            weights: Ваги для агентів (за замовчуванням рівні)
-        """
-        self.weights = weights or {
-            "grok": 0.25,
-            "perplexity": 0.25,
-            "claude": 0.25,
-            "gemini": 0.25
-        }
-        
-        # Перевіряємо що ваги в сумі дають 1.0
+
+    def __init__(self, weights: Optional[Dict[str, float]] = None):
+        self.weights = weights or DEFAULT_WEIGHTS.copy()
         total = sum(self.weights.values())
-        assert abs(total - 1.0) < 0.01, f"Weights must sum to 1.0, got {total}"
-    
+        if abs(total - 1.0) > 0.01:
+            raise ValueError(f"Weights must sum to 1.0, got {total:.3f}")
+
+    def update_weights(self, new_weights: Dict[str, float]) -> None:
+        """Update agent weights. Called by BrierScore tracker quarterly."""
+        total = sum(new_weights.values())
+        if abs(total - 1.0) > 0.01:
+            raise ValueError(f"New weights must sum to 1.0, got {total:.3f}")
+        old = dict(self.weights)
+        self.weights = dict(new_weights)
+        logger.info(f"📊 Weights updated: {old} → {new_weights}")
+
     def aggregate(
         self,
         event: MarketEvent,
@@ -53,323 +68,267 @@ class Aggregator:
         perplexity: Signal,
         claude: Signal,
         gemini: Signal,
-        prompt_hash: str
+        prompt_hash: str,
+        devil_advocate: Optional[Signal] = None,
     ) -> CouncilResponse:
         """
-        Об'єднує сигнали від всіх агентів
-        
+        Aggregate 4 (or 5) agent signals into a council response.
+
         Args:
-            event: Подія що тригернула аналіз
-            grok: Сигнал від Grok
-            perplexity: Сигнал від Perplexity
-            claude: Сигнал від Claude
-            gemini: Сигнал від Gemini
-            prompt_hash: Hash промптів для auditability
-        
+            event:          Triggering market event
+            grok:           Grok sentiment signal
+            perplexity:     Perplexity fact-check signal
+            claude:         Claude Sonnet risk signal
+            gemini:         Gemini macro signal
+            prompt_hash:    SHA256 of prompts for audit
+            devil_advocate: Optional 5th adversarial signal (weight=0.15)
+
         Returns:
-            CouncilResponse з консенсусом та рекомендацією
+            CouncilResponse
         """
-        
-        signals = {
+        signals: Dict[str, Signal] = {
             "grok": grok,
             "perplexity": perplexity,
             "claude": claude,
-            "gemini": gemini
+            "gemini": gemini,
         }
-        
-        # 1. Визначаємо consensus
-        consensus, strength = self._calculate_consensus(signals)
-        
-        # 2. Рахуємо combined confidence
-        combined_conf = self._calculate_combined_confidence(signals)
-        
-        # 3. Збираємо всі ризики
-        key_risks = self._collect_risks(signals)
-        
-        # 4. Визначаємо invalidation price
-        invalidation = self._calculate_invalidation_price(signals, consensus)
-        
-        # 5. Генеруємо рекомендацію
-        recommendation = self._generate_recommendation(
-            consensus, 
-            strength, 
-            combined_conf,
-            invalidation,
-            signals
-        )
-        
-        # Створюємо відповідь
+
+        consensus, strength = self._vote(signals, devil_advocate)
+        confidence = self._confidence(signals, consensus, devil_advocate)
+        risks = self._risks(signals, devil_advocate)
+        invalidation = self._invalidation(signals, consensus)
+        rec = self._recommendation(consensus, strength, confidence, invalidation, signals)
+
         return CouncilResponse(
             timestamp=datetime.now(),
             event_type=event.event_type,
-            pair=event.pair,
+            instrument=event.instrument,
             grok=grok,
             perplexity=perplexity,
             claude=claude,
             gemini=gemini,
+            devil_advocate=devil_advocate,
             consensus=consensus,
             consensus_strength=strength,
-            combined_confidence=combined_conf,
-            key_risks=key_risks,
+            combined_confidence=confidence,
+            key_risks=risks,
             invalidation_price=invalidation,
-            recommendation=recommendation,
-            prompt_hash=prompt_hash
+            recommendation=rec,
+            prompt_hash=prompt_hash,
         )
-    
-    def _calculate_consensus(
-        self, 
-        signals: Dict[str, Signal]
-    ) -> Tuple[Literal["LONG", "SHORT", "WAIT", "CONFLICT"], 
-               Literal["UNANIMOUS", "STRONG", "WEAK", "NONE"]]:
+
+    # ── Voting ────────────────────────────────────────────────────────────────
+
+    def _vote(
+        self,
+        signals: Dict[str, Signal],
+        devil: Optional[Signal],
+    ) -> Tuple[
+        Literal["LONG", "SHORT", "WAIT", "CONFLICT"],
+        Literal["UNANIMOUS", "STRONG", "WEAK", "NONE"],
+    ]:
         """
-        Рахує consensus через голосування
-        
-        Returns:
-            (consensus_action, consensus_strength)
-        
-        🧒 ПРАВИЛА:
-        - 4/4 = UNANIMOUS (всі згодні)
-        - 3/4 = STRONG (сильна більшість)
-        - 2/4 = WEAK (слабка більшість)
-        - 1/4 або розділені = CONFLICT → WAIT (безпечно)
+        Confidence-weighted voting.
+        Score per action = Σ(weight × confidence) for all agents choosing that action.
+        Devil always votes WAIT at DEVIL_WEIGHT.
         """
-        
-        # Рахуємо голоси
-        votes = {"LONG": 0, "SHORT": 0, "WAIT": 0}
-        
-        for signal in signals.values():
-            votes[signal.action] += 1
-        
-        # Знаходимо переможця
-        max_votes = max(votes.values())
-        winners = [action for action, count in votes.items() if count == max_votes]
-        
-        # Визначаємо consensus
-        if len(winners) > 1:
-            # Розділені голоси - конфлікт → БЕЗПЕЧНИЙ WAIT
-            return "WAIT", "NONE"  # 🔧 ФІКС: одразу повертаємо WAIT
-        
-        consensus = winners[0]
-        
-        # Визначаємо силу
-        if max_votes == 4:
+        scores: Dict[str, float] = {"LONG": 0.0, "SHORT": 0.0, "WAIT": 0.0}
+
+        for name, signal in signals.items():
+            w = self.weights.get(name, 0.25)
+            scores[signal.action] += w * signal.confidence
+
+        if devil is not None:
+            scores["WAIT"] += DEVIL_WEIGHT * devil.confidence
+
+        total = sum(scores.values())
+        if total == 0:
+            return "WAIT", "NONE"
+
+        norm = {k: v / total for k, v in scores.items()}
+        winner = max(norm, key=norm.__getitem__)
+        top_score = norm[winner]
+
+        # CONFLICT: two actions within 10% of each other
+        sorted_scores = sorted(norm.values(), reverse=True)
+        if len(sorted_scores) >= 2 and (sorted_scores[0] - sorted_scores[1]) < 0.10:
+            return "CONFLICT", "NONE"
+
+        if top_score >= 0.75:
             strength = "UNANIMOUS"
-        elif max_votes == 3:
+        elif top_score >= 0.55:
             strength = "STRONG"
-        elif max_votes == 2:
+        elif top_score >= 0.40:
             strength = "WEAK"
         else:
             strength = "NONE"
-        
-        return consensus, strength
-    
-    def _calculate_combined_confidence(self, signals: Dict[str, Signal]) -> float:
-        """
-        Рахує зважену середню confidence
-        
-        Returns:
-            Combined confidence (0.0-1.0)
-        
-        🧒 ФОРМУЛА:
-        grok * 0.25 + perp * 0.25 + claude * 0.25 + gemini * 0.25
-        """
-        combined = 0.0
-        
-        for name, signal in signals.items():
-            weight = self.weights.get(name, 0.25)
-            combined += signal.confidence * weight
-        
-        return round(combined, 2)
-    
-    def _collect_risks(self, signals: Dict[str, Signal]) -> List[str]:
-        """
-        Збирає всі унікальні ризики від агентів
-        
-        Returns:
-            Список ризиків
-        """
-        risks = []
-        
-        for name, signal in signals.items():
-            if signal.risk_notes and signal.risk_notes not in risks:
-                # Додаємо з префіксом агента
-                risk = f"[{name.upper()}] {signal.risk_notes}"
-                risks.append(risk)
-        
-        return risks
-    
-    def _calculate_invalidation_price(
-        self, 
+
+        logger.debug(
+            f"Vote | norm={norm} | winner={winner} ({top_score:.0%}) | strength={strength}"
+        )
+        return winner, strength
+
+    # ── Confidence ────────────────────────────────────────────────────────────
+
+    def _confidence(
+        self,
         signals: Dict[str, Signal],
-        consensus: str
+        consensus: str,
+        devil: Optional[Signal],
     ) -> float:
         """
-        Визначає invalidation price
-        
-        🧒 ЛОГІКА:
-        - LONG → бере МАКСИМАЛЬНИЙ invalidation (найобережніший)
-        - SHORT → бере МІНІМАЛЬНИЙ invalidation (найобережніший)
-        - WAIT/CONFLICT → None
+        Combined confidence = weighted avg of agreeing agents
+        minus penalty from disagreeing agents × their weight × 0.30
+        minus additional penalty from devil's advocate × 0.20
         """
-        
-        if consensus in ["WAIT", "CONFLICT"]:
+        if consensus == "CONFLICT":
+            vals = [s.confidence for s in signals.values()]
+            return round(sum(vals) / len(vals), 2)
+
+        agree_w, agree_c, penalty = 0.0, 0.0, 0.0
+
+        for name, sig in signals.items():
+            w = self.weights.get(name, 0.25)
+            if sig.action == consensus:
+                agree_w += w
+                agree_c += w * sig.confidence
+            else:
+                penalty += w * sig.confidence * 0.30
+
+        if agree_w == 0:
+            return 0.0
+
+        base = agree_c / agree_w
+        if devil is not None:
+            penalty += DEVIL_WEIGHT * devil.confidence * 0.20
+
+        return round(max(0.0, min(1.0, base - penalty)), 2)
+
+    # ── Risks ─────────────────────────────────────────────────────────────────
+
+    def _risks(
+        self, signals: Dict[str, Signal], devil: Optional[Signal]
+    ) -> List[str]:
+        seen: set = set()
+        risks: List[str] = []
+        for name, sig in signals.items():
+            note = sig.risk_notes.strip()
+            if note and note not in seen:
+                seen.add(note)
+                risks.append(f"[{name.upper()}] {note}")
+        if devil and devil.risk_notes:
+            note = devil.risk_notes.strip()
+            if note not in seen:
+                risks.append(f"[DEVIL] {note}")
+        return risks
+
+    # ── Invalidation ──────────────────────────────────────────────────────────
+
+    def _invalidation(
+        self, signals: Dict[str, Signal], consensus: str
+    ) -> Optional[float]:
+        if consensus in ("WAIT", "CONFLICT"):
             return None
-        
-        # Збираємо всі invalidation prices
-        prices = [
-            s.invalidation_price 
-            for s in signals.values() 
-            if s.invalidation_price is not None
-        ]
-        
+        prices = [s.invalidation_price for s in signals.values() if s.invalidation_price]
         if not prices:
             return None
-        
-        # LONG → максимальний (найвищий stop-loss)
-        # SHORT → мінімальний (найнижчий stop-loss)
-        if consensus == "LONG":
-            return max(prices)
-        else:  # SHORT
-            return min(prices)
-    
-    def _generate_recommendation(
+        return max(prices) if consensus == "LONG" else min(prices)
+
+    # ── Recommendation ────────────────────────────────────────────────────────
+
+    def _recommendation(
         self,
         consensus: str,
         strength: str,
         confidence: float,
-        invalidation: float,
-        signals: Dict[str, Signal]
+        invalidation: Optional[float],
+        signals: Dict[str, Signal],
     ) -> dict:
-        """
-        Генерує структуровану рекомендацію
-        
-        Returns:
-            Dict з рекомендацією
-        """
-        
-        # Базова рекомендація
-        rec = {
+        rec: dict = {
             "action": consensus,
             "strength": strength,
-            "confidence": confidence
+            "confidence": confidence,
+            "agent_votes": {
+                name: f"{sig.action}:{sig.confidence:.2f}"
+                for name, sig in signals.items()
+            },
         }
-        
-        # Якщо WAIT або CONFLICT - тільки базова інфа
-        if consensus in ["WAIT", "CONFLICT"]:
-            rec["reason"] = "Insufficient consensus or high uncertainty"
+
+        if consensus in ("WAIT", "CONFLICT"):
+            rec["reason"] = (
+                "Strong disagreement between agents — no actionable edge"
+                if consensus == "CONFLICT"
+                else "Insufficient evidence for directional trade"
+            )
             return rec
-        
-        # Для LONG/SHORT додаємо деталі
+
         rec["invalidation_price"] = invalidation
-        
-        # Position sizing на основі strength + confidence
-        if strength == "UNANIMOUS" and confidence >= 0.8:
-            max_position = 0.05  # 5% (максимум)
-        elif strength == "STRONG" and confidence >= 0.7:
-            max_position = 0.03  # 3%
-        elif strength in ["STRONG", "WEAK"] and confidence >= 0.6:
-            max_position = 0.02  # 2%
+
+        # Position sizing
+        if strength == "UNANIMOUS" and confidence >= 0.80:
+            pos = 0.05
+        elif strength == "STRONG" and confidence >= 0.70:
+            pos = 0.03
+        elif strength in ("STRONG", "WEAK") and confidence >= 0.60:
+            pos = 0.02
         else:
-            max_position = 0.01  # 1% (мінімум)
-        
-        rec["max_position_size"] = max_position
-        
-        # Збираємо ключові insights
-        insights = []
-        for name, signal in signals.items():
-            if signal.action == consensus:
-                # Якщо агент згоден з консенсусом - додаємо його thesis
-                insight = f"{name.upper()}: {signal.thesis[:100]}"
-                insights.append(insight)
-        
-        rec["key_insights"] = insights
-        
+            pos = 0.01
+
+        rec["max_position_pct"] = pos
+        rec["key_insights"] = [
+            f"{name.upper()}: {sig.thesis[:120]}"
+            for name, sig in signals.items()
+            if sig.action == consensus
+        ]
+
         return rec
 
 
-# ==============================================================================
-# ТЕСТУВАННЯ
-# ==============================================================================
+# ──────────────────────────────────────────────────────────────────────────────
+# Smoke test
+# ──────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("🧪 Testing Aggregator...")
-    
-    # Створюємо тестові сигнали
-    grok_signal = Signal(
-        action="LONG",
-        confidence=0.85,
-        thesis="Massive FOMO on X, retail buying heavily",
-        invalidation_price=95000,
-        risk_notes="Could be fake hype",
-        sources=["https://x.com/example"]
-    )
-    
-    perp_signal = Signal(
-        action="WAIT",
-        confidence=0.4,
-        thesis="Can't verify the news from primary sources",
-        invalidation_price=None,
-        risk_notes="Unverified information",
-        sources=[]
-    )
-    
-    claude_signal = Signal(
-        action="LONG",
-        confidence=0.6,
-        thesis="Risk/reward is acceptable if stop at $95k",
-        invalidation_price=95000,
-        risk_notes="High volatility, small position recommended",
-        sources=[]
-    )
-    
-    gemini_signal = Signal(
-        action="LONG",
-        confidence=0.75,
-        thesis="Similar pattern in March 2024 led to +12% move",
-        invalidation_price=94500,
-        risk_notes="Pattern could fail if volume drops",
-        sources=["https://tradingview.com/example"]
-    )
-    
-    # Створюємо тестову подію
-    test_event = MarketEvent(
-        event_type="price_spike",
-        pair="BTC/USDT",
-        severity=0.8,
-        data={"price_change": 5.2}
-    )
-    
-    # Створюємо aggregator
+    s_long = Signal(action="LONG", confidence=0.82, thesis="Supply cut confirmed",
+                    invalidation_price=70.0, risk_notes="Demand may drop", sources=[])
+    s_wait = Signal(action="WAIT", confidence=0.45, thesis="Unclear picture",
+                    invalidation_price=None, risk_notes="Data conflict", sources=[])
+    s_devil = Signal(action="WAIT", confidence=0.65, thesis="China PMI below 50",
+                     invalidation_price=None, risk_notes="PMI misread risk", sources=[])
+
+    event = MarketEvent(event_type="price_spike", instrument="BZ=F",
+                        severity=0.8, data={"price_change_pct": 3.1})
+
     agg = Aggregator()
-    
-    # Агрегуємо
-    response = agg.aggregate(
-        event=test_event,
-        grok=grok_signal,
-        perplexity=perp_signal,
-        claude=claude_signal,
-        gemini=gemini_signal,
-        prompt_hash="test_hash_123"
-    )
-    
-    # Перевірки
-    print(f"\n✅ Aggregation complete:")
-    print(f"   Consensus: {response.consensus} ({response.consensus_strength})")
-    print(f"   Combined confidence: {response.combined_confidence:.0%}")
-    print(f"   Votes: LONG=3, WAIT=1 → Should be STRONG")
-    assert response.consensus == "LONG"
-    assert response.consensus_strength == "STRONG"
-    
-    print(f"\n   Invalidation: ${response.invalidation_price}")
-    print(f"   Should be max(95000, 94500) = 95000 for LONG")
-    assert response.invalidation_price == 95000
-    
-    print(f"\n   Key risks ({len(response.key_risks)}):")
-    for risk in response.key_risks:
-        print(f"      - {risk[:60]}...")
-    
-    print(f"\n   Recommendation:")
-    print(f"      Action: {response.recommendation['action']}")
-    print(f"      Max position: {response.recommendation['max_position_size']:.1%}")
-    
-    print("\n🎉 All Aggregator tests passed!")
+
+    # Test 1: UNANIMOUS
+    resp = agg.aggregate(event, s_long, s_long, s_long, s_long, "h1")
+    assert resp.consensus == "LONG"
+    assert resp.consensus_strength == "UNANIMOUS"
+    print(f"✅ UNANIMOUS: {resp.consensus} ({resp.consensus_strength}) @ {resp.combined_confidence:.0%}")
+
+    # Test 2: Devil's advocate reduces confidence
+    resp_d = agg.aggregate(event, s_long, s_long, s_long, s_long, "h2", devil_advocate=s_devil)
+    assert resp_d.combined_confidence < resp.combined_confidence
+    assert resp_d.devil_advocate is not None
+    print(f"✅ Devil advocate: confidence {resp.combined_confidence:.0%} → {resp_d.combined_confidence:.0%}")
+    devil_risks = [r for r in resp_d.key_risks if "[DEVIL]" in r]
+    assert len(devil_risks) > 0
+    print(f"✅ Devil risk captured: {devil_risks[0][:60]}")
+
+    # Test 3: STRONG with one WAIT
+    resp2 = agg.aggregate(event, s_long, s_long, s_long, s_wait, "h3")
+    assert resp2.consensus == "LONG"
+    assert resp2.consensus_strength in ("STRONG", "UNANIMOUS")
+    print(f"✅ STRONG: {resp2.consensus} ({resp2.consensus_strength})")
+
+    # Test 4: Position sizing
+    assert resp.recommendation["max_position_pct"] == 0.05
+    assert resp2.recommendation["max_position_pct"] <= 0.03
+    print(f"✅ Position sizing: UNANIMOUS={resp.recommendation['max_position_pct']:.0%}")
+
+    # Test 5: Weight update
+    agg.update_weights({"grok": 0.30, "perplexity": 0.20, "claude": 0.30, "gemini": 0.20})
+    print(f"✅ Weight update: {agg.weights}")
+
+    print("\n🎉 Aggregator v2 all smoke tests passed!")

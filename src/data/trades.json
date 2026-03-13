@@ -1,0 +1,2466 @@
+[
+  {
+    "id": "20260310_185253_197fe46f",
+    "timestamp": "2026-03-10T18:52:53.182064",
+    "trigger": {
+      "timestamp": "2026-03-10 18:51:12.716651",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67324",
+        "summary": "Annual U.S. crude oil exports in 2025 decreased 3% from 2024, the first annual decrease since 2021. Exports decreased to Europe and the Asia and Oceania region, the two top regional destinations for U.S. crude oil. Despite fewer crude oil exports, U.S. crude oil imports decreased by more. Overall, U.S. net imports of crude oil—total imports minus total exports—decreased from 2.5 million barrels per day (b/d) in 2024 to 2.2 million b/d in 2025.",
+        "published": "Tue, 10 Mar 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.51,
+      "headline": "Annual U.S. crude oil exports decrease for first time since 2021",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 18:52:53.181840",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "NONE",
+      "combined_confidence": 0.0,
+      "key_risks": [
+        "[GROK] Technical error"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "NONE",
+        "confidence": 0.0,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.00",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "0d97ec2e920a012631ec04ada28d0c344a4d38aa1cde61e40d187a8fcd42881f",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_185458_3b812572",
+    "timestamp": "2026-03-10T18:54:58.754314",
+    "trigger": {
+      "timestamp": "2026-03-10 18:51:12.716976",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67304",
+        "summary": "In 2025, exports of major petroleum-based transportation fuels, including distillate fuel oil, motor gasoline, and jet fuel, averaged 2.4 million barrels per day (b/d), about the same as the previous year. Distillate fuel oil, commonly sold as diesel, accounts for more than half of these exports, and the entirety of the annual decrease. Exports of gasoline and jet fuel increased slightly in 2025 over 2024. As in previous years, Mexico was the most popular destination by volume for all three fuels, especially gasoline.",
+        "published": "Mon, 09 Mar 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.425,
+      "headline": "U.S. exports of major transportation fuels in 2025 were about the same as in 2024",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 18:54:58.754148",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "NONE",
+      "combined_confidence": 0.0,
+      "key_risks": [
+        "[GROK] Technical error"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "NONE",
+        "confidence": 0.0,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.00",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "b6addef5eb79db9d5bae16690377bb84bada2b8319d1cfe19055cb6353972253",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_185624_dd7a5b71",
+    "timestamp": "2026-03-10T18:56:24.142648",
+    "trigger": {
+      "timestamp": "2026-03-10 18:51:12.717680",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67225",
+        "summary": "Natural gas pipeline projects completed in the United States in 2025 increased capacity by approximately 6.3 billion cubic feet per day (Bcf/d), according to our recently updated Natural Gas Pipeline Projects Tracker. A substantial portion, 85%, or 5.3 Bcf/d, of this new capacity is dedicated to delivering natural gas to the South Central region of the United States. This region includes the Gulf Coast, where much of the nation's growing natural gas demand, particularly from liquefied natural gas (LNG), is concentrated. The new capacity primarily connects both new and existing supply sources to consumers in the region.",
+        "published": "Wed, 25 Feb 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.51,
+      "headline": "Most natural gas pipelines built in 2025 connect the South Central United States to supply",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 18:56:24.142459",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "NONE",
+      "combined_confidence": 0.0,
+      "key_risks": [
+        "[GROK] Technical error"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "NONE",
+        "confidence": 0.0,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.00",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "2a60be130300d980679f544b235f8b79eb81dd6904f938aac5147adc7283a5d0",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_185801_69f89259",
+    "timestamp": "2026-03-10T18:58:01.530689",
+    "trigger": {
+      "timestamp": "2026-03-10 18:51:12.717973",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67224",
+        "summary": "Ten years ago, on February 24, 2016, the first liquefied natural gas (LNG) cargo from the Sabine Pass Terminal was exported from the United States, marking the beginning of a new era in U.S. LNG exports. Today, the United States is the world's largest LNG exporter, ahead of both Australia and Qatar. LNG exports surged from 0.5 billion cubic feet per day (Bcf/d) in 2016 to 15.0 Bcf/d in 2025, and in our February Short-Term Energy Outlook, we forecast U.S. LNG exports to exceed 18.1 Bcf/d in 2027. LNG exports from the United States increased for several reasons, including abundant natural gas supply and reserves, flexible LNG export contracts, and relatively low feedgas costs. In addition, increasing international demand and a favorable investment climate have supported LNG infrastructure expansions in the United States.",
+        "published": "Tue, 24 Feb 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.425,
+      "headline": "Ten years after first Sabine Pass cargo, U.S. LNG exports are still on the rise",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 18:58:01.530461",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "NONE",
+      "combined_confidence": 0.0,
+      "key_risks": [
+        "[GROK] Technical error"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "NONE",
+        "confidence": 0.0,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.00",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "c4b87d9d6ba99d08f6dbadd7c87a9eefc93da4b0af4dce372048aa8bb6082d11",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_185940_73b4ddd0",
+    "timestamp": "2026-03-10T18:59:40.925049",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.631521",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67324",
+        "summary": "Annual U.S. crude oil exports in 2025 decreased 3% from 2024, the first annual decrease since 2021. Exports decreased to Europe and the Asia and Oceania region, the two top regional destinations for U.S. crude oil. Despite fewer crude oil exports, U.S. crude oil imports decreased by more. Overall, U.S. net imports of crude oil—total imports minus total exports—decreased from 2.5 million barrels per day (b/d) in 2024 to 2.2 million b/d in 2025.",
+        "published": "Tue, 10 Mar 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.51,
+      "headline": "Annual U.S. crude oil exports decrease for first time since 2021",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 18:59:40.924794",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA reports a 3% decrease in U.S. crude exports for 2025, with reductions to key regions, suggesting possible global demand softening; however, as historical data, it lacks immediate implications for Brent prices.",
+        "invalidation_price": null,
+        "risk_notes": "Historical data may not reflect current or future market dynamics, potentially leading to no impact.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67324"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "U.S. crude exports down 3% in 2025 vs 2024, first decline since 2021. However, imports fell more sharply, reducing net imports from 2.5 to 2.2 mb/d. Mixed signal: lower exports bearish for global supply, but reduced net imports suggests weaker U.S. demand. Insufficient current price/inventory data to assess market impact.",
+        "invalidation_price": null,
+        "risk_notes": "Data is backward-looking (2025 vs 2024) with no current market context on inventories, OPEC+ policy, or geopolitical factors that drive current pricing",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67324"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.16,
+      "key_risks": [
+        "[GROK] Historical data may not reflect current or future market dynamics, potentially leading to no impact.",
+        "[PERPLEXITY] Technical error",
+        "[CLAUDE] Data is backward-looking (2025 vs 2024) with no current market context on inventories, OPEC+ policy, or geopolitical factors that drive current pricing"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.16,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.35",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "d4c9b1f180b9a1e136ffb8064426faa65756cbb291ce94575532d89466e612e8",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_190052_788d0884",
+    "timestamp": "2026-03-10T19:00:52.531475",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.631853",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67304",
+        "summary": "In 2025, exports of major petroleum-based transportation fuels, including distillate fuel oil, motor gasoline, and jet fuel, averaged 2.4 million barrels per day (b/d), about the same as the previous year. Distillate fuel oil, commonly sold as diesel, accounts for more than half of these exports, and the entirety of the annual decrease. Exports of gasoline and jet fuel increased slightly in 2025 over 2024. As in previous years, Mexico was the most popular destination by volume for all three fuels, especially gasoline.",
+        "published": "Mon, 09 Mar 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.425,
+      "headline": "U.S. exports of major transportation fuels in 2025 were about the same as in 2024",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:00:52.531251",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA data shows 2025 fuel exports stable at 2.4 million b/d, with decreases in distillate fuel oil offset by slight gains in gasoline and jet fuel. This historical data provides no clear directional signal for Brent Crude, indicating neutral market impact.",
+        "invalidation_price": null,
+        "risk_notes": "If global demand for refined products surges unexpectedly, it could drive Brent prices higher despite the stable export figures.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67304"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "US petroleum exports flat at 2.4mb/d in 2025 vs 2024, with diesel exports declining while gasoline/jet fuel rose slightly. This reflects stable US refining capacity utilization but mixed product demand signals. Insufficient directional catalyst for Brent crude - export data shows refined product flows, not crude supply/demand fundamentals.",
+        "invalidation_price": null,
+        "risk_notes": "Missing critical data: OPEC+ production levels, inventory changes, geopolitical developments, and current futures curve structure needed for directional conviction",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67304"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.16,
+      "key_risks": [
+        "[GROK] If global demand for refined products surges unexpectedly, it could drive Brent prices higher despite the stable export figures.",
+        "[PERPLEXITY] Technical error",
+        "[CLAUDE] Missing critical data: OPEC+ production levels, inventory changes, geopolitical developments, and current futures curve structure needed for directional conviction"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.16,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.35",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "fcec044580e20052ca0aac7b8a3fec414dab445229ca2327be6ed99b64282758",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_190140_9bb0a723",
+    "timestamp": "2026-03-10T19:01:40.144774",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.632385",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67225",
+        "summary": "Natural gas pipeline projects completed in the United States in 2025 increased capacity by approximately 6.3 billion cubic feet per day (Bcf/d), according to our recently updated Natural Gas Pipeline Projects Tracker. A substantial portion, 85%, or 5.3 Bcf/d, of this new capacity is dedicated to delivering natural gas to the South Central region of the United States. This region includes the Gulf Coast, where much of the nation's growing natural gas demand, particularly from liquefied natural gas (LNG), is concentrated. The new capacity primarily connects both new and existing supply sources to consumers in the region.",
+        "published": "Wed, 25 Feb 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.51,
+      "headline": "Most natural gas pipelines built in 2025 connect the South Central United States to supply",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:01:40.144585",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.25,
+        "thesis": "US nat gas pipeline capacity increase primarily affects regional gas flows to Gulf Coast LNG facilities. Indirect oil impact through potential energy substitution effects, but insufficient direct crude oil market drivers to establish clear directional bias. Need complementary crude-specific data.",
+        "invalidation_price": null,
+        "risk_notes": "Natural gas infrastructure changes have minimal direct impact on Brent crude fundamentals - missing key oil market drivers like OPEC decisions, inventory data, or geopolitical developments",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67225"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "US natural gas pipeline capacity increase in 2025 primarily supports LNG exports, not directly impacting crude oil supply/demand. While increased gas availability could marginally influence long-term fuel switching, it's not a short-term driver for Brent. The news is about 2025 capacity, not a new market shock, and does not provide a clear directional signal for crude oil in Q1.",
+        "invalidation_price": null,
+        "risk_notes": "The market could misinterpret this as a broader signal of energy abundance, indirectly pressuring crude. A significant, unexpected shift in industrial fuel consumption away from oil due to more competitive gas is a low-probability risk. Historical analogues are weak due to the indirect nature of the event on crude.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67225"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.14,
+      "key_risks": [
+        "[GROK] Technical error",
+        "[CLAUDE] Natural gas infrastructure changes have minimal direct impact on Brent crude fundamentals - missing key oil market drivers like OPEC decisions, inventory data, or geopolitical developments",
+        "[GEMINI] The market could misinterpret this as a broader signal of energy abundance, indirectly pressuring crude. A significant, unexpected shift in industrial fuel consumption away from oil due to more competitive gas is a low-probability risk. Historical analogues are weak due to the indirect nature of the event on crude."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.14,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.25",
+          "gemini": "WAIT:0.30"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "c8369eeacdaaae79cb9091e8a6480979edab3d5ca3bae6f73bf78cab4bfbcbc8",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_190233_a10eea8e",
+    "timestamp": "2026-03-10T19:02:33.195944",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.632585",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67224",
+        "summary": "Ten years ago, on February 24, 2016, the first liquefied natural gas (LNG) cargo from the Sabine Pass Terminal was exported from the United States, marking the beginning of a new era in U.S. LNG exports. Today, the United States is the world's largest LNG exporter, ahead of both Australia and Qatar. LNG exports surged from 0.5 billion cubic feet per day (Bcf/d) in 2016 to 15.0 Bcf/d in 2025, and in our February Short-Term Energy Outlook, we forecast U.S. LNG exports to exceed 18.1 Bcf/d in 2027. LNG exports from the United States increased for several reasons, including abundant natural gas supply and reserves, flexible LNG export contracts, and relatively low feedgas costs. In addition, increasing international demand and a favorable investment climate have supported LNG infrastructure expansions in the United States.",
+        "published": "Tue, 24 Feb 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.425,
+      "headline": "Ten years after first Sabine Pass cargo, U.S. LNG exports are still on the rise",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:02:33.195695",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.2,
+        "thesis": "EIA report highlights growth in US LNG exports, which is unrelated to crude oil markets as it focuses on natural gas; no direct impact on Brent Crude prices.",
+        "invalidation_price": null,
+        "risk_notes": "Indirect effects if LNG expansion influences broader energy demand or competes with oil for infrastructure.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67224"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.25,
+        "thesis": "US LNG export growth is a 10-year structural story already priced into energy markets. This retrospective analysis provides no new actionable information for crude oil trading. LNG primarily competes with pipeline gas and coal in power generation, not oil products. Without current price data, technical levels, or fresh supply/demand catalysts, no directional bias warranted.",
+        "invalidation_price": null,
+        "risk_notes": "Missing critical market data - no current Brent price, futures curve structure, or inventory levels to assess actual trading opportunity",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67224"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "The EIA report confirms the US's established role as the world's largest LNG exporter, with continued growth projected through 2027. This represents a long-term structural shift in global energy supply, generally providing more energy optionality and potential substitution away from crude in some sectors. However, the information presented is a reiteration of known trends and existing forecasts, not a new, unexpected catalyst. The market has likely already priced in the implications of robust US LNG supply, leading to minimal immediate impact on Brent crude futures.",
+        "invalidation_price": null,
+        "risk_notes": "The primary risk to a 'WAIT' thesis is if the market interprets this reiteration of strong LNG supply as a stronger-than-expected signal for overall energy abundance, leading to a bearish sentiment shift for crude. Conversely, any unrelated geopolitical event or crude supply disruption could easily overshadow this gas-centric news, rendering its impact negligible.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67224"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.19,
+      "key_risks": [
+        "[GROK] Indirect effects if LNG expansion influences broader energy demand or competes with oil for infrastructure.",
+        "[PERPLEXITY] Technical error",
+        "[CLAUDE] Missing critical market data - no current Brent price, futures curve structure, or inventory levels to assess actual trading opportunity",
+        "[GEMINI] The primary risk to a 'WAIT' thesis is if the market interprets this reiteration of strong LNG supply as a stronger-than-expected signal for overall energy abundance, leading to a bearish sentiment shift for crude. Conversely, any unrelated geopolitical event or crude supply disruption could easily overshadow this gas-centric news, rendering its impact negligible."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.19,
+        "agent_votes": {
+          "grok": "WAIT:0.20",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.25",
+          "gemini": "WAIT:0.30"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "6b1f9b3bb0792bc4120bf5dd52c34399801b434e289c6c0bb73653fa9fbc469a",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_190323_7bbda56e",
+    "timestamp": "2026-03-10T19:03:23.512310",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.632762",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67206",
+        "summary": "U.S. power plant owners and operators plan to retire nearly 11 gigawatts (GW) of utility-scale electric generating capacity from the U.S. power grid this year, according to data reported to us in our latest Preliminary Monthly Electric Generator Inventory. Almost all the scheduled retirements are either coal-fired power plants (58%) or steam turbines and simple-cycle natural gas (42%).",
+        "published": "Mon, 23 Feb 2026 09:00:00 EST",
+        "relevance_level": "high",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.6799999999999999,
+      "headline": "Retirement delays of U.S. electric generating capacity may continue in 2026",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:03:23.512005",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA report indicates U.S. retirement of 11 GW of power capacity, mostly coal and natural gas, suggesting a potential long-term decline in fossil fuel demand, which could indirectly pressure Brent prices, but the impact on global crude oil is minimal and speculative.",
+        "invalidation_price": null,
+        "risk_notes": "The retirements might be offset by increased use of other energy sources or have no significant effect on global oil demand.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67206"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.2,
+        "thesis": "EIA report on 11GW coal/gas power plant retirements in 2026 has negligible direct impact on crude oil demand. Power sector fuel is primarily coal/natgas; any delays maintain non-oil generation. No link to petroleum inventories, refinery runs, or Cushing levels. Noise vs genuine oil market signal.",
+        "invalidation_price": null,
+        "risk_notes": "Unexpected policy shift tying plant ops to oil-derived fuels, but unsupported by data.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67206"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.25,
+        "thesis": "U.S. power plant retirements (11GW coal/gas) have minimal direct impact on crude oil demand. Power sector uses <1% of U.S. oil consumption. Coal-to-gas switching already priced in. Event lacks immediate crude oil market relevance despite high EIA source credibility.",
+        "invalidation_price": null,
+        "risk_notes": "Missing critical oil market fundamentals - inventory data, OPEC+ decisions, geopolitical developments, or refining margins that actually drive Brent pricing",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67206"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.2,
+        "thesis": "EIA report on US power plant retirements (58% coal, 42% simple-cycle natural gas) in 2026 is a US electricity grid structural adjustment. It has negligible direct impact on global crude oil demand or supply, as crude is not a primary fuel for utility-scale generation in the US. Macro-fundamental analysis shows no significant direct drivers for Brent from this event, nor does it align with typical seasonal demand patterns for crude.",
+        "invalidation_price": null,
+        "risk_notes": "Market misinterpretation of the report as a broader energy transition signal directly impacting crude demand, or an unforeseen shift towards oil-fired generation to replace retired capacity (highly improbable). No strong historical analogues exist for this specific event type that directly impacted global crude oil prices significantly.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67206"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.24,
+      "key_risks": [
+        "[GROK] The retirements might be offset by increased use of other energy sources or have no significant effect on global oil demand.",
+        "[PERPLEXITY] Unexpected policy shift tying plant ops to oil-derived fuels, but unsupported by data.",
+        "[CLAUDE] Missing critical oil market fundamentals - inventory data, OPEC+ decisions, geopolitical developments, or refining margins that actually drive Brent pricing",
+        "[GEMINI] Market misinterpretation of the report as a broader energy transition signal directly impacting crude demand, or an unforeseen shift towards oil-fired generation to replace retired capacity (highly improbable). No strong historical analogues exist for this specific event type that directly impacted global crude oil prices significantly."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.24,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.20",
+          "claude": "WAIT:0.25",
+          "gemini": "WAIT:0.20"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "1aa02e6b6a9aed994e73cf286e2bf7bb681584eba7d6a1959712c47fd68918e6",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_190416_8ef1d484",
+    "timestamp": "2026-03-10T19:04:16.920480",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.633734",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67205",
+        "summary": "U.S. power plant developers and operators plan to add 86 gigawatts (GW) of new utility-scale electric generating capacity to the U.S. power grid in 2026 in our latest Preliminary Monthly Electric Generator Inventory report, a record if realized. Solar power makes up 51% of the planned 2026 capacity additions, followed by battery storage at 28% and wind at 14%.",
+        "published": "Fri, 20 Feb 2026  09:00:00 EST",
+        "relevance_level": "high",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.6799999999999999,
+      "headline": "New U.S. electric generating capacity expected to reach a record high in 2026",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:04:16.920222",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.25,
+        "thesis": "U.S. renewable capacity additions (86 GW in 2026, 51% solar) reduce long-term oil demand for power generation, but impact is structural/multi-year, not immediate. Current Brent weakness driven by crude supply surplus (3M bpd overhang), not power sector fuel mix. Event is noise relative to near-term inventory dynamics.",
+        "invalidation_price": null,
+        "risk_notes": "Renewable buildout is gradual; oil power plants already marginal in U.S. grid. This event has zero bearing on 2026 crude balance. Confusing power sector decarbonization with crude oil trading is a category error. Real risk: missing actual drivers—OPEC+ compliance, Russian/Venezuelan export flows, China strategic stockpile demand.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164",
+          "https://naga.com/en/news-and-analysis/articles/oil-price-prediction"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "86GW renewable capacity addition in 2026 (51% solar, 28% battery, 14% wind) signals long-term oil demand erosion in power generation. However, impact is gradual and power sector represents <5% of US oil consumption. Current oil prices driven more by geopolitics, OPEC+ policy, and transportation demand. Insufficient immediate catalyst for directional trade.",
+        "invalidation_price": null,
+        "risk_notes": "Accelerated renewable adoption could compound with EV growth faster than expected, creating bearish oil demand narrative",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67205"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.15,
+      "key_risks": [
+        "[GROK] Technical error",
+        "[PERPLEXITY] Renewable buildout is gradual; oil power plants already marginal in U.S. grid. This event has zero bearing on 2026 crude balance. Confusing power sector decarbonization with crude oil trading is a category error. Real risk: missing actual drivers—OPEC+ compliance, Russian/Venezuelan export flows, China strategic stockpile demand.",
+        "[CLAUDE] Accelerated renewable adoption could compound with EV growth faster than expected, creating bearish oil demand narrative"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.15,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "WAIT:0.25",
+          "claude": "WAIT:0.35",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "6356e5b31618a71c40839eb150194ed6d3af2b85943156c2c7a5b6f00e5791e9",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_190505_4c939048",
+    "timestamp": "2026-03-10T19:05:05.975170",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.633944",
+      "event_type": "tanker_alert",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67184",
+        "summary": "U.S. exports of refined petroleum products carried on clean product tankers have increased steadily over the last year, with exports totaling 6.3 million barrels per day (b/d) in January 2026, about 10% more than in January 2025 and near record highs, according to data from Vortexa. Growth in exports of diesel, gasoline, and liquified petroleum gases (LPG) drove the overall increase. Exports of diesel both increased and shifted destinations, with more headed to Europe and less headed to South America, which has historically been the largest destination for U.S. distillate exports.",
+        "published": "Tue, 17 Feb 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.51,
+      "headline": "Maritime exports of petroleum products increased in January 2026",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:05:05.974918",
+      "event_type": "tanker_alert",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "Increased U.S. refined product exports, including diesel to Europe, indicate stronger global demand, which could indirectly support Brent Crude prices, but the impact is not direct and based on medium-relevance data.",
+        "invalidation_price": null,
+        "risk_notes": "The exports may not lead to higher crude demand if they are driven by temporary factors or oversupply in refined markets.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67184"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA/Vortexa data shows US clean product exports at 6.3Mb/d Jan 2026 (+10% YoY), diesel +210kb/d (19%) with Europe shipments doubling due to winter demand/supply constraints. Supports tighter Europe diesel balances (bullish LGO), but dated (Feb 17 pub) and no Cushing/inventory/ARA stocks data. Neutral for Brent crude as product exports don't directly impact raw crude supply/demand.",
+        "invalidation_price": null,
+        "risk_notes": "Stale data (3+ weeks old); no primary EIA WPSR crude stocks, refinery utilization, or OPEC+ production updates to confirm macro impact.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67184",
+          "https://www.oilmonster.com/article/us-petroleum-product-exports-hit-multiyear-high-in-january-2026/7927"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "US refined product exports at 6.3mb/d (+10% YoY) signal strong refining margins but mixed crude impact. Higher diesel exports to Europe vs lower to S.America suggests regional demand shifts rather than net global demand growth. Refinery runs may support crude demand but export growth pace appears to be moderating from record levels.",
+        "invalidation_price": null,
+        "risk_notes": "European diesel demand could weaken faster than expected, reducing US export economics and refinery crude demand",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67184"
+        ]
+      },
+      "gemini": {
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "US refined product exports, particularly diesel to Europe, are near record highs in Jan 2026, indicating robust global product demand. This strong demand environment, reinforced by Q1 seasonal heating oil demand in Europe, supports higher refinery utilization globally, translating into increased crude oil demand.",
+        "invalidation_price": null,
+        "risk_notes": "The primary risk is that the increased US product exports are primarily met by increased US domestic crude production, rather than drawing on global crude supplies or significantly increasing global crude demand. A sudden global economic slowdown or a sharp decline in European industrial activity could also quickly reverse product demand.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67184"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "STRONG",
+      "combined_confidence": 0.27,
+      "key_risks": [
+        "[GROK] The exports may not lead to higher crude demand if they are driven by temporary factors or oversupply in refined markets.",
+        "[PERPLEXITY] Stale data (3+ weeks old); no primary EIA WPSR crude stocks, refinery utilization, or OPEC+ production updates to confirm macro impact.",
+        "[CLAUDE] European diesel demand could weaken faster than expected, reducing US export economics and refinery crude demand",
+        "[GEMINI] The primary risk is that the increased US product exports are primarily met by increased US domestic crude production, rather than drawing on global crude supplies or significantly increasing global crude demand. A sudden global economic slowdown or a sharp decline in European industrial activity could also quickly reverse product demand."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "STRONG",
+        "confidence": 0.27,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.30",
+          "claude": "WAIT:0.35",
+          "gemini": "LONG:0.65"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "d07795f8b9c6aa229033d8875f5c5be9855ba732dcbb322c1ec1b84fc2240cc6",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_190550_835ef1b0",
+    "timestamp": "2026-03-10T19:05:50.113919",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.634294",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67164",
+        "summary": "We forecast that production of petroleum and other liquids will continue to exceed global demand, which results in Brent crude oil prices falling from an average of $69 per barrel (b) in 2025 to $58/b in 2026 and $53/b in 2027. Crude oil prices tend to decrease as global petroleum stocks increase. Persistently high implied global oil inventory builds in the near-term are putting downward pressure on crude oil prices despite heightened uncertainty around the volume of crude oil exports from Russia and Venezuela.",
+        "published": "Wed, 11 Feb 2026 09:00:00 EST",
+        "relevance_level": "high",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.85,
+      "headline": "EIA forecasts lower oil prices in 2026 and 2027 due to persistent stock builds",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:05:50.113620",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "SHORT",
+        "confidence": 0.75,
+        "thesis": "EIA forecasts global petroleum oversupply, with production exceeding demand, leading to declining Brent crude prices from $69/b in 2025 to $58/b in 2026 and $53/b in 2027, due to building inventories despite export uncertainties from Russia and Venezuela.",
+        "invalidation_price": null,
+        "risk_notes": "Uncertainties in Russian and Venezuelan crude exports could disrupt supply, potentially tightening the market and reversing price declines.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164"
+        ]
+      },
+      "perplexity": {
+        "action": "SHORT",
+        "confidence": 0.72,
+        "thesis": "EIA Feb 11 report confirms persistent supply surplus (production exceeding demand through 2026-27) with inventory builds pressuring prices lower. Brent forecast $58/bbl 2026 vs $69 in 2025 reflects structural oversupply. Multiple institutions (JPM $60, GS $56-60, Reuters poll $61.27) converge on $56-61 range. Current price likely elevated on geopolitical premium; fundamentals support mean reversion toward $58-60 by year-end as surplus persists.",
+        "invalidation_price": 72.0,
+        "risk_notes": "Geopolitical shock (Iran/Strait of Hormuz disruption) could spike prices to $100+; GS estimates $18/bbl risk premium already priced. OPEC+ surprise production cuts or faster-than-expected demand growth could invalidate thesis. Russian/Venezuelan export sanctions impact still uncertain per EIA.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164",
+          "https://www.jpmorgan.com/insights/global-research/commodities/oil-prices",
+          "https://oilprice.com/Energy/Energy-General/Goldman-Sachs-Hikes-Year-End-Oil-Price-Forecast-by-6-Per-Barrel.html",
+          "https://naga.com/za/news-and-analysis/articles/oil-price-prediction"
+        ]
+      },
+      "claude": {
+        "action": "SHORT",
+        "confidence": 0.75,
+        "thesis": "EIA forecasts structural oversupply through 2027, with Brent falling from $69 (2025) to $53 (2027). Persistent inventory builds despite geopolitical risks signal fundamental weakness. Current price likely above fair value given supply/demand imbalance. Target $58-60 range near-term.",
+        "invalidation_price": 75.0,
+        "risk_notes": "Major supply disruption from Russia/Venezuela sanctions or Middle East conflict could quickly reverse oversupply narrative",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164"
+        ]
+      },
+      "gemini": {
+        "action": "SHORT",
+        "confidence": 0.85,
+        "thesis": "EIA forecasts Brent crude prices to fall from $69/b (2025) to $58/b (2026) and $53/b (2027). This sustained decline is driven by global production of petroleum and other liquids continuing to exceed demand, leading to persistently high implied global oil inventory builds. This fundamental oversupply creates a bearish outlook for crude.",
+        "invalidation_price": null,
+        "risk_notes": "The EIA report itself flags 'heightened uncertainty around the volume of crude oil exports from Russia and Venezuela.' A significant, unexpected disruption or reduction in supply from these regions could tighten the market faster than anticipated, counteracting the oversupply thesis. Geopolitical escalation remains a key upside risk. Historical analogues like 2014-2016 suggest a similar oversupply scenario can lead to a more severe price decline than currently forecast.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "SHORT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.77,
+      "key_risks": [
+        "[GROK] Uncertainties in Russian and Venezuelan crude exports could disrupt supply, potentially tightening the market and reversing price declines.",
+        "[PERPLEXITY] Geopolitical shock (Iran/Strait of Hormuz disruption) could spike prices to $100+; GS estimates $18/bbl risk premium already priced. OPEC+ surprise production cuts or faster-than-expected demand growth could invalidate thesis. Russian/Venezuelan export sanctions impact still uncertain per EIA.",
+        "[CLAUDE] Major supply disruption from Russia/Venezuela sanctions or Middle East conflict could quickly reverse oversupply narrative",
+        "[GEMINI] The EIA report itself flags 'heightened uncertainty around the volume of crude oil exports from Russia and Venezuela.' A significant, unexpected disruption or reduction in supply from these regions could tighten the market faster than anticipated, counteracting the oversupply thesis. Geopolitical escalation remains a key upside risk. Historical analogues like 2014-2016 suggest a similar oversupply scenario can lead to a more severe price decline than currently forecast."
+      ],
+      "invalidation_price": 72.0,
+      "recommendation": {
+        "action": "SHORT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.77,
+        "agent_votes": {
+          "grok": "SHORT:0.75",
+          "perplexity": "SHORT:0.72",
+          "claude": "SHORT:0.75",
+          "gemini": "SHORT:0.85"
+        },
+        "invalidation_price": 72.0,
+        "max_position_pct": 0.01,
+        "key_insights": [
+          "GROK: EIA forecasts global petroleum oversupply, with production exceeding demand, leading to declining Brent crude prices fro",
+          "PERPLEXITY: EIA Feb 11 report confirms persistent supply surplus (production exceeding demand through 2026-27) with inventory builds",
+          "CLAUDE: EIA forecasts structural oversupply through 2027, with Brent falling from $69 (2025) to $53 (2027). Persistent inventory",
+          "GEMINI: EIA forecasts Brent crude prices to fall from $69/b (2025) to $58/b (2026) and $53/b (2027). This sustained decline is d"
+        ]
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "a014fe2b1f6ee403e228f66f4cbe1ff8c958320f7aff958fe86edda9d3e1711d",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "All checks passed — SHORT approved",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 1,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_190645_7c602a9a",
+    "timestamp": "2026-03-10T19:06:45.095987",
+    "trigger": {
+      "timestamp": "2026-03-10 18:58:36.634605",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67124",
+        "summary": "Working natural gas stocks fell 360 billion cubic feet (Bcf) in the Lower 48 states for the week ending January 30, 2026, amid Winter Storm Fern-the largest weekly net withdrawal reported in the history of the Weekly Natural Gas Storage Report. The withdrawal exceeded the five-year average for the same week by 89% (170 Bcf). The large withdrawals resulted from increased heating demand for natural gas and natural gas production curtailments because of severe winter weather. Working gas stocks are now 1.1% below the five-year average for this time of year.",
+        "published": "Thu, 05 Feb 2026 09:00:00 EST",
+        "relevance_level": "high",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.6799999999999999,
+      "headline": "Record natural gas stock withdrawals during week ending January 30, 2026",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:06:45.095769",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA report highlights large natural gas stock draw due to winter storm, but it primarily affects gas markets, not crude oil. No direct impact on Brent Crude demand or supply evident, so insufficient evidence for a trade signal.",
+        "invalidation_price": null,
+        "risk_notes": "If the natural gas shortage prompts a significant shift to oil-based heating, it could unexpectedly boost crude oil demand.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67124"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "Natural gas storage drawdown indicates severe winter weather but limited direct impact on crude oil fundamentals. Gas-to-oil switching potential minimal at current price spreads. Weather event temporary, crude supply/demand balance unchanged. Insufficient crude-specific catalysts for directional bias.",
+        "invalidation_price": null,
+        "risk_notes": "Extended cold weather could boost heating oil demand and refinery runs, indirectly supporting crude",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67124"
+        ]
+      },
+      "gemini": {
+        "action": "LONG",
+        "confidence": 0.5,
+        "thesis": "Record US natural gas withdrawal (360 Bcf, 89% above 5-yr avg) due to Winter Storm Fern signals exceptionally strong Q1 heating demand and natural gas supply tightness. While primarily a gas event, this robust energy demand, coupled with potential (though unconfirmed) crude production impacts from severe weather, provides modest indirect support for Brent. Increased distillate demand will likely boost refinery runs, pulling on crude stocks.",
+        "invalidation_price": null,
+        "risk_notes": "The event is primarily a natural gas story. If crude oil production was not impacted by Winter Storm Fern, and if fuel switching from natural gas primarily benefits heavier refined products (like fuel oil) rather than directly increasing crude demand, Brent's upside will be limited. Historical analogues like Polar Vortex (2014) showed only modest crude support when crude production wasn't directly curtailed, contrasting with Winter Storm Uri (2021) which saw stronger crude gains due to direct crude production shut-ins.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67124"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "STRONG",
+      "combined_confidence": 0.18,
+      "key_risks": [
+        "[GROK] If the natural gas shortage prompts a significant shift to oil-based heating, it could unexpectedly boost crude oil demand.",
+        "[PERPLEXITY] Technical error",
+        "[CLAUDE] Extended cold weather could boost heating oil demand and refinery runs, indirectly supporting crude",
+        "[GEMINI] The event is primarily a natural gas story. If crude oil production was not impacted by Winter Storm Fern, and if fuel switching from natural gas primarily benefits heavier refined products (like fuel oil) rather than directly increasing crude demand, Brent's upside will be limited. Historical analogues like Polar Vortex (2014) showed only modest crude support when crude production wasn't directly curtailed, contrasting with Winter Storm Uri (2021) which saw stronger crude gains due to direct crude production shut-ins."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "STRONG",
+        "confidence": 0.18,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.35",
+          "gemini": "LONG:0.50"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "4fc2206a7e33caeba235f93b27a9b5d95406aca90ec6a22f90a9652d3ce44755",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 1,
+      "cooldown_remaining_sec": 1745
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191238_953daeb8",
+    "timestamp": "2026-03-10T19:12:38.664148",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.510808",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67324",
+        "summary": "Annual U.S. crude oil exports in 2025 decreased 3% from 2024, the first annual decrease since 2021. Exports decreased to Europe and the Asia and Oceania region, the two top regional destinations for U.S. crude oil. Despite fewer crude oil exports, U.S. crude oil imports decreased by more. Overall, U.S. net imports of crude oil—total imports minus total exports—decreased from 2.5 million barrels per day (b/d) in 2024 to 2.2 million b/d in 2025.",
+        "published": "Tue, 10 Mar 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.51,
+      "headline": "Annual U.S. crude oil exports decrease for first time since 2021",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:12:38.663960",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "U.S. crude exports down 3% in 2025 vs 2024, but net imports also fell (2.5 to 2.2 mb/d) suggesting balanced domestic supply-demand. First export decline since 2021 indicates potential tightening but lacks magnitude for clear directional bias. Need current price levels, OPEC+ policy, and global demand data to assess impact on Brent.",
+        "invalidation_price": null,
+        "risk_notes": "Data is retrospective (2025 vs 2024) with unclear current market implications - could signal either supply tightening or demand weakness",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67324"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.09,
+      "key_risks": [
+        "[GROK] Technical error",
+        "[CLAUDE] Data is retrospective (2025 vs 2024) with unclear current market implications - could signal either supply tightening or demand weakness"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.09,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.35",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "3005d89fe11d375188bf1d3a8cdb3e8be375e5723066854d3f931393370db37d",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191352_8714f91d",
+    "timestamp": "2026-03-10T19:13:52.693534",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.511155",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67304",
+        "summary": "In 2025, exports of major petroleum-based transportation fuels, including distillate fuel oil, motor gasoline, and jet fuel, averaged 2.4 million barrels per day (b/d), about the same as the previous year. Distillate fuel oil, commonly sold as diesel, accounts for more than half of these exports, and the entirety of the annual decrease. Exports of gasoline and jet fuel increased slightly in 2025 over 2024. As in previous years, Mexico was the most popular destination by volume for all three fuels, especially gasoline.",
+        "published": "Mon, 09 Mar 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.425,
+      "headline": "U.S. exports of major transportation fuels in 2025 were about the same as in 2024",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:13:52.693234",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA data shows stable 2025 petroleum exports with a slight decrease in distillate fuel oil, suggesting mixed demand signals that may not strongly impact Brent prices amid broader stability in gasoline and jet fuel exports.",
+        "invalidation_price": null,
+        "risk_notes": "Global demand could surge unexpectedly, offsetting the distillate export decline.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67304"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.2,
+        "thesis": "EIA data shows stable 2025 US exports of transport fuels at 2.4 mb/d, with minor 28k b/d distillate drop offset by gasoline/jet gains. Backward-looking annual data amid current ME conflict risk premium ($94/b Brent Mar9). No fresh crude inv, Cushing, or refinery data. Global surplus forecast 3.1 mb/d 2026 exerts long-term pressure but event is noise vs geo risks.",
+        "invalidation_price": null,
+        "risk_notes": "Publication lag; ignores Hormuz closure & shut-ins driving current rally. Stale vs live WPSR flows.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67304"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "US refined product exports flat at 2.4mb/d with diesel declining but gasoline/jet fuel rising. Mixed signal - diesel weakness suggests demand concerns but overall export stability indicates steady refining activity. Insufficient directional catalyst for crude without broader supply/demand context or price levels.",
+        "invalidation_price": null,
+        "risk_notes": "Diesel export decline could signal broader demand weakness spreading to crude oil consumption",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67304"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.21,
+      "key_risks": [
+        "[GROK] Global demand could surge unexpectedly, offsetting the distillate export decline.",
+        "[PERPLEXITY] Publication lag; ignores Hormuz closure & shut-ins driving current rally. Stale vs live WPSR flows.",
+        "[CLAUDE] Diesel export decline could signal broader demand weakness spreading to crude oil consumption",
+        "[GEMINI] Technical error"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.21,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.20",
+          "claude": "WAIT:0.35",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "18e0e4e7f29a5cab8ce75271a24316ad45210b5dbb20a7bedab7d9546c323fdb",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191444_afd1c745",
+    "timestamp": "2026-03-10T19:14:44.762966",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.511939",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67225",
+        "summary": "Natural gas pipeline projects completed in the United States in 2025 increased capacity by approximately 6.3 billion cubic feet per day (Bcf/d), according to our recently updated Natural Gas Pipeline Projects Tracker. A substantial portion, 85%, or 5.3 Bcf/d, of this new capacity is dedicated to delivering natural gas to the South Central region of the United States. This region includes the Gulf Coast, where much of the nation's growing natural gas demand, particularly from liquefied natural gas (LNG), is concentrated. The new capacity primarily connects both new and existing supply sources to consumers in the region.",
+        "published": "Wed, 25 Feb 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.51,
+      "headline": "Most natural gas pipelines built in 2025 connect the South Central United States to supply",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:14:44.762657",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "Increased US natural gas pipeline capacity adds 6.3 Bcf/d, mainly to the Gulf Coast for LNG, per EIA data. This is US-focused and unrelated to crude oil supply/demand, so minimal impact on Brent prices.",
+        "invalidation_price": null,
+        "risk_notes": "If cheaper natural gas significantly substitutes for oil in global markets, it could indirectly pressure Brent prices.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67225"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "US natural gas pipeline capacity additions (6.3 Bcf/d in 2025, 85% to Gulf Coast) support LNG export growth and reduce structural gas bottlenecks. However, this is a natural gas infrastructure story with indirect crude impact. Brent pricing is driven by crude supply/demand balance, OPEC+ compliance, and geopolitical factors—not gas takeaway capacity. Pipeline expansion supports future LNG exports but does not immediately affect crude oil markets or Brent fundamentals in March 2026.",
+        "invalidation_price": null,
+        "risk_notes": "Event conflates natural gas midstream with crude oil markets. Gas pipeline capacity is a long-term structural tailwind for US energy exports but has negligible near-term impact on Brent crude pricing. Crude inventories, refinery runs, OPEC+ production decisions, and geopolitical risk remain the primary Brent drivers. No crude-specific data provided.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67225",
+          "https://pipexch.com/u-s-midstream-report-natural-gas-pipeline-growth-drives-2025-optimism/",
+          "https://oilprice.com/Energy/Natural-Gas/US-Natural-Gas-Output-and-Demand-to-Smash-Records-in-2025.html"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.25,
+        "thesis": "US nat gas pipeline expansion primarily affects domestic gas markets, not crude oil fundamentals. 6.3 Bcf/d capacity increase supports LNG exports but has minimal direct impact on Brent crude demand/supply dynamics. Event lacks sufficient crude-specific catalysts for actionable trade.",
+        "invalidation_price": null,
+        "risk_notes": "Indirect substitution effects between gas and oil in power generation could emerge, but magnitude unclear without demand elasticity data",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67225"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.22,
+      "key_risks": [
+        "[GROK] If cheaper natural gas significantly substitutes for oil in global markets, it could indirectly pressure Brent prices.",
+        "[PERPLEXITY] Event conflates natural gas midstream with crude oil markets. Gas pipeline capacity is a long-term structural tailwind for US energy exports but has negligible near-term impact on Brent crude pricing. Crude inventories, refinery runs, OPEC+ production decisions, and geopolitical risk remain the primary Brent drivers. No crude-specific data provided.",
+        "[CLAUDE] Indirect substitution effects between gas and oil in power generation could emerge, but magnitude unclear without demand elasticity data",
+        "[GEMINI] Technical error"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.22,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.35",
+          "claude": "WAIT:0.25",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "c63c89ad17bd87382bfe79db91c7698dd8ce0ecb8ce3a04ebd312cc9b9e3cd70",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191529_5a628646",
+    "timestamp": "2026-03-10T19:15:29.556125",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.512235",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67224",
+        "summary": "Ten years ago, on February 24, 2016, the first liquefied natural gas (LNG) cargo from the Sabine Pass Terminal was exported from the United States, marking the beginning of a new era in U.S. LNG exports. Today, the United States is the world's largest LNG exporter, ahead of both Australia and Qatar. LNG exports surged from 0.5 billion cubic feet per day (Bcf/d) in 2016 to 15.0 Bcf/d in 2025, and in our February Short-Term Energy Outlook, we forecast U.S. LNG exports to exceed 18.1 Bcf/d in 2027. LNG exports from the United States increased for several reasons, including abundant natural gas supply and reserves, flexible LNG export contracts, and relatively low feedgas costs. In addition, increasing international demand and a favorable investment climate have supported LNG infrastructure expansions in the United States.",
+        "published": "Tue, 24 Feb 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.425,
+      "headline": "Ten years after first Sabine Pass cargo, U.S. LNG exports are still on the rise",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:15:29.555887",
+      "event_type": "news_event",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Perplexity analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.25,
+        "thesis": "US LNG export growth is a 10-year structural story already priced into energy markets. This retrospective analysis provides no new actionable information for crude oil trading. LNG competes with oil in some applications but correlation is weak and indirect. Need current supply/demand fundamentals, OPEC+ decisions, or geopolitical catalysts for directional Brent trade.",
+        "invalidation_price": null,
+        "risk_notes": "Missing critical real-time data: current Brent futures curve structure, OPEC+ compliance levels, crack spreads, and speculative positioning needed for informed crude oil directional bias",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67224"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.2,
+        "thesis": "The EIA report on US LNG export growth is a natural gas market milestone, confirming an established long-term trend. While LNG growth impacts global natural gas markets and energy transition dynamics, its direct and immediate influence on Brent crude oil prices is negligible. Crude oil demand and supply fundamentals remain largely unaffected by this specific news item, which is a retrospective rather than a new catalyst.",
+        "invalidation_price": null,
+        "risk_notes": "The primary risk is that the market interprets this natural gas development as a stronger indirect signal for broader energy market shifts (e.g., fuel switching, energy security perceptions) that could unexpectedly impact crude oil demand or supply balances, contrary to the current assessment of minimal direct impact.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67224"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.11,
+      "key_risks": [
+        "[GROK] Technical error",
+        "[CLAUDE] Missing critical real-time data: current Brent futures curve structure, OPEC+ compliance levels, crack spreads, and speculative positioning needed for informed crude oil directional bias",
+        "[GEMINI] The primary risk is that the market interprets this natural gas development as a stronger indirect signal for broader energy market shifts (e.g., fuel switching, energy security perceptions) that could unexpectedly impact crude oil demand or supply balances, contrary to the current assessment of minimal direct impact."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.11,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "WAIT:0.00",
+          "claude": "WAIT:0.25",
+          "gemini": "WAIT:0.20"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "6adbd1542771bc3d1018522c78d9057f9acd5cf4b5f61256c718168e54cd2887",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191610_ef04fe66",
+    "timestamp": "2026-03-10T19:16:10.107213",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.512539",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67206",
+        "summary": "U.S. power plant owners and operators plan to retire nearly 11 gigawatts (GW) of utility-scale electric generating capacity from the U.S. power grid this year, according to data reported to us in our latest Preliminary Monthly Electric Generator Inventory. Almost all the scheduled retirements are either coal-fired power plants (58%) or steam turbines and simple-cycle natural gas (42%).",
+        "published": "Mon, 23 Feb 2026 09:00:00 EST",
+        "relevance_level": "high",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.6799999999999999,
+      "headline": "Retirement delays of U.S. electric generating capacity may continue in 2026",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:16:10.106982",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA report on US power plant retirements (mostly coal and natural gas) has minimal direct impact on global crude oil demand, as it's focused on domestic electricity generation, not oil markets; likely noise in the broader context.",
+        "invalidation_price": null,
+        "risk_notes": "If retirements lead to unforeseen increases in natural gas prices or energy policy shifts, it could indirectly boost oil demand.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67206"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "US power plant retirement delays (11 GW planned, but only 4.6 GW retired in 2025) could marginally support natural gas demand, but EIA's core thesis remains bearish: global oil surplus persists through 2026 with Brent forecast at $58/bbl. Retirement delays are insufficient to offset structural oversupply from OPEC+ production increases and non-OPEC growth (Brazil, Guyana, Argentina). Power sector dynamics are secondary to crude balance.",
+        "invalidation_price": 65.0,
+        "risk_notes": "If emergency DOE orders prevent further coal/gas retirements and electricity demand surge (projected +20% by 2030) accelerates faster than forecast, natural gas could tighten, reducing crude demand destruction. Conversely, if China's strategic stockpile purchases reverse or OPEC+ compliance weakens, surplus could worsen faster than EIA models, pushing Brent below $55.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164",
+          "https://www.eia.gov/todayinenergy/detail.php?id=67206",
+          "https://www.jpmorgan.com/insights/global-research/commodities/oil-prices"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.25,
+        "thesis": "U.S. power plant retirements (11GW coal/gas) have minimal direct impact on crude oil demand. Power sector uses <1% of U.S. oil consumption. Coal-to-gas switching already priced in. Event lacks immediate crude oil market relevance despite high EIA source credibility.",
+        "invalidation_price": null,
+        "risk_notes": "Missing broader energy transition context and actual oil demand data to assess secondary effects",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67206"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "The EIA report detailing planned U.S. power plant retirements (11 GW, primarily coal and natural gas) in 2026 has negligible direct impact on global Brent crude oil demand or supply. Crude oil is not a primary fuel for U.S. electricity generation. While part of a broader energy transition, the immediate and direct implications for crude oil markets are too indirect and minor to warrant a directional trade. This event is more pertinent to U.S. natural gas and electricity markets.",
+        "invalidation_price": null,
+        "risk_notes": "The primary risk is if these retirements are interpreted by the market as a leading indicator of a significantly accelerated or disruptive energy transition in the US, potentially leading to broader bearish sentiment across all fossil fuels, including crude. However, this is a second-order, speculative effect not directly supported by the report's immediate implications for crude.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67206"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.3,
+      "key_risks": [
+        "[GROK] If retirements lead to unforeseen increases in natural gas prices or energy policy shifts, it could indirectly boost oil demand.",
+        "[PERPLEXITY] If emergency DOE orders prevent further coal/gas retirements and electricity demand surge (projected +20% by 2030) accelerates faster than forecast, natural gas could tighten, reducing crude demand destruction. Conversely, if China's strategic stockpile purchases reverse or OPEC+ compliance weakens, surplus could worsen faster than EIA models, pushing Brent below $55.",
+        "[CLAUDE] Missing broader energy transition context and actual oil demand data to assess secondary effects",
+        "[GEMINI] The primary risk is if these retirements are interpreted by the market as a leading indicator of a significantly accelerated or disruptive energy transition in the US, potentially leading to broader bearish sentiment across all fossil fuels, including crude. However, this is a second-order, speculative effect not directly supported by the report's immediate implications for crude."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.3,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.35",
+          "claude": "WAIT:0.25",
+          "gemini": "WAIT:0.30"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "160f5dfe157ba9f06d07023fe402f5c5ba0ef905772e7c0c6b87a388d941e506",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191659_5e26acf4",
+    "timestamp": "2026-03-10T19:16:59.497111",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.512890",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67205",
+        "summary": "U.S. power plant developers and operators plan to add 86 gigawatts (GW) of new utility-scale electric generating capacity to the U.S. power grid in 2026 in our latest Preliminary Monthly Electric Generator Inventory report, a record if realized. Solar power makes up 51% of the planned 2026 capacity additions, followed by battery storage at 28% and wind at 14%.",
+        "published": "Fri, 20 Feb 2026  09:00:00 EST",
+        "relevance_level": "high",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.6799999999999999,
+      "headline": "New U.S. electric generating capacity expected to reach a record high in 2026",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:16:59.496777",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA report on planned 2026 U.S. renewable additions (86 GW, mostly solar) could signal long-term reduced oil demand for power, potentially pressuring Brent prices downward, but the impact is indirect and not immediate, given oil's primary use in transport.",
+        "invalidation_price": null,
+        "risk_notes": "Renewable projects may face delays or cancellations, or oil demand could rise in other sectors, negating any potential price pressure.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67205"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.2,
+        "thesis": "EIA report on 86 GW power capacity additions in 2026 (51% solar, 28% battery, 14% wind) signals long-term shift to renewables, potentially curbing future oil demand growth for power generation. However, impact on 2026 oil market is indirect, distant, and minimal vs dominant supply surplus forecasts (EIA/JPM/Goldman: Brent $53-60/bbl on 2-3mbd overhang). No primary crude/refinery data; noise for near-term trading.",
+        "invalidation_price": null,
+        "risk_notes": "Report may not translate to actual builds; oil demand resilient from transport/aviation; ignores supply-demand macro.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67205"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "86GW renewable capacity addition (65% solar+wind) signals long-term oil demand erosion in power generation, but impact on crude prices minimal given power sector represents <5% of global oil demand. Transportation fuel demand remains dominant driver. Insufficient current market data to assess immediate price impact.",
+        "invalidation_price": null,
+        "risk_notes": "Accelerated EV adoption could amplify renewable power's negative impact on oil demand faster than anticipated",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67205"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA report on record U.S. utility-scale electric capacity additions in 2026 (solar, battery, wind) has minimal direct impact on Brent crude. Crude oil is not a primary fuel for U.S. electricity generation. While signaling long-term energy transition, the short-to-medium term demand implications for global crude are negligible, warranting a neutral stance. The report focuses on power, not transportation or petrochemicals, which are crude's main demand drivers.",
+        "invalidation_price": null,
+        "risk_notes": "The primary risk is that the market overreacts to this as a broader signal of accelerating energy transition, leading to a more significant bearish sentiment across all fossil fuels, including crude, despite the weak direct link. Historical analogues also show limited direct crude price impact from similar energy transition signals.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67205"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.29,
+      "key_risks": [
+        "[GROK] Renewable projects may face delays or cancellations, or oil demand could rise in other sectors, negating any potential price pressure.",
+        "[PERPLEXITY] Report may not translate to actual builds; oil demand resilient from transport/aviation; ignores supply-demand macro.",
+        "[CLAUDE] Accelerated EV adoption could amplify renewable power's negative impact on oil demand faster than anticipated",
+        "[GEMINI] The primary risk is that the market overreacts to this as a broader signal of accelerating energy transition, leading to a more significant bearish sentiment across all fossil fuels, including crude, despite the weak direct link. Historical analogues also show limited direct crude price impact from similar energy transition signals."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.29,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.20",
+          "claude": "WAIT:0.35",
+          "gemini": "WAIT:0.30"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "50f058ed3e00a610a611c088ddb6b5393847f699c7a4a3c64d78600500fde7cc",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191803_0df7aa43",
+    "timestamp": "2026-03-10T19:18:03.229724",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.513348",
+      "event_type": "tanker_alert",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67184",
+        "summary": "U.S. exports of refined petroleum products carried on clean product tankers have increased steadily over the last year, with exports totaling 6.3 million barrels per day (b/d) in January 2026, about 10% more than in January 2025 and near record highs, according to data from Vortexa. Growth in exports of diesel, gasoline, and liquified petroleum gases (LPG) drove the overall increase. Exports of diesel both increased and shifted destinations, with more headed to Europe and less headed to South America, which has historically been the largest destination for U.S. distillate exports.",
+        "published": "Tue, 17 Feb 2026 09:00:00 EST",
+        "relevance_level": "medium",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.51,
+      "headline": "Maritime exports of petroleum products increased in January 2026",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:18:03.229537",
+      "event_type": "tanker_alert",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "Increased U.S. exports of refined products, including diesel to Europe, suggest potential oversupply in products, which could indirectly pressure Brent Crude prices, but the impact on crude is unclear and not directly tied to this event.",
+        "invalidation_price": null,
+        "risk_notes": "If global crude demand strengthens or geopolitical events disrupt supply, the bearish thesis could be invalidated.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67184"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA/Vortexa data shows US diesel exports to Europe doubled YoY to support winter demand, tightening regional gasoil supply (ARA stocks key). However, Jan 2026 data (published Feb 17) is 3 weeks old by Mar 10; no fresh EIA WPSR, IEA, or Kpler tanker flows confirm ongoing trend. Neutral for Brent crude as this is products export, not crude supply impact. Noise vs genuine opportunity unclear without inventory verification.",
+        "invalidation_price": null,
+        "risk_notes": "Stale data; latest EIA WPSR could show ARA gasoil stockbuild or US refinery intake drop reversing export pace",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67184"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "U.S. refined product exports at 6.3mb/d (+10% YoY) signal strong refining margins but mixed crude impact. Higher diesel exports to Europe vs South America shift suggests regional demand patterns changing. Without current crack spreads, inventory levels, or OPEC+ production data, insufficient evidence for directional Brent trade. Need refinery run rates and crude input demand confirmation.",
+        "invalidation_price": null,
+        "risk_notes": "Increased refining activity could boost crude demand, but export growth may reflect oversupply domestically rather than tight global markets",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67184"
+        ]
+      },
+      "gemini": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Gemini analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "devil_advocate": null,
+      "consensus": "WAIT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.25,
+      "key_risks": [
+        "[GROK] If global crude demand strengthens or geopolitical events disrupt supply, the bearish thesis could be invalidated.",
+        "[PERPLEXITY] Stale data; latest EIA WPSR could show ARA gasoil stockbuild or US refinery intake drop reversing export pace",
+        "[CLAUDE] Increased refining activity could boost crude demand, but export growth may reflect oversupply domestically rather than tight global markets",
+        "[GEMINI] Technical error"
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "WAIT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.25,
+        "agent_votes": {
+          "grok": "WAIT:0.35",
+          "perplexity": "WAIT:0.30",
+          "claude": "WAIT:0.35",
+          "gemini": "WAIT:0.00"
+        },
+        "reason": "Insufficient evidence for directional trade"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "5fbf41034e48c509de16b75445e8ab80e6ab1fbaf4df445829e2341ab3bc10fb",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "Consensus is WAIT — no action needed",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 0,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191843_4a71f7ca",
+    "timestamp": "2026-03-10T19:18:43.703517",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.513879",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67164",
+        "summary": "We forecast that production of petroleum and other liquids will continue to exceed global demand, which results in Brent crude oil prices falling from an average of $69 per barrel (b) in 2025 to $58/b in 2026 and $53/b in 2027. Crude oil prices tend to decrease as global petroleum stocks increase. Persistently high implied global oil inventory builds in the near-term are putting downward pressure on crude oil prices despite heightened uncertainty around the volume of crude oil exports from Russia and Venezuela.",
+        "published": "Wed, 11 Feb 2026 09:00:00 EST",
+        "relevance_level": "high",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.85,
+      "headline": "EIA forecasts lower oil prices in 2026 and 2027 due to persistent stock builds",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:18:43.703325",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.0,
+        "thesis": "Grok analysis error",
+        "invalidation_price": null,
+        "risk_notes": "Technical error",
+        "sources": []
+      },
+      "perplexity": {
+        "action": "SHORT",
+        "confidence": 0.75,
+        "thesis": "EIA STEO forecasts Brent averaging $58/b in 2026, $53/b in 2027 due to production exceeding demand, leading to 1.9 mb/d inventory builds in 2026 despite near-term Middle East disruptions and risk premium pushing Q2 2026 to $91/b before declining to $70/b in 4Q26. Aligns with JPM forecast of $60/b avg on supply overhang. Long-term bearish fundamentals outweigh temporary geopolitics.",
+        "invalidation_price": 75.0,
+        "risk_notes": "Protracted Strait of Hormuz closure or escalated Middle East conflict causing sustained supply disruptions beyond Q2 2026.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164",
+          "https://www.eia.gov/outlooks/steo/report/global_oil.php"
+        ]
+      },
+      "claude": {
+        "action": "SHORT",
+        "confidence": 0.75,
+        "thesis": "EIA forecasts structural oversupply with Brent falling from $69 (2025) to $58 (2026) to $53 (2027). Persistent inventory builds creating downward pressure despite geopolitical risks from Russia/Venezuela. Official source with high credibility (0.85 weight) signals multi-year bearish cycle driven by production exceeding demand fundamentals.",
+        "invalidation_price": 75.0,
+        "risk_notes": "Major supply disruption from Russia/Venezuela or unexpected OPEC+ production cuts could reverse oversupply dynamics",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164"
+        ]
+      },
+      "gemini": {
+        "action": "SHORT",
+        "confidence": 0.85,
+        "thesis": "The EIA forecasts sustained global petroleum oversupply and rising inventories through 2027, projecting Brent prices to fall from $69/b (2025) to $53/b (2027). This fundamental imbalance, driven by production exceeding demand, points to a multi-year bearish trend. This aligns with historical episodes of oversupply leading to significant price declines and inventory builds, suggesting a market moving into contango.",
+        "invalidation_price": 72.0,
+        "risk_notes": "The most important risk is an unexpected, significant supply disruption from key producers (e.g., Russia, Venezuela), which the EIA report itself highlights as uncertain. A stronger-than-forecast global economic rebound boosting demand significantly could also invalidate the thesis.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67164"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "SHORT",
+      "consensus_strength": "UNANIMOUS",
+      "combined_confidence": 0.78,
+      "key_risks": [
+        "[GROK] Technical error",
+        "[PERPLEXITY] Protracted Strait of Hormuz closure or escalated Middle East conflict causing sustained supply disruptions beyond Q2 2026.",
+        "[CLAUDE] Major supply disruption from Russia/Venezuela or unexpected OPEC+ production cuts could reverse oversupply dynamics",
+        "[GEMINI] The most important risk is an unexpected, significant supply disruption from key producers (e.g., Russia, Venezuela), which the EIA report itself highlights as uncertain. A stronger-than-forecast global economic rebound boosting demand significantly could also invalidate the thesis."
+      ],
+      "invalidation_price": 72.0,
+      "recommendation": {
+        "action": "SHORT",
+        "strength": "UNANIMOUS",
+        "confidence": 0.78,
+        "agent_votes": {
+          "grok": "WAIT:0.00",
+          "perplexity": "SHORT:0.75",
+          "claude": "SHORT:0.75",
+          "gemini": "SHORT:0.85"
+        },
+        "invalidation_price": 72.0,
+        "max_position_pct": 0.01,
+        "key_insights": [
+          "PERPLEXITY: EIA STEO forecasts Brent averaging $58/b in 2026, $53/b in 2027 due to production exceeding demand, leading to 1.9 mb/d ",
+          "CLAUDE: EIA forecasts structural oversupply with Brent falling from $69 (2025) to $58 (2026) to $53 (2027). Persistent inventory",
+          "GEMINI: The EIA forecasts sustained global petroleum oversupply and rising inventories through 2027, projecting Brent prices to "
+        ]
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "5535b34f851a1dc9abf1407990396a097547e45d1710c4a4d3f75593cfdecb86",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": true,
+      "reason": "All checks passed — SHORT approved",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 1,
+      "cooldown_remaining_sec": 0
+    },
+    "risk_allowed": true,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  },
+  {
+    "id": "20260310_191928_9a2f7b06",
+    "timestamp": "2026-03-10T19:19:28.361148",
+    "trigger": {
+      "timestamp": "2026-03-10 19:11:44.514354",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "data": {
+        "source": "eia",
+        "link": "https://www.eia.gov/todayinenergy/detail.php?id=67124",
+        "summary": "Working natural gas stocks fell 360 billion cubic feet (Bcf) in the Lower 48 states for the week ending January 30, 2026, amid Winter Storm Fern-the largest weekly net withdrawal reported in the history of the Weekly Natural Gas Storage Report. The withdrawal exceeded the five-year average for the same week by 89% (170 Bcf). The large withdrawals resulted from increased heating demand for natural gas and natural gas production curtailments because of severe winter weather. Working gas stocks are now 1.1% below the five-year average for this time of year.",
+        "published": "Thu, 05 Feb 2026 09:00:00 EST",
+        "relevance_level": "high",
+        "source_weight": 0.85,
+        "source_category": "official"
+      },
+      "severity": 0.6799999999999999,
+      "headline": "Record natural gas stock withdrawals during week ending January 30, 2026",
+      "source_weight": 0.5,
+      "rag_context_ids": []
+    },
+    "council_response": {
+      "timestamp": "2026-03-10 19:19:28.360992",
+      "event_type": "eia_report",
+      "instrument": "BZ=F",
+      "grok": {
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "EIA reports a significant natural gas stock drawdown due to winter weather, suggesting higher energy demand, but this has indirect and uncertain impact on Brent Crude as it's not directly related to oil markets.",
+        "invalidation_price": null,
+        "risk_notes": "Natural gas dynamics may not translate to oil prices, as they are separate commodities with minimal correlation in this context.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67124"
+        ]
+      },
+      "perplexity": {
+        "action": "WAIT",
+        "confidence": 0.2,
+        "thesis": "Event is EIA natural gas storage report showing large winter withdrawal due to storm. No crude oil, refinery, or gasoline data provided. Natgas and crude have loose correlation via associated gas production, but primary sources (EIA Petroleum Status Report) absent. Stale/irrelevant for Brent drivers like Cushing stocks or OPEC+. Noise for BZ=F.",
+        "invalidation_price": null,
+        "risk_notes": "Misidentified event; actual EIA Petroleum Report could show crude draw/build reversing signal",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67124"
+        ]
+      },
+      "claude": {
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "Natural gas storage draw is gas-specific, not oil-relevant. Record 360 Bcf withdrawal reflects heating demand and weather disruptions but doesn't directly impact crude oil fundamentals. Gas-oil substitution minimal in current energy mix. Need oil-specific catalysts for BZ=F positioning.",
+        "invalidation_price": null,
+        "risk_notes": "Broader energy complex correlation could spill into crude if gas shortages trigger industrial fuel switching",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67124"
+        ]
+      },
+      "gemini": {
+        "action": "LONG",
+        "confidence": 0.75,
+        "thesis": "Record US natural gas withdrawal (360 Bcf) due to Winter Storm Fern, the largest ever, signals robust heating demand and potential fuel switching from gas to heating oil. Natural gas stocks are now 1.1% below the 5-year average, indicating a tightening energy complex. This strong distillate demand incentivizes higher refinery runs, thereby increasing crude demand and supporting Brent prices.",
+        "invalidation_price": 78.0,
+        "risk_notes": "The primary risk is that the fuel switching to heating oil is less impactful on global crude demand than anticipated, or that global crude supply can easily absorb any marginal increase in refinery demand. A rapid end to severe weather could also quickly normalize demand. Historical analogues support a bullish thesis, so no contradiction to flag.",
+        "sources": [
+          "https://www.eia.gov/todayinenergy/detail.php?id=67124"
+        ]
+      },
+      "devil_advocate": null,
+      "consensus": "CONFLICT",
+      "consensus_strength": "NONE",
+      "combined_confidence": 0.4,
+      "key_risks": [
+        "[GROK] Natural gas dynamics may not translate to oil prices, as they are separate commodities with minimal correlation in this context.",
+        "[PERPLEXITY] Misidentified event; actual EIA Petroleum Report could show crude draw/build reversing signal",
+        "[CLAUDE] Broader energy complex correlation could spill into crude if gas shortages trigger industrial fuel switching",
+        "[GEMINI] The primary risk is that the fuel switching to heating oil is less impactful on global crude demand than anticipated, or that global crude supply can easily absorb any marginal increase in refinery demand. A rapid end to severe weather could also quickly normalize demand. Historical analogues support a bullish thesis, so no contradiction to flag."
+      ],
+      "invalidation_price": null,
+      "recommendation": {
+        "action": "CONFLICT",
+        "strength": "NONE",
+        "confidence": 0.4,
+        "agent_votes": {
+          "grok": "WAIT:0.30",
+          "perplexity": "WAIT:0.20",
+          "claude": "WAIT:0.35",
+          "gemini": "LONG:0.75"
+        },
+        "reason": "Strong disagreement between agents — no actionable edge"
+      },
+      "forecast": null,
+      "adversarial_result": null,
+      "prompt_hash": "304470781f6287dec7b266056b54ce03303b671f78f818a27a4f08b71bd4d271",
+      "total_cost_usd": 0.0
+    },
+    "risk_check": {
+      "allowed": false,
+      "reason": "Cooldown active: 1755s remaining",
+      "oil_risk_score": {
+        "geopolitical": 0.3,
+        "supply": 0.3,
+        "demand": 0.3,
+        "financial": 0.2,
+        "seasonal": 0.6,
+        "technical": 0.2
+      },
+      "daily_alerts_count": 1,
+      "cooldown_remaining_sec": 1755
+    },
+    "risk_allowed": false,
+    "your_decision": null,
+    "entry_price": null,
+    "exit_price": null,
+    "pnl": null,
+    "outcome": null,
+    "lessons_learned": null
+  }
+]

@@ -1,9 +1,9 @@
 """
-Gemini Agent - Pattern Analyst 🔬
-Шукає історичні паттерни та статистичні закономірності
+Gemini Agent — Macro & Fundamentals Analyst for Oil Markets
+Uses Google GenAI SDK
 """
 
-from google import genai  # 🔧 ФІКС: Новий SDK
+from google import genai
 from google.genai import types
 from council.base_agent import BaseAgent
 from models.schemas import Signal, MarketEvent
@@ -13,161 +13,128 @@ import json
 
 class GeminiAgent(BaseAgent):
     """
-    Gemini як аналітик паттернів
-    
-    🧒 ЩО ЦЕ:
-    - Фокус: Історичні паттерни, статистика, графіки
-    - Особистість: Аналітичний, data-driven
-    - API: Google Gemini (новий SDK)
+    Gemini as macro-fundamental analyst for oil markets.
+
+    - Focus: seasonal patterns, China demand, inventory trends,
+      contango/backwardation, USD correlation, crack spreads
+    - API: Google GenAI SDK
+    - Model: configurable via settings.GEMINI_MODEL
     """
-    
-    def __init__(self, api_key: str):
+
+    def __init__(self, api_key: str, model: str = "gemini-2.5-flash"):
         """
-        Ініціалізація Gemini агента
-        
+        Initialise Gemini agent.
+
         Args:
-            api_key: Google AI Studio API ключ
+            api_key: Google AI Studio API key
+            model: model name (default gemini-2.5-flash)
         """
         super().__init__(api_key, "Gemini")
-        
-        # 🔧 ФІКС: Новий спосіб ініціалізації
+
+        if not api_key:
+            raise ValueError("GOOGLE_AI_API_KEY is empty — cannot initialise GeminiAgent")
+
+        self.model_name = model
         self.client = genai.Client(api_key=api_key)
-        self.model_name = "gemini-2.0-flash-exp"
-    
+
     def analyze(self, event: MarketEvent, context: dict) -> Signal:
         """
-        Аналізує подію з фокусом на паттерни
-        
+        Analyse a market event with focus on macro fundamentals.
+
         Args:
-            event: Подія на ринку
-            context: Контекст (історичні дані)
-        
+            event: Oil market event
+            context: Additional context (historical data, indicators)
+
         Returns:
-            Signal з рекомендацією
+            Signal with recommendation
         """
-        
-        # Формуємо prompt
         user_prompt = format_user_prompt(
             event_type=event.event_type,
-            pair=event.pair,
+            instrument=event.instrument,
             market_data=event.data,
-            news=context.get('news', 'No recent news'),
-            indicators=context.get('indicators', {})
+            news=context.get("news", "No recent news"),
+            indicators=context.get("indicators", {}),
         )
-        
-        # Додаємо інструкцію для JSON
+
+        # Gemini does not natively support system messages in the same way,
+        # so we prepend the system prompt to the user content.
         full_prompt = f"""{GEMINI_SYSTEM_PROMPT}
 
 {user_prompt}
 
-Respond ONLY with valid JSON matching this exact structure (no markdown, no preamble):
+IMPORTANT: Return a SINGLE JSON object (not an array) for instrument {event.instrument} only.
+Respond ONLY with valid JSON (no markdown, no preamble):
 {{
     "action": "LONG" | "SHORT" | "WAIT",
     "confidence": 0.0-1.0,
-    "thesis": "max 500 chars with historical examples",
+    "thesis": "max 500 chars with macro/fundamental rationale",
     "invalidation_price": number or null,
-    "risk_notes": "what could invalidate the pattern",
+    "risk_notes": "what could invalidate the thesis",
     "sources": ["url1", "url2"]
 }}"""
-        
+
         try:
-            # 🔧 ФІКС: Новий спосіб виклику API
             response = self.client.models.generate_content(
                 model=self.model_name,
-                contents=full_prompt
+                contents=full_prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.2,
+                ),
             )
-            
-            # Витягуємо текст
+
             response_text = response.text
-            
-            # Витягуємо JSON з відповіді
             json_data = self.extract_json_from_response(response_text)
-            
-            # Валідуємо
             return self.validate_output(json_data)
-            
+
         except Exception as e:
-            print(f"❌ Gemini analysis failed: {e}")
-            
+            print(f"Gemini analysis failed: {e}")
             return Signal(
                 action="WAIT",
                 confidence=0.0,
                 thesis="Gemini analysis error",
                 risk_notes="Technical error",
-                sources=[]
+                sources=[],
             )
-    
+
     def test_connection(self) -> bool:
-        """Тестує з'єднання з Gemini API"""
+        """Test connectivity to Gemini API."""
         try:
             response = self.client.models.generate_content(
                 model=self.model_name,
-                contents="Reply with: OK"
+                contents="Reply with: OK",
+                config=types.GenerateContentConfig(
+                    temperature=0.0,
+                ),
             )
             return "OK" in response.text
         except Exception as e:
-            print(f"❌ Gemini connection test failed: {e}")
+            print(f"Gemini connection test failed: {e}")
             return False
 
 
 # ==============================================================================
-# ТЕСТУВАННЯ
+# MANUAL TEST
 # ==============================================================================
 
 if __name__ == "__main__":
-    print("🧪 Testing GeminiAgent...")
-    
-    from config.settings import settings
-    
-    # Перевіряємо API ключ
-    if "fake" in settings.GEMINI_API_KEY.lower():
-        print("⚠️ Cannot test: GEMINI_API_KEY is fake")
-        print("   To test, add real Google AI Studio key to .env")
-        print("\n💡 Get free key: https://aistudio.google.com/apikey")
-        print("   For mock testing, run: pytest tests/")
+    from config.settings import get_settings
+
+    settings = get_settings()
+
+    api_key = settings.GOOGLE_AI_API_KEY or settings.GOOGLE_API_KEY
+    if not api_key:
+        print("GOOGLE_AI_API_KEY is empty — skipping live test")
         exit(0)
-    
-    # Створюємо агента
-    gemini = GeminiAgent(api_key=settings.GEMINI_API_KEY)
-    print(f"✅ GeminiAgent created: {gemini}")
-    
-    # Тест з'єднання
-    print("\n🔗 Testing API connection...")
-    if gemini.test_connection():
-        print("✅ Connection successful!")
-    else:
-        print("❌ Connection failed")
-        exit(1)
-    
-    # Тестовий аналіз
-    print("\n🧪 Testing analysis...")
-    
-    test_event = MarketEvent(
-        event_type="price_spike",
-        pair="BTC/USDT",
-        severity=0.75,
-        data={
-            "price_change": 4.2,
-            "current_price": 97000,
-            "volume": 3_000_000_000,
-            "pattern": "rising wedge"
-        }
+
+    gemini = GeminiAgent(
+        api_key=api_key,
+        model=settings.GEMINI_MODEL,
     )
-    
-    test_context = {
-        "news": "Similar pattern seen in March 2024",
-        "indicators": {
-            "rsi": 72,
-            "volume_profile": "decreasing",
-            "historical_success_rate": 0.75
-        }
-    }
-    
-    signal = gemini.analyze(test_event, test_context)
-    
-    print(f"\n✅ Analysis complete:")
-    print(f"   Action: {signal.action}")
-    print(f"   Confidence: {signal.confidence:.0%}")
-    print(f"   Thesis: {signal.thesis[:100]}...")
-    
-    print("\n🎉 GeminiAgent test complete!")
+    print(f"GeminiAgent created: {gemini}")
+
+    print("Testing API connection...")
+    if gemini.test_connection():
+        print("Connection successful!")
+    else:
+        print("Connection failed")
+        exit(1)
