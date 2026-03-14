@@ -50,6 +50,7 @@ from risk.risk_governor import RiskGovernor
 from journal.trade_journal import TradeJournal
 from journal.digest_history import DigestHistory, DigestRecord
 from journal.agent_memory import AgentMemory
+from journal.daily_summary import DailySummaryHistory
 from watchers.oil_price_watcher import OilPriceWatcher
 from watchers.oil_news_scanner import OilNewsScanner
 from watchers.scheduled_events import ScheduledEventsManager
@@ -145,6 +146,8 @@ class TradingCouncil:
         self.digest_interval_hours = digest_interval_hours
         self.digest_history = DigestHistory()
         self.agent_memory = AgentMemory()
+        self.daily_summary = DailySummaryHistory()
+        self._current_day: str = datetime.now().strftime("%Y-%m-%d")
         self.running = False
 
         # Accumulator: stores analyses between digest cycles
@@ -217,6 +220,14 @@ class TradingCouncil:
                 digest_contexts[instrument] = hist
         context["digest_history"] = digest_contexts
 
+        # 6. Daily summaries (multi-day trend context)
+        daily_contexts: dict[str, str] = {}
+        for instrument in self.price_watcher.instruments:
+            daily = self.daily_summary.get_context_for_agents(instrument, n=7)
+            if daily:
+                daily_contexts[instrument] = daily
+        context["daily_history"] = daily_contexts
+
         return context
 
     # ------------------------------------------------------------------
@@ -250,6 +261,11 @@ class TradingCouncil:
         digest_hist = context.get("digest_history", {}).get(event.instrument, "")
         if digest_hist:
             user_prompt += f"\n\n{digest_hist}\n"
+
+        # Inject daily summaries for multi-day trend context
+        daily_hist = context.get("daily_history", {}).get(event.instrument, "")
+        if daily_hist:
+            user_prompt += f"\n\n{daily_hist}\n"
 
         # 1. Collect signals from all agents
         logger.info("Querying all 4 agents...")
@@ -506,6 +522,12 @@ class TradingCouncil:
             # Save to digest history for cross-digest learning
             self._save_digest_record(instrument, analyses)
 
+        # Check if day changed — build daily summary
+        today = datetime.now().strftime("%Y-%m-%d")
+        if today != self._current_day:
+            self._build_daily_summaries(context)
+            self._current_day = today
+
         # Clear accumulator
         self._accumulator.clear()
         self._last_digest_time = datetime.now()
@@ -565,6 +587,65 @@ class TradingCouncil:
             key_risks=risks,
         )
         self.digest_history.add(record)
+
+    def _build_daily_summaries(self, context: dict) -> None:
+        """Build daily summaries from today's digests for each instrument."""
+        yesterday = self._current_day  # day that just ended
+        prices = context.get("prices", {})
+
+        for instrument in self.price_watcher.instruments:
+            # Get all digests from today (filter by date prefix)
+            all_digests = self.digest_history.get_recent(instrument, n=24)
+            todays_digests = [
+                d for d in all_digests if d.timestamp.startswith(yesterday)
+            ]
+
+            if not todays_digests:
+                continue
+
+            # Get price for daily summary
+            price_info = prices.get(instrument, {})
+            current_price = price_info.get("price", 0.0)
+
+            record = self.daily_summary.build_from_digests(
+                instrument=instrument,
+                digests=todays_digests,
+                closing_price=current_price,
+            )
+            self.daily_summary.add(record)
+            logger.info(
+                f"Daily summary saved: {instrument} @ {record.date} — "
+                f"{record.dominant_trend}, {record.total_events} events, "
+                f"{record.digest_count} digests"
+            )
+
+    def save_daily_summary_now(self, context: dict) -> None:
+        """Force-save daily summary (for --once mode or manual trigger)."""
+        today = datetime.now().strftime("%Y-%m-%d")
+        prices = context.get("prices", {})
+
+        for instrument in self.price_watcher.instruments:
+            all_digests = self.digest_history.get_recent(instrument, n=24)
+            todays_digests = [
+                d for d in all_digests if d.timestamp.startswith(today)
+            ]
+
+            if not todays_digests:
+                continue
+
+            price_info = prices.get(instrument, {})
+            current_price = price_info.get("price", 0.0)
+
+            record = self.daily_summary.build_from_digests(
+                instrument=instrument,
+                digests=todays_digests,
+                closing_price=current_price,
+            )
+            self.daily_summary.add(record)
+            logger.info(
+                f"Daily summary (forced): {instrument} @ {record.date} — "
+                f"{record.dominant_trend}, {record.total_events} events"
+            )
 
     # ------------------------------------------------------------------
     # Main loop
@@ -629,6 +710,8 @@ class TradingCouncil:
         # Check if digest is due
         if self._is_digest_due():
             await self._send_digest(context)
+            # Also update daily summary after each digest
+            self.save_daily_summary_now(context)
 
         return results
 
