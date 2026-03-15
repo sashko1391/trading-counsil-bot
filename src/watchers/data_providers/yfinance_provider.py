@@ -133,14 +133,14 @@ class YFinanceProvider:
 
     def fetch_price(self, symbol: str) -> Dict[str, Any]:
         """Fetch latest price data for *symbol*."""
-        if symbol == "LGO" and not self._can_use_yf(symbol):
+        if symbol == "LGO":
             return self._fetch_lgo_price()
 
         return self._fetch_yf_price(symbol)
 
     def fetch_history(self, symbol: str, periods: int = 50) -> List[Dict[str, Any]]:
         """Fetch recent OHLCV bars for *symbol*."""
-        if symbol == "LGO" and not self._can_use_yf(symbol):
+        if symbol == "LGO":
             return self._fetch_lgo_history(periods)
 
         return self._fetch_yf_history(symbol, periods)
@@ -217,14 +217,18 @@ class YFinanceProvider:
         return result
 
     # ------------------------------------------------------------------
-    # Gasoil (LGO) via nasdaqdatalink or fallback
+    # Gasoil (LGO) — use HO=F (Heating Oil) as proxy
     # ------------------------------------------------------------------
+    # ICE Gasoil London is not available on Yahoo Finance.
+    # HO=F (NYMEX Heating Oil) is the closest liquid proxy.
+    # Price is in USD/gallon; we convert to USD/metric tonne (×317.7).
+
+    _HO_GAL_TO_TONNE = 317.7  # gallons per metric tonne for diesel/gasoil
 
     def _fetch_lgo_price(self) -> Dict[str, Any]:
+        # Try nasdaqdatalink first (real ICE Gasoil)
         if _HAS_NASDAQ:
             try:
-                import pandas as pd  # type: ignore
-
                 data = nasdaqdatalink.get("CHRIS/ICE_G1", rows=1)
                 if data is not None and not data.empty:
                     last = data.iloc[-1]
@@ -236,47 +240,70 @@ class YFinanceProvider:
                         "low": float(last.get("Low", 0)),
                         "close": float(last.get("Settle", last.iloc[-1])),
                         "volume": float(last.get("Volume", 0)),
-                        "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+                        "timestamp": _now_utc().isoformat(),
                     }
             except Exception as exc:
-                logger.warning(f"nasdaqdatalink fetch for LGO failed: {exc}")
+                logger.debug(f"nasdaqdatalink ICE_G1 failed: {exc}")
 
-        logger.warning(
-            "LGO (Gasoil) data unavailable — nasdaqdatalink not installed or fetch failed. "
-            "Install nasdaqdatalink and set NASDAQ_DATA_LINK_API_KEY for Gasoil support."
-        )
-        return {
-            "symbol": "LGO",
-            "price": 0.0,
-            "open": 0.0,
-            "high": 0.0,
-            "low": 0.0,
-            "close": 0.0,
-            "volume": 0.0,
-            "timestamp": datetime.now(tz=timezone.utc).isoformat(),
-        }
+        # Fallback: HO=F (Heating Oil) as proxy
+        try:
+            data = self._fetch_yf_price("HO=F")
+            k = self._HO_GAL_TO_TONNE
+            return {
+                "symbol": "LGO",
+                "price": round(data["price"] * k, 2),
+                "open": round(data["open"] * k, 2),
+                "high": round(data["high"] * k, 2),
+                "low": round(data["low"] * k, 2),
+                "close": round(data["close"] * k, 2),
+                "volume": float(data["volume"]),
+                "timestamp": data["timestamp"],
+            }
+        except Exception as exc:
+            logger.warning(f"LGO proxy (HO=F) failed: {exc}")
+            return {
+                "symbol": "LGO", "price": 0.0, "open": 0.0,
+                "high": 0.0, "low": 0.0, "close": 0.0, "volume": 0.0,
+                "timestamp": _now_utc().isoformat(),
+            }
 
     def _fetch_lgo_history(self, periods: int) -> List[Dict[str, Any]]:
+        # Try nasdaqdatalink first
         if _HAS_NASDAQ:
             try:
                 data = nasdaqdatalink.get("CHRIS/ICE_G1", rows=periods)
                 if data is not None and not data.empty:
                     result: List[Dict[str, Any]] = []
                     for idx, row in data.iterrows():
-                        result.append(
-                            {
-                                "symbol": "LGO",
-                                "open": float(row.get("Open", 0)),
-                                "high": float(row.get("High", 0)),
-                                "low": float(row.get("Low", 0)),
-                                "close": float(row.get("Settle", row.iloc[-1])),
-                                "volume": float(row.get("Volume", 0)),
-                                "timestamp": idx.isoformat() if hasattr(idx, "isoformat") else str(idx),
-                            }
-                        )
+                        result.append({
+                            "symbol": "LGO",
+                            "open": float(row.get("Open", 0)),
+                            "high": float(row.get("High", 0)),
+                            "low": float(row.get("Low", 0)),
+                            "close": float(row.get("Settle", row.iloc[-1])),
+                            "volume": float(row.get("Volume", 0)),
+                            "timestamp": idx.isoformat() if hasattr(idx, "isoformat") else str(idx),
+                        })
                     return result
             except Exception as exc:
-                logger.warning(f"nasdaqdatalink history for LGO failed: {exc}")
+                logger.debug(f"nasdaqdatalink ICE_G1 history failed: {exc}")
 
-        logger.warning("LGO history unavailable — returning empty list.")
-        return []
+        # Fallback: HO=F history converted to $/tonne
+        try:
+            ho_hist = self._fetch_yf_history("HO=F", periods)
+            k = self._HO_GAL_TO_TONNE
+            return [
+                {
+                    "symbol": "LGO",
+                    "open": round(r["open"] * k, 2),
+                    "high": round(r["high"] * k, 2),
+                    "low": round(r["low"] * k, 2),
+                    "close": round(r["close"] * k, 2),
+                    "volume": r["volume"],
+                    "timestamp": r["timestamp"],
+                }
+                for r in ho_hist
+            ]
+        except Exception as exc:
+            logger.warning(f"LGO proxy history (HO=F) failed: {exc}")
+            return []
