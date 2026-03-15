@@ -285,7 +285,7 @@ export default function WarRoom() {
 
   // Price chart data (maintained locally, updated from API)
   const [brentData, setBrentData] = useState(() => generatePriceData(82.0, 0.4));
-  const [gasoilData, setGasoilData] = useState(() => generatePriceData(728.0, 1.8));
+  const [gasoilData, setGasoilData] = useState(() => generatePriceData(1184.0, 5.0));
   const [brentFlash, setBrentFlash] = useState(false);
   const [gasoilFlash, setGasoilFlash] = useState(false);
 
@@ -293,7 +293,7 @@ export default function WarRoom() {
 
   // Extract prices from API
   const brentPrice = prices?.["BZ=F"]?.price || brentData[brentData.length - 1]?.p || 82.0;
-  const gasoilPrice = prices?.["LGO"]?.price || gasoilData[gasoilData.length - 1]?.p || 728.0;
+  const gasoilPrice = prices?.["LGO"]?.price || gasoilData[gasoilData.length - 1]?.p || 1184.0;
   const brentChange = forecast?.instrument === "BZ=F" && forecast?.current_price
     ? ((brentPrice - forecast.current_price) / forecast.current_price * 100) : 0;
   const gasoilChange = 0;
@@ -365,7 +365,7 @@ export default function WarRoom() {
   // Ticker
   const tickerItems = [
     `BRENT $${brentPrice.toFixed(2)}`,
-    `GASOIL $${gasoilPrice.toFixed(2)}`,
+    `HO $${gasoilPrice.toFixed(0)}/т`,
     `РИЗИК ${compositeDisplay}/10`,
     `КОНСЕНСУС: ${forecast?.direction || "—"}`,
     `СТАТУС: ${status.toUpperCase()}`,
@@ -423,7 +423,7 @@ export default function WarRoom() {
           <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
             {[
               { label: "БРЕНТ BZ=F", price: brentPrice, change: brentChange, flash: brentFlash },
-              { label: "ГАЗОЙЛЬ LGO", price: gasoilPrice, change: gasoilChange, flash: gasoilFlash },
+              { label: "ДИСТИЛЯТИ HO", price: gasoilPrice, change: gasoilChange, flash: gasoilFlash },
             ].map((item) => (
               <div key={item.label} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.15em" }}>{item.label}</div>
@@ -531,7 +531,7 @@ export default function WarRoom() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, opacity: focusMode ? 0.7 : 1, transition: "opacity 0.4s" }}>
               {[
                 { title: "Нафта Brent", ticker: "BZ=F · 1 ГОД.", price: brentPrice, change: brentChange, data: brentData },
-                { title: "Газойль London", ticker: "LGO · 1 ГОД.", price: gasoilPrice, change: gasoilChange, data: gasoilData },
+                { title: "Дистиляти (HO proxy)", ticker: "HO=F · $/т", price: gasoilPrice, change: gasoilChange, data: gasoilData },
               ].map((c) => (
                 <div key={c.title} style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "12px 14px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
