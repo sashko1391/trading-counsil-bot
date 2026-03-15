@@ -1,24 +1,33 @@
 #!/usr/bin/env python3
-"""Generate Architecture PDF for Oil Trading Intelligence Bot."""
+"""Generate Architecture PDF for Oil Trading Intelligence Bot (Ukrainian)."""
 
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import mm, cm
+from reportlab.lib.units import mm
 from reportlab.lib.colors import HexColor, black, white
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    PageBreak, KeepTogether, HRFlowable,
+    PageBreak, HRFlowable,
 )
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime
 import os
 
+# Register DejaVu fonts (Cyrillic support)
+pdfmetrics.registerFont(TTFont("DejaVu", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+pdfmetrics.registerFont(TTFont("DejaVuBd", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"))
+pdfmetrics.registerFont(TTFont("DejaVuMono", "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"))
+
+# Register font family for <b> tag support
+pdfmetrics.registerFontFamily(
+    "DejaVu", normal="DejaVu", bold="DejaVuBd",
+)
+
 # Colors
 DARK = HexColor("#1a1a2e")
 ACCENT = HexColor("#00d4aa")
-ACCENT2 = HexColor("#0099ff")
 GRAY = HexColor("#666666")
 LIGHT_GRAY = HexColor("#f0f0f0")
 TABLE_HEADER = HexColor("#1a1a2e")
@@ -31,62 +40,77 @@ def build_styles():
     styles = getSampleStyleSheet()
 
     styles.add(ParagraphStyle(
-        "Cover", fontSize=28, leading=34, textColor=DARK,
-        alignment=TA_CENTER, spaceAfter=12, fontName="Helvetica-Bold",
+        "Cover", fontSize=26, leading=32, textColor=DARK,
+        alignment=TA_CENTER, spaceAfter=12, fontName="DejaVuBd",
     ))
     styles.add(ParagraphStyle(
-        "CoverSub", fontSize=14, leading=18, textColor=GRAY,
-        alignment=TA_CENTER, spaceAfter=6, fontName="Helvetica",
+        "CoverSub", fontSize=13, leading=17, textColor=GRAY,
+        alignment=TA_CENTER, spaceAfter=6, fontName="DejaVu",
     ))
     styles.add(ParagraphStyle(
-        "H1", fontSize=18, leading=22, textColor=DARK,
-        spaceBefore=20, spaceAfter=10, fontName="Helvetica-Bold",
+        "H1", fontSize=16, leading=20, textColor=DARK,
+        spaceBefore=20, spaceAfter=10, fontName="DejaVuBd",
     ))
     styles.add(ParagraphStyle(
-        "H2", fontSize=14, leading=17, textColor=DARK,
-        spaceBefore=14, spaceAfter=6, fontName="Helvetica-Bold",
+        "H2", fontSize=12, leading=16, textColor=DARK,
+        spaceBefore=14, spaceAfter=6, fontName="DejaVuBd",
     ))
     styles.add(ParagraphStyle(
-        "H3", fontSize=11, leading=14, textColor=DARK,
-        spaceBefore=10, spaceAfter=4, fontName="Helvetica-Bold",
+        "H3", fontSize=10, leading=13, textColor=DARK,
+        spaceBefore=10, spaceAfter=4, fontName="DejaVuBd",
     ))
     styles.add(ParagraphStyle(
-        "Body", fontSize=10, leading=14, textColor=black,
-        spaceAfter=6, fontName="Helvetica", alignment=TA_JUSTIFY,
+        "Body", fontSize=9, leading=13, textColor=black,
+        spaceAfter=6, fontName="DejaVu", alignment=TA_JUSTIFY,
     ))
     styles.add(ParagraphStyle(
-        "BulletItem", fontSize=10, leading=14, textColor=black,
-        spaceAfter=3, fontName="Helvetica", leftIndent=18,
-        bulletIndent=6, bulletFontName="Helvetica",
+        "BulletItem", fontSize=9, leading=13, textColor=black,
+        spaceAfter=3, fontName="DejaVu", leftIndent=18,
+        bulletIndent=6, bulletFontName="DejaVu",
     ))
     styles.add(ParagraphStyle(
-        "CodeBlock", fontSize=9, leading=12, textColor=HexColor("#333"),
-        fontName="Courier", backColor=LIGHT_GRAY, leftIndent=12,
+        "CodeBlock", fontSize=8, leading=11, textColor=HexColor("#333"),
+        fontName="DejaVuMono", backColor=LIGHT_GRAY, leftIndent=12,
         rightIndent=12, spaceBefore=4, spaceAfter=4,
         borderPadding=6,
     ))
     styles.add(ParagraphStyle(
         "Caption", fontSize=8, leading=10, textColor=GRAY,
-        alignment=TA_CENTER, spaceAfter=8, fontName="Helvetica-Oblique",
+        alignment=TA_CENTER, spaceAfter=8, fontName="DejaVu",
     ))
     styles.add(ParagraphStyle(
         "Footer", fontSize=8, leading=10, textColor=GRAY,
-        alignment=TA_CENTER, fontName="Helvetica",
+        alignment=TA_CENTER, fontName="DejaVu",
     ))
     return styles
 
 
+_CELL_STYLE = ParagraphStyle(
+    "Cell", fontSize=8, leading=11, fontName="DejaVu", textColor=black,
+)
+_HEADER_CELL_STYLE = ParagraphStyle(
+    "HeaderCell", fontSize=8, leading=11, fontName="DejaVuBd", textColor=white,
+)
+
+
+def _wrap(text, style=None):
+    """Wrap cell text in a Paragraph for proper text wrapping."""
+    if isinstance(text, Paragraph):
+        return text
+    s = style or _CELL_STYLE
+    # Convert newlines to <br/> for reportlab
+    t = str(text).replace("\n", "<br/>")
+    return Paragraph(t, s)
+
+
 def make_table(headers, rows, col_widths=None):
-    """Create a styled table."""
-    data = [headers] + rows
+    """Create a styled table with Cyrillic-safe font and auto-wrapping cells."""
+    wrapped_headers = [_wrap(h, _HEADER_CELL_STYLE) for h in headers]
+    wrapped_rows = [[_wrap(cell) for cell in row] for row in rows]
+    data = [wrapped_headers] + wrapped_rows
     t = Table(data, colWidths=col_widths, repeatRows=1)
     style = [
         ("BACKGROUND", (0, 0), (-1, 0), TABLE_HEADER),
-        ("TEXTCOLOR", (0, 0), (-1, 0), white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, 0), 9),
-        ("FONTSIZE", (0, 1), (-1, -1), 9),
-        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
         ("ALIGN", (0, 0), (-1, -1), "LEFT"),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("GRID", (0, 0), (-1, -1), 0.5, HexColor("#cccccc")),
@@ -110,96 +134,98 @@ def build_pdf():
     s = build_styles()
     story = []
 
-    # ── COVER ──
+    # ── ОБКЛАДИНКА ──
     story.append(Spacer(1, 60 * mm))
     story.append(Paragraph("OIL TRADING INTELLIGENCE BOT", s["Cover"]))
     story.append(Spacer(1, 8 * mm))
-    story.append(Paragraph("System Architecture Document", s["CoverSub"]))
+    story.append(Paragraph("Документ архітектури системи", s["CoverSub"]))
     story.append(Spacer(1, 12 * mm))
-    story.append(Paragraph("Version 1.0", s["CoverSub"]))
-    story.append(Paragraph(f"Date: {datetime.now().strftime('%d %B %Y')}", s["CoverSub"]))
+    story.append(Paragraph("Версія 1.0", s["CoverSub"]))
+    story.append(Paragraph(f"Дата: {datetime.now().strftime('%d.%m.%Y')}", s["CoverSub"]))
     story.append(Spacer(1, 20 * mm))
-    story.append(Paragraph("CONFIDENTIAL", s["CoverSub"]))
+    story.append(Paragraph("КОНФІДЕНЦІЙНО", s["CoverSub"]))
     story.append(PageBreak())
 
-    # ── TABLE OF CONTENTS ──
-    story.append(Paragraph("Table of Contents", s["H1"]))
+    # ── ЗМІСТ ──
+    story.append(Paragraph("Зміст", s["H1"]))
     toc = [
-        "1. Executive Summary",
-        "2. System Architecture Overview",
-        "3. Data Sources & Event Detection",
-        "4. AI Agents & Analysis",
-        "5. Consensus Aggregation",
-        "6. Risk Governance",
-        "7. Notifications & Persistence",
-        "8. Knowledge Retrieval (RAG)",
-        "9. API Server & Frontend",
-        "10. Deployment Architecture",
-        "11. Data Models & Schemas",
-        "12. External Dependencies",
-        "13. Security & Compliance",
-        "14. Performance Characteristics",
-        "15. Operational Costs",
+        "1. Загальний огляд",
+        "2. Архітектура системи",
+        "3. Джерела даних та детекція подій",
+        "4. AI-агенти та аналіз",
+        "5. Консенсусна агрегація",
+        "6. Управління ризиками",
+        "7. Сповіщення та зберігання даних",
+        "8. Пошук знань (RAG)",
+        "9. API-сервер та фронтенд",
+        "10. Архітектура деплойменту",
+        "11. Моделі даних та схеми",
+        "12. Зовнішні залежності",
+        "13. Безпека",
+        "14. Характеристики продуктивності",
+        "15. Операційні витрати",
     ]
     for item in toc:
         story.append(Paragraph(item, s["Body"]))
     story.append(PageBreak())
 
-    # ── 1. EXECUTIVE SUMMARY ──
-    story.append(Paragraph("1. Executive Summary", s["H1"]))
+    # ── 1. ЗАГАЛЬНИЙ ОГЛЯД ──
+    story.append(Paragraph("1. Загальний огляд", s["H1"]))
     story.append(hr())
     story.append(Paragraph(
-        "The Oil Trading Intelligence Bot is a multi-agent AI system that monitors crude oil and "
-        "refined products markets in real-time. It combines four specialized AI agents (Claude, Grok, "
-        "Perplexity, Gemini) with automated market monitoring, consensus-based decision-making, "
-        "risk governance, and instant notifications via Telegram.",
+        "Oil Trading Intelligence Bot — мультиагентна AI-система, яка моніторить ринки "
+        "сирої нафти та нафтопродуктів у реальному часі. Система поєднує чотири спеціалізовані "
+        "AI-агенти (Claude, Grok, Perplexity, Gemini) з автоматичним моніторингом ринку, "
+        "консенсусним прийняттям рішень, управлінням ризиками та миттєвими сповіщеннями "
+        "через Telegram.",
         s["Body"]
     ))
     story.append(Paragraph(
-        "The system targets <b>Brent Crude (BZ=F)</b> and <b>Distillates (HO=F proxy)</b> exclusively, "
-        "using a deterministic 5-stage pipeline: Event Detection, Agent Analysis, Consensus Aggregation, "
-        "Risk Filtering, and Notification.",
+        "Система працює виключно з <b>Brent Crude (BZ=F)</b> та <b>Дистилятами (HO=F проксі)</b>, "
+        "використовуючи детерміністичний 5-етапний конвеєр: Детекція подій, Аналіз агентів, "
+        "Консенсусна агрегація, Фільтрація ризиків та Сповіщення.",
         s["Body"]
     ))
     story.append(Spacer(1, 4 * mm))
 
     story.append(make_table(
-        ["Parameter", "Value"],
+        ["Параметр", "Значення"],
         [
-            ["Target Instruments", "Brent Crude (BZ=F), Distillates (HO=F proxy)"],
-            ["AI Agents", "4 (Claude, Grok, Perplexity, Gemini)"],
-            ["Polling Interval", "15 minutes (configurable)"],
-            ["Tech Stack", "Python 3.12, FastAPI, React, Docker"],
-            ["Deployment", "Docker Compose + Caddy (auto-SSL)"],
-            ["Tests", "466 passing"],
-            ["Status", "Production (all 7 phases complete)"],
+            ["Цільові інструменти", "Brent Crude (BZ=F), Дистиляти (HO=F проксі)"],
+            ["AI-агенти", "4 (Claude, Grok, Perplexity, Gemini)"],
+            ["Інтервал опитування", "15 хвилин (налаштовується)"],
+            ["Технічний стек", "Python 3.12, FastAPI, React, Docker"],
+            ["Деплоймент", "Docker Compose + Caddy (авто-SSL)"],
+            ["Тести", "466 пройдено"],
+            ["Статус", "Продакшн (всі 7 фаз завершені)"],
         ],
         col_widths=[50 * mm, 120 * mm],
     ))
     story.append(PageBreak())
 
-    # ── 2. SYSTEM ARCHITECTURE ──
-    story.append(Paragraph("2. System Architecture Overview", s["H1"]))
+    # ── 2. АРХІТЕКТУРА СИСТЕМИ ──
+    story.append(Paragraph("2. Архітектура системи", s["H1"]))
     story.append(hr())
-    story.append(Paragraph("5-Stage Pipeline", s["H2"]))
+    story.append(Paragraph("5-етапний конвеєр", s["H2"]))
 
     pipeline_data = [
-        ["Stage", "Component", "Description"],
-        ["1. Detection", "OilPriceWatcher\nOilNewsScanner\nScheduledEvents\n+6 enrichment watchers",
-         "Detects price spikes, volume surges, news events, scheduled catalysts. "
-         "Enriches with OVX volatility, DXY/currencies, COT positioning, weather, refinery margins, seasonal patterns."],
-        ["2. Analysis", "4 AI Agents\n(parallel execution)",
-         "Each agent independently analyzes the event and returns a structured Signal "
-         "(action, confidence, thesis, risks, drivers)."],
-        ["3. Aggregation", "Aggregator\n(deterministic Python)",
-         "Confidence-weighted voting produces CouncilResponse with consensus "
-         "(LONG/SHORT/WAIT/CONFLICT) and strength (UNANIMOUS/STRONG/WEAK/NONE)."],
-        ["4. Risk", "RiskGovernor\n(6-category scoring)",
-         "Evaluates geopolitical, supply, demand, financial, seasonal, and technical risks. "
-         "Applies daily limits, cooldowns, and confidence thresholds."],
-        ["5. Output", "TelegramNotifier\nTradeJournal\nForecastTracker\nFrontend Dashboard",
-         "Sends alerts to Telegram, logs decisions, tracks forecast accuracy (Brier Score), "
-         "and pushes updates to the War Room dashboard."],
+        ["Етап", "Компонент", "Опис"],
+        ["1. Детекція", "OilPriceWatcher\nOilNewsScanner\nScheduledEvents\n+6 збагачувачів",
+         "Виявляє стрибки цін, сплески обсягу, новинні події, заплановані каталізатори. "
+         "Збагачує даними OVX волатильності, DXY/валют, COT позиціонування, погоди, "
+         "маржі нафтопереробки, сезонних патернів."],
+        ["2. Аналіз", "4 AI-агенти\n(паралельне виконання)",
+         "Кожен агент незалежно аналізує подію та повертає структурований Signal "
+         "(дія, впевненість, теза, ризики, драйвери)."],
+        ["3. Агрегація", "Aggregator\n(детерміністичний Python)",
+         "Зважене голосування за впевненістю формує CouncilResponse з консенсусом "
+         "(LONG/SHORT/WAIT/CONFLICT) та силою (UNANIMOUS/STRONG/WEAK/NONE)."],
+        ["4. Ризики", "RiskGovernor\n(6 категорій скорингу)",
+         "Оцінює геополітичні, пропозиції, попиту, фінансові, сезонні та технічні ризики. "
+         "Застосовує денні ліміти, кулдаун та пороги впевненості."],
+        ["5. Вихід", "TelegramNotifier\nTradeJournal\nForecastTracker\nФронтенд-дашборд",
+         "Надсилає алерти в Telegram, логує рішення, відстежує точність прогнозів "
+         "(Brier Score), оновлює дашборд War Room."],
     ]
     story.append(make_table(
         pipeline_data[0], pipeline_data[1:],
@@ -207,386 +233,393 @@ def build_pdf():
     ))
     story.append(PageBreak())
 
-    # ── 3. DATA SOURCES ──
-    story.append(Paragraph("3. Data Sources & Event Detection", s["H1"]))
+    # ── 3. ДЖЕРЕЛА ДАНИХ ──
+    story.append(Paragraph("3. Джерела даних та детекція подій", s["H1"]))
     story.append(hr())
 
-    story.append(Paragraph("3.1 Core Watchers", s["H2"]))
+    story.append(Paragraph("3.1 Основні вотчери", s["H2"]))
     story.append(make_table(
-        ["Watcher", "Source", "Detects"],
+        ["Вотчер", "Джерело", "Що виявляє"],
         [
-            ["OilPriceWatcher", "yfinance (BZ=F, HO=F)", "Price spikes (>2%), volume surges (>2x avg), crack spread changes (>5%)"],
-            ["OilNewsScanner", "10 RSS feeds (EIA, Reuters, Bloomberg, OilPrice, OPEC...)", "Relevant oil news events with severity scoring"],
-            ["ScheduledEvents", "Built-in calendar", "OPEC meetings, EIA reports, FOMC decisions"],
+            ["OilPriceWatcher", "yfinance (BZ=F, HO=F)",
+             "Стрибки ціни (>2%), сплески обсягу (>2x середнього), зміни крек-спреду (>5%)"],
+            ["OilNewsScanner", "10 RSS-каналів (EIA, Reuters, Bloomberg, OilPrice, OPEC...)",
+             "Релевантні новини нафтового ринку зі скорингом серйозності"],
+            ["ScheduledEvents", "Вбудований календар",
+             "Засідання ОПЕК, звіти EIA, рішення FOMC"],
         ],
         col_widths=[35 * mm, 45 * mm, 90 * mm],
     ))
 
-    story.append(Paragraph("3.2 Enrichment Sources", s["H2"]))
+    story.append(Paragraph("3.2 Джерела збагачення", s["H2"]))
     story.append(make_table(
-        ["Source", "Data", "API"],
+        ["Джерело", "Дані", "API"],
         [
-            ["OVX (^OVX)", "Oil volatility index, regime classification", "yfinance (free)"],
-            ["DXY + Currencies", "Dollar index, EUR/USD, USD/CNY trends", "yfinance (free)"],
-            ["CFTC COT", "Money Manager net positions, 52-week percentile", "CFTC SODA API (free)"],
-            ["Weather/Hurricane", "Gulf Coast storm tracking, NOAA alerts", "NOAA NHC API (free)"],
-            ["Refinery Margins", "3-2-1 crack spread, gasoline/heating oil cracks", "yfinance (free)"],
-            ["Seasonal Patterns", "12-month demand database", "Built-in"],
-            ["EIA Data", "Weekly petroleum status reports", "EIA API (free)"],
+            ["OVX (^OVX)", "Індекс волатильності нафти, класифікація режимів", "yfinance (безкоштовно)"],
+            ["DXY + валюти", "Індекс долара, EUR/USD, USD/CNY тренди", "yfinance (безкоштовно)"],
+            ["CFTC COT", "Нетто-позиції Money Manager, перцентиль 52 тижні", "CFTC SODA API (безкоштовно)"],
+            ["Погода/урагани", "Відстеження штормів Мексиканської затоки, NOAA алерти", "NOAA NHC API (безкоштовно)"],
+            ["Маржа НПЗ", "Крек-спред 3-2-1, бензин/пічне паливо", "yfinance (безкоштовно)"],
+            ["Сезонні патерни", "12-місячна база попиту", "Вбудовано"],
+            ["Дані EIA", "Тижневі звіти про запаси нафти", "EIA API (безкоштовно)"],
         ],
         col_widths=[35 * mm, 55 * mm, 80 * mm],
     ))
 
-    story.append(Paragraph("3.3 Brent Price: Active Contract Resolution", s["H2"]))
+    story.append(Paragraph("3.3 Brent: визначення активного контракту", s["H2"]))
     story.append(Paragraph(
-        "Yahoo Finance's generic BZ=F ticker can roll to the next contract month before the actual "
-        "front month expires. The system auto-detects this roll by checking the underlyingSymbol and "
-        "falls back to the specific near-month contract (e.g., BZK26.NYM for May 2026), ensuring "
-        "prices match TradingView and Investing.com.",
+        "Тікер BZ=F на Yahoo Finance може перейти на наступний контрактний місяць раніше, "
+        "ніж фактично закінчиться поточний фронт-місяць. Система автоматично виявляє "
+        "цей перехід, перевіряючи underlyingSymbol, і переключається на конкретний "
+        "контракт ближнього місяця (напр., BZK26.NYM для травня 2026), забезпечуючи "
+        "відповідність цін TradingView та Investing.com.",
         s["Body"]
     ))
     story.append(PageBreak())
 
-    # ── 4. AI AGENTS ──
-    story.append(Paragraph("4. AI Agents & Analysis", s["H1"]))
+    # ── 4. AI-АГЕНТИ ──
+    story.append(Paragraph("4. AI-агенти та аналіз", s["H1"]))
     story.append(hr())
 
     story.append(make_table(
-        ["Agent", "Model", "Provider", "Role", "Focus"],
+        ["Агент", "Модель", "Провайдер", "Роль", "Фокус"],
         [
-            ["Claude", "claude-sonnet-4", "Anthropic", "Risk CFO",
-             "Contango, crack spreads, OPEC compliance, geopolitical premium"],
-            ["Grok", "grok-3", "xAI", "Sentiment Hunter",
-             "X/Twitter sentiment, breaking news, rumours, tanker chatter"],
-            ["Perplexity", "sonar", "Perplexity", "Fact Verifier",
-             "EIA/IEA/OPEC data verification, inventory cross-reference"],
-            ["Gemini", "gemini-2.5-flash", "Google", "Macro Analyst",
-             "Seasonal demand, China trends, USD correlation, contango/backwardation"],
+            ["Claude", "claude-sonnet-4", "Anthropic", "Ризик-CFO",
+             "Контанго, крек-спреди,\nквоти ОПЕК, геопремія"],
+            ["Grok", "grok-3", "xAI", "Настрої",
+             "X/Twitter, гарячі новини,\nчутки, чатер танкерів"],
+            ["Perplexity", "sonar", "Perplexity", "Факти",
+             "EIA/IEA/ОПЕК дані,\nкрос-референс запасів"],
+            ["Gemini", "gemini-2.5-flash", "Google", "Макро",
+             "Сезонний попит, Китай,\nUSD, контанго/бекворд."],
         ],
-        col_widths=[22 * mm, 28 * mm, 22 * mm, 28 * mm, 70 * mm],
+        col_widths=[20 * mm, 28 * mm, 22 * mm, 18 * mm, 82 * mm],
     ))
 
     story.append(Spacer(1, 4 * mm))
-    story.append(Paragraph("Agent Output: Signal Schema", s["H2"]))
+    story.append(Paragraph("Вихід агента: схема Signal", s["H2"]))
     story.append(make_table(
-        ["Field", "Type", "Description"],
+        ["Поле", "Тип", "Опис"],
         [
-            ["action", "LONG / SHORT / WAIT", "Trading direction recommendation"],
-            ["confidence", "0.0 - 1.0", "Agent's conviction level"],
-            ["thesis", "string (max 500 chars)", "Reasoning in Ukrainian"],
-            ["risk_notes", "string (max 500 chars)", "Key risks in Ukrainian"],
-            ["invalidation_price", "float (optional)", "Price that invalidates the thesis"],
-            ["drivers", "list (1-3)", "Key market drivers from taxonomy"],
-            ["sources", "list of URLs", "Information sources"],
+            ["action", "LONG / SHORT / WAIT", "Рекомендація напрямку торгівлі"],
+            ["confidence", "0.0 - 1.0", "Рівень впевненості агента"],
+            ["thesis", "рядок (макс. 500 символів)", "Обґрунтування українською"],
+            ["risk_notes", "рядок (макс. 500 символів)", "Ключові ризики українською"],
+            ["invalidation_price", "float (опціонально)", "Ціна, що скасовує тезу"],
+            ["drivers", "список (1-3)", "Ключові ринкові драйвери з таксономії"],
+            ["sources", "список URL", "Джерела інформації"],
         ],
         col_widths=[35 * mm, 40 * mm, 95 * mm],
     ))
 
-    story.append(Paragraph("Adversarial Stage (Devil's Advocate)", s["H2"]))
+    story.append(Paragraph("Адверсаріальний етап (Адвокат диявола)", s["H2"]))
     story.append(Paragraph(
-        "A virtual 5th agent argues against the consensus via a 3-step debate: "
-        "primary thesis, counterargument, and final verdict. Includes sycophancy detection "
-        "that penalizes confidence when the debate produces no substantive objections. "
-        "This stage can shift combined confidence by up to +/-10%.",
+        "Віртуальний 5-й агент аргументує проти консенсусу через 3-крокову дебатну модель: "
+        "основна теза, контраргумент та фінальний вердикт. Включає детекцію підлабузництва, "
+        "яка знижує впевненість, коли дебати не виявляють суттєвих заперечень. "
+        "Цей етап може зсунути загальну впевненість на +/- 10%.",
         s["Body"]
     ))
     story.append(PageBreak())
 
-    # ── 5. AGGREGATION ──
-    story.append(Paragraph("5. Consensus Aggregation", s["H1"]))
+    # ── 5. АГРЕГАЦІЯ ──
+    story.append(Paragraph("5. Консенсусна агрегація", s["H1"]))
     story.append(hr())
     story.append(Paragraph(
-        "The Aggregator uses <b>deterministic Python code</b> (no AI) to combine 4 agent signals "
-        "into a single CouncilResponse via confidence-weighted voting.",
+        "Агрегатор використовує <b>детерміністичний Python-код</b> (без AI) для об'єднання "
+        "4 сигналів агентів у єдиний CouncilResponse через зважене голосування за впевненістю.",
         s["Body"]
     ))
 
     story.append(make_table(
-        ["Strength", "Criteria"],
+        ["Сила", "Критерій"],
         [
-            ["UNANIMOUS", "All 4 agents agree + combined confidence > 80%"],
-            ["STRONG", "3+ agents agree + combined confidence > 70%"],
-            ["WEAK", "Mixed votes + combined confidence 50-70%"],
-            ["NONE", "No clear consensus or all agents say WAIT"],
+            ["UNANIMOUS", "Всі 4 агенти згодні + загальна впевненість > 80%"],
+            ["STRONG", "3+ агенти згодні + загальна впевненість > 70%"],
+            ["WEAK", "Змішані голоси + загальна впевненість 50-70%"],
+            ["NONE", "Немає чіткого консенсусу або всі агенти кажуть WAIT"],
         ],
         col_widths=[35 * mm, 135 * mm],
     ))
 
     story.append(Spacer(1, 4 * mm))
     story.append(Paragraph(
-        "Agent weights are dynamically calibrated based on historical hit rates tracked via "
-        "Brier Score. Overconfident agents are dampened; underconfident agents are boosted.",
+        "Ваги агентів динамічно калібруються на основі історичної точності, яка відстежується "
+        "через Brier Score. Надмірно впевнені агенти зменшуються; недостатньо впевнені — підсилюються.",
         s["Body"]
     ))
     story.append(PageBreak())
 
-    # ── 6. RISK GOVERNANCE ──
-    story.append(Paragraph("6. Risk Governance", s["H1"]))
+    # ── 6. УПРАВЛІННЯ РИЗИКАМИ ──
+    story.append(Paragraph("6. Управління ризиками", s["H1"]))
     story.append(hr())
 
-    story.append(Paragraph("6-Category OilRiskScore", s["H2"]))
+    story.append(Paragraph("6-категорійний OilRiskScore", s["H2"]))
     story.append(make_table(
-        ["Category", "Weight", "Examples"],
+        ["Категорія", "Вага", "Приклади"],
         [
-            ["Geopolitical", "25%", "Conflict, sanctions, chokepoint (Hormuz, Suez)"],
-            ["Supply", "25%", "OPEC cuts, production disruptions, refinery outages"],
-            ["Demand", "20%", "Recession risk, China slowdown, EV transition"],
-            ["Financial", "10%", "Currency volatility, rate decisions, credit stress"],
-            ["Seasonal", "10%", "Q1 heating demand, Q3 driving season"],
-            ["Technical", "10%", "Volatility spikes, chart breakouts, OVX regime"],
+            ["Геополітика", "25%", "Конфлікти, санкції, вузькі місця (Ормуз, Суец)"],
+            ["Пропозиція", "25%", "Скорочення ОПЕК, збої видобутку, зупинка НПЗ"],
+            ["Попит", "20%", "Ризик рецесії, уповільнення Китаю, перехід на EV"],
+            ["Фінанси", "10%", "Волатильність валют, рішення щодо ставок, кредитний стрес"],
+            ["Сезонність", "10%", "Q1 опалювальний попит, Q3 сезон автоподорожей"],
+            ["Технічний", "10%", "Сплески волатильності, пробої графіків, режим OVX"],
         ],
         col_widths=[30 * mm, 20 * mm, 120 * mm],
     ))
 
-    story.append(Paragraph("Gating Rules", s["H2"]))
+    story.append(Paragraph("Правила блокування", s["H2"]))
     story.append(make_table(
-        ["Rule", "Threshold", "Action"],
+        ["Правило", "Поріг", "Дія"],
         [
-            ["Low Confidence", "< 60%", "BLOCK alert"],
-            ["Weak Consensus", "< STRONG", "BLOCK alert"],
-            ["Daily Limit", "> 10 alerts/day", "BLOCK remaining"],
-            ["Cooldown", "< 30 min since last", "BLOCK (prevent churn)"],
-            ["High Risk", "Composite > 85%", "BLOCK alert"],
-            ["OPEC Proximity", "Meeting within 24h", "Raise risk score"],
+            ["Низька впевненість", "< 60%", "БЛОКУВАТИ алерт"],
+            ["Слабкий консенсус", "< STRONG", "БЛОКУВАТИ алерт"],
+            ["Денний ліміт", "> 10 алертів/день", "БЛОКУВАТИ решту"],
+            ["Кулдаун", "< 30 хв з останнього", "БЛОКУВАТИ (запобігання чурну)"],
+            ["Високий ризик", "Композитний > 85%", "БЛОКУВАТИ алерт"],
+            ["Близькість ОПЕК", "Засідання протягом 24 год", "Підвищити оцінку ризику"],
         ],
         col_widths=[35 * mm, 40 * mm, 95 * mm],
     ))
     story.append(PageBreak())
 
-    # ── 7. NOTIFICATIONS ──
-    story.append(Paragraph("7. Notifications & Persistence", s["H1"]))
+    # ── 7. СПОВІЩЕННЯ ──
+    story.append(Paragraph("7. Сповіщення та зберігання даних", s["H1"]))
     story.append(hr())
     story.append(make_table(
-        ["Component", "Purpose", "Storage"],
+        ["Компонент", "Призначення", "Сховище"],
         [
-            ["Telegram Notifier", "Real-time alerts to multiple chat IDs", "Telegram Bot API"],
-            ["Digest Summarizer", "Periodic summary via Gemini Flash", "In-memory + Telegram"],
-            ["Trade Journal", "Full audit trail of all decisions", "data/trades.json"],
-            ["Daily Summary", "End-of-day trend + stats", "data/daily_summary.json"],
-            ["Digest History", "Hourly/6-hourly alert archive", "data/digest_history.json"],
-            ["Agent Memory", "Per-agent decision history for context injection", "data/agent_memory.json"],
-            ["Forecast Tracker", "Brier Score + hit rate tracking", "data/forecast_tracker.json"],
+            ["Telegram Notifier", "Алерти в реальному часі на декілька чатів", "Telegram Bot API"],
+            ["Digest Summarizer", "Періодичне резюме через Gemini Flash", "Пам'ять + Telegram"],
+            ["Trade Journal", "Повний аудит-трейл усіх рішень", "data/trades.json"],
+            ["Денне резюме", "Підсумок тренду та статистики за день", "data/daily_summary.json"],
+            ["Історія дайджестів", "Архів погодинних/6-годинних алертів", "data/digest_history.json"],
+            ["Пам'ять агентів", "Історія рішень кожного агента для контексту", "data/agent_memory.json"],
+            ["Трекер прогнозів", "Brier Score + відстеження точності", "data/forecast_tracker.json"],
         ],
         col_widths=[35 * mm, 55 * mm, 80 * mm],
     ))
     story.append(PageBreak())
 
     # ── 8. RAG ──
-    story.append(Paragraph("8. Knowledge Retrieval (RAG)", s["H1"]))
+    story.append(Paragraph("8. Пошук знань (RAG)", s["H1"]))
     story.append(hr())
     story.append(Paragraph(
-        "Vector-backed knowledge retrieval enriches agent context with domain expertise.",
+        "Векторний пошук знань збагачує контекст агентів доменною експертизою.",
         s["Body"]
     ))
     story.append(make_table(
-        ["Component", "Technology"],
+        ["Компонент", "Технологія"],
         [
-            ["Vector Database", "Pinecone (serverless)"],
-            ["Embedding Model", "text-embedding-3-small (OpenAI, 1536 dims)"],
-            ["Knowledge Base", "4 documents: fundamentals, OPEC history, seasonal patterns, EIA guide"],
-            ["Query Flow", "Format query -> Embed -> Search top-5 similar chunks -> Inject into prompt"],
-            ["Fallback", "If Pinecone/OpenAI unavailable, agents continue without RAG context"],
+            ["Векторна БД", "Pinecone (serverless)"],
+            ["Модель ембедингів", "text-embedding-3-small (OpenAI, 1536 вимірів)"],
+            ["База знань", "4 документи: основи ринку, історія ОПЕК, сезонні патерни, гайд EIA"],
+            ["Потік запиту", "Формування запиту → Ембединг → Пошук top-5 схожих чанків → Інжекція в промпт"],
+            ["Фолбек", "Якщо Pinecone/OpenAI недоступні, агенти продовжують без RAG-контексту"],
         ],
         col_widths=[35 * mm, 135 * mm],
     ))
     story.append(PageBreak())
 
-    # ── 9. API & FRONTEND ──
-    story.append(Paragraph("9. API Server & Frontend", s["H1"]))
+    # ── 9. API ТА ФРОНТЕНД ──
+    story.append(Paragraph("9. API-сервер та фронтенд", s["H1"]))
     story.append(hr())
 
-    story.append(Paragraph("9.1 REST API Endpoints", s["H2"]))
+    story.append(Paragraph("9.1 REST API ендпоінти", s["H2"]))
     story.append(make_table(
-        ["Method", "Path", "Description"],
+        ["Метод", "Шлях", "Опис"],
         [
-            ["GET", "/api/status", "System status, uptime, connected clients"],
-            ["GET", "/api/forecast", "Latest OilForecast"],
-            ["GET", "/api/council", "Latest CouncilResponse (all agent votes)"],
-            ["GET", "/api/prices", "Current BZ=F & LGO prices"],
-            ["GET", "/api/agents", "Agent statuses"],
-            ["GET", "/api/risk", "Risk check + 6-category score"],
-            ["GET", "/api/signals", "Signal history (last 20)"],
-            ["GET", "/api/history/daily", "Daily summaries"],
-            ["GET", "/api/history/digests", "Digest history"],
-            ["GET", "/api/history/agents/all", "All agents' memory"],
-            ["WS", "/ws", "Real-time WebSocket (auto-broadcast)"],
+            ["GET", "/api/status", "Статус системи, аптайм, підключені клієнти"],
+            ["GET", "/api/forecast", "Останній OilForecast"],
+            ["GET", "/api/council", "Останній CouncilResponse (голоси всіх агентів)"],
+            ["GET", "/api/prices", "Поточні ціни BZ=F та LGO"],
+            ["GET", "/api/agents", "Статуси агентів"],
+            ["GET", "/api/risk", "Перевірка ризиків + 6-категорійна оцінка"],
+            ["GET", "/api/signals", "Історія сигналів (останні 20)"],
+            ["GET", "/api/history/daily", "Денні підсумки"],
+            ["GET", "/api/history/digests", "Історія дайджестів"],
+            ["GET", "/api/history/agents/all", "Пам'ять усіх агентів"],
+            ["WS", "/ws", "WebSocket у реальному часі (авто-бродкаст)"],
         ],
         col_widths=[18 * mm, 50 * mm, 102 * mm],
     ))
 
-    story.append(Paragraph("9.2 Frontend: War Room Dashboard", s["H2"]))
+    story.append(Paragraph("9.2 Фронтенд: War Room Dashboard", s["H2"]))
     story.append(Paragraph(
-        "React SPA with matrix-style theme. Features: live price charts (SVG), "
-        "agent consensus panel, risk score gauge, signal history table, "
-        "history panel (daily/digest/agent tabs with trend charts). "
-        "Three selectable themes: Matrix (green), Amber (orange), Cyber (cyan). "
-        "WebSocket auto-reconnect with fallback to REST polling.",
+        "React SPA з matrix-стилем. Функції: графіки цін у реальному часі (SVG), "
+        "панель консенсусу агентів, індикатор ризику, таблиця історії сигналів, "
+        "панель історії (вкладки: денні/дайджести/пам'ять агентів з графіками трендів). "
+        "Три теми на вибір: Matrix (зелена), Amber (помаранчева), Cyber (блакитна). "
+        "WebSocket з авто-перепідключенням та фолбеком на REST-поллінг.",
         s["Body"]
     ))
     story.append(PageBreak())
 
-    # ── 10. DEPLOYMENT ──
-    story.append(Paragraph("10. Deployment Architecture", s["H1"]))
+    # ── 10. ДЕПЛОЙМЕНТ ──
+    story.append(Paragraph("10. Архітектура деплойменту", s["H1"]))
     story.append(hr())
 
     story.append(make_table(
-        ["Service", "Container", "Port", "Role"],
+        ["Сервіс", "Контейнер", "Порт", "Роль"],
         [
-            ["bot", "oil-bot (Python 3.12-slim)", "8000 (internal)", "Backend: FastAPI + WebSocket + Bot pipeline"],
-            ["frontend", "oil-frontend (Node → serve)", "3000 (internal)", "React SPA static server"],
-            ["caddy", "caddy:2-alpine", "80, 443 (external)", "Reverse proxy, auto-SSL (Let's Encrypt)"],
+            ["bot", "oil-bot (Python 3.12-slim)", "8000 (внутрішній)",
+             "Бекенд: FastAPI + WebSocket + конвеєр бота"],
+            ["frontend", "oil-frontend (Node → serve)", "3000 (внутрішній)",
+             "React SPA статичний сервер"],
+            ["caddy", "caddy:2-alpine", "80, 443 (зовнішній)",
+             "Зворотний проксі, авто-SSL (Let's Encrypt)"],
         ],
         col_widths=[25 * mm, 50 * mm, 35 * mm, 60 * mm],
     ))
 
     story.append(Spacer(1, 4 * mm))
-    story.append(Paragraph("Routing (Caddyfile)", s["H2"]))
+    story.append(Paragraph("Маршрутизація (Caddyfile)", s["H2"]))
     story.append(make_table(
-        ["Path", "Destination"],
+        ["Шлях", "Призначення"],
         [
-            ["/api/*", "bot:8000 (FastAPI backend)"],
+            ["/api/*", "bot:8000 (FastAPI бекенд)"],
             ["/ws", "bot:8000 (WebSocket)"],
             ["/*", "frontend:3000 (React SPA)"],
         ],
         col_widths=[40 * mm, 130 * mm],
     ))
 
-    story.append(Paragraph("Data Persistence", s["H2"]))
+    story.append(Paragraph("Персистентність даних", s["H2"]))
     story.append(Paragraph(
-        "Bot data (trades, journals, metrics) is stored in a Docker named volume "
-        "<b>bot-data:/app/data</b>, ensuring persistence across container restarts. "
-        "Caddy SSL certificates are stored in <b>caddy-data</b> volume.",
+        "Дані бота (угоди, журнал, метрики) зберігаються у Docker named volume "
+        "<b>bot-data:/app/data</b>, що забезпечує персистентність при перезапуску контейнерів. "
+        "SSL-сертифікати Caddy зберігаються у volume <b>caddy-data</b>.",
         s["Body"]
     ))
     story.append(PageBreak())
 
-    # ── 11. DATA MODELS ──
-    story.append(Paragraph("11. Data Models & Schemas", s["H1"]))
+    # ── 11. МОДЕЛІ ДАНИХ ──
+    story.append(Paragraph("11. Моделі даних та схеми", s["H1"]))
     story.append(hr())
-    story.append(Paragraph("All models use <b>Pydantic v2</b> with strict validation.", s["Body"]))
+    story.append(Paragraph("Усі моделі використовують <b>Pydantic v2</b> зі строгою валідацією.", s["Body"]))
     story.append(make_table(
-        ["Model", "Purpose", "Key Fields"],
+        ["Модель", "Призначення", "Ключові поля"],
         [
-            ["Signal", "Single agent recommendation", "action, confidence, thesis, risk_notes, drivers"],
-            ["MarketEvent", "Detected anomaly/news", "event_type, instrument, severity, headline, data"],
-            ["CouncilResponse", "Aggregated result", "4x Signal + consensus + strength + confidence"],
-            ["OilForecast", "Actionable forecast", "direction, target_price, current_price, timeframe, drivers"],
-            ["OilRiskScore", "6-category risk", "geopolitical, supply, demand, financial, seasonal, technical"],
-            ["RiskCheck", "Gate decision", "allowed (bool), reason, daily_alerts_count"],
+            ["Signal", "Рекомендація одного агента", "action, confidence, thesis, risk_notes, drivers"],
+            ["MarketEvent", "Виявлена аномалія/новина", "event_type, instrument, severity, headline, data"],
+            ["CouncilResponse", "Агрегований результат", "4x Signal + consensus + strength + confidence"],
+            ["OilForecast", "Прогноз для дії", "direction, target_price, current_price, timeframe, drivers"],
+            ["OilRiskScore", "6-категорійний ризик", "geopolitical, supply, demand, financial, seasonal, technical"],
+            ["RiskCheck", "Рішення гейту", "allowed (bool), reason, daily_alerts_count"],
         ],
         col_widths=[30 * mm, 40 * mm, 100 * mm],
     ))
     story.append(PageBreak())
 
-    # ── 12. DEPENDENCIES ──
-    story.append(Paragraph("12. External Dependencies", s["H1"]))
+    # ── 12. ЗАЛЕЖНОСТІ ──
+    story.append(Paragraph("12. Зовнішні залежності", s["H1"]))
     story.append(hr())
 
-    story.append(Paragraph("12.1 Third-Party APIs", s["H2"]))
+    story.append(Paragraph("12.1 API третіх сторін", s["H2"]))
     story.append(make_table(
-        ["Service", "Usage", "Auth", "Cost"],
+        ["Сервіс", "Використання", "Авторизація", "Вартість"],
         [
-            ["Anthropic (Claude)", "Risk analysis", "API key", "~$45-75/mo"],
-            ["xAI (Grok)", "Sentiment analysis", "API key", "~$30-45/mo"],
-            ["Perplexity", "Fact verification", "API key", "~$7-15/mo"],
-            ["Google (Gemini)", "Macro + digests", "API key", "~$1-4/mo"],
-            ["OpenAI", "Embeddings (RAG)", "API key", "< $1/mo"],
-            ["Pinecone", "Vector DB", "API key", "Free tier"],
-            ["Yahoo Finance", "Price data", "None (public)", "Free"],
-            ["CFTC SODA", "COT positioning", "None (public)", "Free"],
-            ["NOAA", "Weather/hurricanes", "None (public)", "Free"],
-            ["EIA", "Energy statistics", "API key (free)", "Free"],
-            ["Telegram", "Notifications", "Bot token", "Free"],
+            ["Anthropic (Claude)", "Аналіз ризиків", "API ключ", "~$45-75/міс"],
+            ["xAI (Grok)", "Аналіз настроїв", "API ключ", "~$30-45/міс"],
+            ["Perplexity", "Верифікація фактів", "API ключ", "~$7-15/міс"],
+            ["Google (Gemini)", "Макро + дайджести", "API ключ", "~$1-4/міс"],
+            ["OpenAI", "Ембединги (RAG)", "API ключ", "< $1/міс"],
+            ["Pinecone", "Векторна БД", "API ключ", "Безкоштовно"],
+            ["Yahoo Finance", "Дані цін", "Без авторизації", "Безкоштовно"],
+            ["CFTC SODA", "COT позиціонування", "Без авторизації", "Безкоштовно"],
+            ["NOAA", "Погода/урагани", "Без авторизації", "Безкоштовно"],
+            ["EIA", "Статистика енергетики", "API ключ (безкоштовно)", "Безкоштовно"],
+            ["Telegram", "Сповіщення", "Токен бота", "Безкоштовно"],
         ],
         col_widths=[35 * mm, 40 * mm, 35 * mm, 60 * mm],
     ))
 
-    story.append(Paragraph("12.2 Key Python Packages", s["H2"]))
+    story.append(Paragraph("12.2 Ключові Python-пакети", s["H2"]))
     story.append(make_table(
-        ["Package", "Version", "Purpose"],
+        ["Пакет", "Версія", "Призначення"],
         [
-            ["pydantic", ">= 2.5", "Data validation & schemas"],
-            ["anthropic", ">= 0.18", "Claude API client"],
-            ["openai", ">= 1.12", "OpenAI + xAI/Perplexity (compatible endpoint)"],
-            ["google-genai", ">= 0.3", "Gemini API client"],
-            ["yfinance", ">= 0.2.30", "Market data (prices, OVX, DXY)"],
-            ["httpx", ">= 0.27", "Async HTTP client"],
-            ["fastapi", ">= 0.110", "REST API framework"],
-            ["feedparser", ">= 6.0", "RSS news parsing"],
-            ["pinecone", ">= 5.0", "Vector database client"],
-            ["loguru", ">= 0.7", "Structured logging"],
+            ["pydantic", ">= 2.5", "Валідація даних та схеми"],
+            ["anthropic", ">= 0.18", "Клієнт Claude API"],
+            ["openai", ">= 1.12", "OpenAI + xAI/Perplexity (сумісний ендпоінт)"],
+            ["google-genai", ">= 0.3", "Клієнт Gemini API"],
+            ["yfinance", ">= 0.2.30", "Ринкові дані (ціни, OVX, DXY)"],
+            ["httpx", ">= 0.27", "Асинхронний HTTP-клієнт"],
+            ["fastapi", ">= 0.110", "REST API фреймворк"],
+            ["feedparser", ">= 6.0", "Парсинг RSS новин"],
+            ["pinecone", ">= 5.0", "Клієнт векторної БД"],
+            ["loguru", ">= 0.7", "Структуроване логування"],
         ],
         col_widths=[35 * mm, 25 * mm, 110 * mm],
     ))
     story.append(PageBreak())
 
-    # ── 13. SECURITY ──
-    story.append(Paragraph("13. Security & Compliance", s["H1"]))
+    # ── 13. БЕЗПЕКА ──
+    story.append(Paragraph("13. Безпека", s["H1"]))
     story.append(hr())
     story.append(make_table(
-        ["Area", "Implementation"],
+        ["Аспект", "Реалізація"],
         [
-            ["Secret Management", "All API keys in .env (never committed to git)"],
-            ["Input Validation", "Pydantic schemas enforce structure on all external data"],
-            ["HTTPS", "Caddy auto-provisions Let's Encrypt certificates"],
-            ["Security Headers", "X-Content-Type-Options, X-Frame-Options, Referrer-Policy"],
-            ["Non-root Container", "Bot runs as appuser inside Docker"],
-            ["Rate Limiting", "Cooldown + daily alert limits prevent spam"],
-            ["Audit Trail", "Every decision logged with prompt hash (SHA256)"],
-            ["Data Isolation", "Dry-run trades in separate file from production"],
+            ["Управління секретами", "Усі API-ключі у .env (ніколи не комітяться у git)"],
+            ["Валідація вводу", "Pydantic-схеми забезпечують структуру всіх зовнішніх даних"],
+            ["HTTPS", "Caddy автоматично отримує сертифікати Let's Encrypt"],
+            ["Заголовки безпеки", "X-Content-Type-Options, X-Frame-Options, Referrer-Policy"],
+            ["Non-root контейнер", "Бот працює як appuser всередині Docker"],
+            ["Обмеження частоти", "Кулдаун + денні ліміти алертів запобігають спаму"],
+            ["Аудит-трейл", "Кожне рішення логується з хешем промпту (SHA256)"],
+            ["Ізоляція даних", "Dry-run торгівлі в окремому файлі від продакшну"],
         ],
-        col_widths=[35 * mm, 135 * mm],
+        col_widths=[40 * mm, 130 * mm],
     ))
     story.append(PageBreak())
 
-    # ── 14. PERFORMANCE ──
-    story.append(Paragraph("14. Performance Characteristics", s["H1"]))
+    # ── 14. ПРОДУКТИВНІСТЬ ──
+    story.append(Paragraph("14. Характеристики продуктивності", s["H1"]))
     story.append(hr())
     story.append(make_table(
-        ["Operation", "Duration"],
+        ["Операція", "Тривалість"],
         [
-            ["Price fetch (yfinance)", "200-500 ms"],
-            ["News poll (10 RSS feeds)", "500-1000 ms"],
-            ["Single agent API call", "2-5 seconds"],
-            ["4 agents in parallel", "2-5 seconds (concurrent)"],
-            ["Aggregation (deterministic)", "< 100 ms"],
-            ["Risk check", "< 50 ms"],
-            ["Telegram notification", "500-1000 ms"],
-            ["Full polling cycle", "~7-10 seconds"],
+            ["Отримання ціни (yfinance)", "200-500 мс"],
+            ["Опитування новин (10 RSS)", "500-1000 мс"],
+            ["Один виклик AI-агента", "2-5 секунд"],
+            ["4 агенти паралельно", "2-5 секунд (одночасно)"],
+            ["Агрегація (детерміністична)", "< 100 мс"],
+            ["Перевірка ризиків", "< 50 мс"],
+            ["Сповіщення Telegram", "500-1000 мс"],
+            ["Повний цикл опитування", "~7-10 секунд"],
         ],
         col_widths=[50 * mm, 120 * mm],
     ))
 
     story.append(Spacer(1, 6 * mm))
-    story.append(Paragraph("Resource Usage", s["H2"]))
+    story.append(Paragraph("Використання ресурсів", s["H2"]))
     story.append(make_table(
-        ["Component", "Memory", "CPU"],
+        ["Компонент", "Пам'ять", "CPU"],
         [
-            ["Bot (Python)", "300-500 MB", "Low (mostly I/O wait)"],
-            ["Frontend (React)", "50-100 MB", "Minimal"],
-            ["Caddy (proxy)", "20-30 MB", "Minimal"],
-            ["Total", "~500-700 MB", "1-2 vCPU sufficient"],
+            ["Bot (Python)", "300-500 МБ", "Низький (в основному I/O очікування)"],
+            ["Frontend (React)", "50-100 МБ", "Мінімальний"],
+            ["Caddy (проксі)", "20-30 МБ", "Мінімальний"],
+            ["Разом", "~500-700 МБ", "1-2 vCPU достатньо"],
         ],
         col_widths=[40 * mm, 60 * mm, 70 * mm],
     ))
     story.append(PageBreak())
 
-    # ── 15. COSTS ──
-    story.append(Paragraph("15. Operational Costs", s["H1"]))
+    # ── 15. ВИТРАТИ ──
+    story.append(Paragraph("15. Операційні витрати", s["H1"]))
     story.append(hr())
-    story.append(Paragraph("Estimated monthly costs (50 polling cycles/day, ~10 events/day):", s["Body"]))
+    story.append(Paragraph("Орієнтовні місячні витрати (50 циклів опитування/день, ~10 подій/день):", s["Body"]))
     story.append(make_table(
-        ["Category", "Service", "Est. Monthly Cost"],
+        ["Категорія", "Сервіс", "Орієнтовна вартість/міс"],
         [
-            ["AI Agents", "Claude + Grok + Perplexity + Gemini", "$80-140"],
-            ["Embeddings", "OpenAI text-embedding-3-small", "< $1"],
-            ["Vector DB", "Pinecone (free tier)", "$0"],
-            ["Market Data", "yfinance + CFTC + NOAA + EIA", "$0"],
-            ["Infrastructure", "Hetzner CPX22 (4 vCPU, 8GB RAM)", "~$12"],
-            ["Domain + SSL", "Caddy + Let's Encrypt", "$0 (auto)"],
-            ["Notifications", "Telegram Bot API", "$0"],
+            ["AI-агенти", "Claude + Grok + Perplexity + Gemini", "$80-140"],
+            ["Ембединги", "OpenAI text-embedding-3-small", "< $1"],
+            ["Векторна БД", "Pinecone (безкоштовний план)", "$0"],
+            ["Ринкові дані", "yfinance + CFTC + NOAA + EIA", "$0"],
+            ["Інфраструктура", "Hetzner CPX22 (4 vCPU, 8 ГБ RAM)", "~$12"],
+            ["Домен + SSL", "Caddy + Let's Encrypt", "$0 (авто)"],
+            ["Сповіщення", "Telegram Bot API", "$0"],
             ["", "", ""],
-            ["TOTAL", "", "$92-153/month"],
+            ["РАЗОМ", "", "$92-153/місяць"],
         ],
         col_widths=[35 * mm, 70 * mm, 65 * mm],
     ))
@@ -595,9 +628,9 @@ def build_pdf():
     story.append(hr())
     story.append(Spacer(1, 6 * mm))
     story.append(Paragraph(
-        f"Generated: {datetime.now().strftime('%d %B %Y')} | "
+        f"Згенеровано: {datetime.now().strftime('%d.%m.%Y')} | "
         "Oil Trading Intelligence Bot v1.0 | "
-        "All rights reserved.",
+        "Усі права захищені.",
         s["Footer"]
     ))
 
@@ -609,11 +642,11 @@ def build_pdf():
         bottomMargin=20 * mm,
         leftMargin=18 * mm,
         rightMargin=18 * mm,
-        title="Oil Trading Intelligence Bot — Architecture",
+        title="Oil Trading Intelligence Bot — Архітектура",
         author="Trading Council",
     )
     doc.build(story)
-    print(f"PDF generated: {OUTPUT_PATH}")
+    print(f"PDF згенеровано: {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":
