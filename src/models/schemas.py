@@ -22,6 +22,7 @@ class Signal(BaseModel):
     invalidation_price: Optional[float] = None
     risk_notes: str = ""
     sources: List[str] = Field(default_factory=list)
+    drivers: List[str] = Field(default_factory=list, max_length=5)
 
     @field_validator("risk_notes", mode="before")
     @classmethod

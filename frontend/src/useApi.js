@@ -93,6 +93,51 @@ export function usePolling(path, intervalMs = 10000) {
   return { data, error };
 }
 
+// ── One-shot fetch hook ─────────────────────────────────────────────────────
+
+export function useFetch(path) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const refetch = useCallback(async () => {
+    setLoading(true);
+    try {
+      const json = await fetchJson(path);
+      setData(json);
+    } catch (e) {
+      console.warn(`Fetch ${path} failed:`, e);
+    }
+    setLoading(false);
+  }, [path]);
+
+  useEffect(() => { refetch(); }, [refetch]);
+
+  return { data, loading, refetch };
+}
+
+// ── History data hook ───────────────────────────────────────────────────────
+
+export function useHistoryData(instrument = "BZ=F") {
+  const { data: digests, loading: digestsLoading, refetch: refetchDigests } =
+    useFetch(`/api/history/digests?instrument=${instrument}&limit=24`);
+  const { data: daily, loading: dailyLoading, refetch: refetchDaily } =
+    useFetch(`/api/history/daily?instrument=${instrument}&limit=30`);
+  const { data: agentHistory, loading: agentsLoading, refetch: refetchAgents } =
+    useFetch(`/api/history/agents/all?instrument=${instrument}&limit=10`);
+
+  const refetchAll = useCallback(() => {
+    refetchDigests(); refetchDaily(); refetchAgents();
+  }, [refetchDigests, refetchDaily, refetchAgents]);
+
+  return {
+    digests: Array.isArray(digests) ? digests : [],
+    daily: Array.isArray(daily) ? daily : [],
+    agentHistory: agentHistory && !agentHistory.error ? agentHistory : {},
+    loading: digestsLoading || dailyLoading || agentsLoading,
+    refetch: refetchAll,
+  };
+}
+
 // ── Composite hook: merges WS + REST fallback ────────────────────────────────
 
 export function useBotData() {

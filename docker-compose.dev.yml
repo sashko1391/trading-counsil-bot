@@ -1,0 +1,27 @@
+# Local development — no Caddy, no SSL, dry-run mode
+# Usage: docker compose -f docker-compose.dev.yml up --build
+
+services:
+  bot:
+    build: .
+    container_name: oil-bot-dev
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - PORT=8000
+      - BOT_ARGS=--dry-run
+    volumes:
+      - ./data:/app/data
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""
+    container_name: oil-frontend-dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - bot

@@ -261,6 +261,61 @@ async def websocket_endpoint(ws: WebSocket):
 
 # ── Journal endpoints ─────────────────────────────────────────────────────────
 
+# ── History endpoints ─────────────────────────────────────────────────────────
+
+@app.get("/api/history/digests")
+async def get_digest_history(instrument: str = "BZ=F", limit: int = 24):
+    """Digest history for an instrument."""
+    try:
+        from journal.digest_history import DigestHistory
+        dh = DigestHistory()
+        records = dh.get_recent(instrument, n=limit)
+        return [r.to_dict() for r in records]
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+@app.get("/api/history/daily")
+async def get_daily_history(instrument: str = "BZ=F", limit: int = 30):
+    """Daily summaries for an instrument."""
+    try:
+        from journal.daily_summary import DailySummaryHistory
+        ds = DailySummaryHistory()
+        records = ds.get_recent(instrument, n=limit)
+        return [r.to_dict() for r in records]
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+@app.get("/api/history/agents")
+async def get_agent_history(agent: str = "grok", instrument: str = "BZ=F", limit: int = 20):
+    """Agent memory for a specific agent + instrument."""
+    try:
+        from journal.agent_memory import AgentMemory
+        am = AgentMemory()
+        entries = am.get_history(agent, instrument, n=limit)
+        return [e.to_dict() for e in entries]
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+@app.get("/api/history/agents/all")
+async def get_all_agents_history(instrument: str = "BZ=F", limit: int = 10):
+    """Latest memory entries for all agents."""
+    try:
+        from journal.agent_memory import AgentMemory
+        am = AgentMemory()
+        result = {}
+        for agent in ["grok", "perplexity", "claude", "gemini"]:
+            entries = am.get_history(agent, instrument, n=limit)
+            result[agent] = [e.to_dict() for e in entries]
+        return result
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+# ── Journal endpoints ─────────────────────────────────────────────────────────
+
 @app.get("/api/journal")
 async def get_journal(limit: int = 20):
     """Recent trade journal entries."""

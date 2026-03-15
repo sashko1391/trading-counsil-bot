@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useBotData } from "./useApi.js";
+import { useBotData, useHistoryData } from "./useApi.js";
+import HistoryPanel from "./HistoryPanel.jsx";
 
 // ─── THEMES ───────────────────────────────────────────────────────────────────
 const THEMES = {
@@ -33,7 +34,12 @@ function MatrixRain({ opacity = 0.18 }) {
     resize(); window.addEventListener("resize", resize);
     const fs = 13, cols = Math.floor(c.width / fs);
     const drops = Array(cols).fill(1);
-    const id = setInterval(() => {
+    let rafId = 0;
+    let lastTime = 0;
+    const draw = (ts) => {
+      rafId = requestAnimationFrame(draw);
+      if (ts - lastTime < 40) return; // throttle to ~25fps
+      lastTime = ts;
       ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0, 0, c.width, c.height);
       for (let i = 0; i < drops.length; i++) {
         const ch = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
@@ -42,8 +48,9 @@ function MatrixRain({ opacity = 0.18 }) {
         if (drops[i] * fs > c.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
       }
-    }, 40);
-    return () => { clearInterval(id); window.removeEventListener("resize", resize); };
+    };
+    rafId = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(rafId); window.removeEventListener("resize", resize); };
   }, []);
   return <canvas ref={ref} style={{ position: "fixed", top: 0, left: 0, zIndex: 0, opacity, pointerEvents: "none", transition: "opacity 0.5s" }} />;
 }
@@ -264,6 +271,9 @@ function SignalRow({ s, idx, theme, isNew }) {
 export default function WarRoom() {
   const { forecast, agents, prices, riskScore, signals, events, status, wsConnected } = useBotData();
 
+  const [activeTab, setActiveTab] = useState("dashboard"); // "dashboard" | "history"
+  const historyData = useHistoryData("BZ=F");
+
   const [theme, setTheme] = useState("matrix");
   const [focusMode, setFocusMode] = useState(false);
   const [rainOpacity, setRainOpacity] = useState(0.18);
@@ -390,6 +400,24 @@ export default function WarRoom() {
             <span style={{ fontSize: 9, color: statusColor, letterSpacing: "0.2em" }}>
               [ {status === "active" ? "СИСТЕМА АКТИВНА" : status === "idle" ? "ОЧІКУВАННЯ" : "ПІДКЛЮЧЕННЯ..."} · {statusLabel} ]
             </span>
+            <div style={{ display: "flex", gap: 2, marginLeft: 14 }}>
+              {[
+                { key: "dashboard", label: "ДАШБОРД" },
+                { key: "history", label: "ІСТОРІЯ" },
+              ].map(tab => (
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                  style={{
+                    background: activeTab === tab.key ? `${T.accent}22` : "transparent",
+                    border: `1px solid ${activeTab === tab.key ? T.accent : T.dark}`,
+                    color: activeTab === tab.key ? T.accent : T.dark,
+                    fontSize: 9, padding: "3px 10px", fontFamily: "monospace", cursor: "pointer",
+                    letterSpacing: "0.12em", transition: "all 0.2s",
+                    textShadow: activeTab === tab.key ? `0 0 6px ${T.accent}88` : "none",
+                  }}>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
@@ -428,8 +456,22 @@ export default function WarRoom() {
         </div>
         <style>{`@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }`}</style>
 
-        {/* ── MAIN GRID ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 295px", gap: 12, paddingTop: 12 }}>
+        {/* ── HISTORY TAB ── */}
+        {activeTab === "history" && (
+          <div style={{ paddingTop: 12 }}>
+            <HistoryPanel
+              theme={T}
+              daily={historyData.daily}
+              digests={historyData.digests}
+              agentHistory={historyData.agentHistory}
+              loading={historyData.loading}
+              onRefresh={historyData.refetch}
+            />
+          </div>
+        )}
+
+        {/* ── MAIN GRID (DASHBOARD) ── */}
+        {activeTab === "dashboard" && <div style={{ display: "grid", gridTemplateColumns: "1fr 295px", gap: 12, paddingTop: 12 }}>
 
           {/* ── LEFT ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -620,7 +662,7 @@ export default function WarRoom() {
               ТЕМА: {THEMES[theme].name} · ⌘K — КОМАНДИ
             </div>
           </div>
-        </div>
+        </div>}
       </div>
 
       <div aria-live="assertive" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", opacity: 0 }}>

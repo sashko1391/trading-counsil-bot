@@ -57,9 +57,11 @@ Use this exact schema:
     "thesis": "макс 500 символів УКРАЇНСЬКОЮ — чому саме ця дія",
     "invalidation_price": number or null,
     "risk_notes": "що може піти не так — УКРАЇНСЬКОЮ",
-    "sources": ["url1"]
+    "sources": ["url1"],
+    "drivers": ["driver1", "driver2"]
 }}
 ОБОВ'ЯЗКОВО: thesis та risk_notes писати УКРАЇНСЬКОЮ (uk-UA). Англійський текст = помилка формату.
+ОБОВ'ЯЗКОВО: Include 1-3 drivers from the taxonomy in your JSON.
 Pure JSON only — no markdown, no preamble."""
 
         try:

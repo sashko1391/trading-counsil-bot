@@ -199,6 +199,15 @@ class Settings:
     PERFORMANCE_PATH: Path = Path("data/agent_performance.json")
     KNOWLEDGE_PATH: Path = Path("data/knowledge")
 
+    def __repr__(self) -> str:
+        """Mask API keys/tokens in repr to prevent accidental logging."""
+        safe = {k: ("***" if "KEY" in k or "TOKEN" in k else getattr(self, k))
+                for k in dir(self) if k.isupper() and not k.startswith("_")}
+        return f"Settings({safe})"
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
     def __init__(self):
         str_keys = [
             "XAI_API_KEY", "ANTHROPIC_API_KEY", "PERPLEXITY_API_KEY",
@@ -231,6 +240,10 @@ class Settings:
         v = os.environ.get("ADVERSARIAL_ENABLED")
         if v is not None:
             self.ADVERSARIAL_ENABLED = v.lower() in ("1", "true", "yes")
+
+        # Ensure data directories exist
+        for p in [self.JOURNAL_PATH.parent, self.KNOWLEDGE_PATH, Path("data/logs")]:
+            p.mkdir(parents=True, exist_ok=True)
 
 
 _settings: Optional[Settings] = None

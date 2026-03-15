@@ -414,14 +414,17 @@ No preamble, no markdown — pure JSON.
 # ─────────────────────────────────────────────────────────────────────────────
 
 def get_agent_prompt(agent_name: str) -> str:
-    """Return the system prompt for a given agent."""
+    """Return the system prompt for a given agent. Raises ValueError if unknown."""
     prompts = {
         "grok": GROK_SYSTEM_PROMPT,
         "perplexity": PERPLEXITY_SYSTEM_PROMPT,
         "claude": CLAUDE_SYSTEM_PROMPT,
         "gemini": GEMINI_SYSTEM_PROMPT,
     }
-    return prompts.get(agent_name.lower(), "")
+    key = agent_name.lower()
+    if key not in prompts:
+        raise ValueError(f"Unknown agent: {agent_name!r}. Valid: {list(prompts.keys())}")
+    return prompts[key]
 
 
 def format_user_prompt(

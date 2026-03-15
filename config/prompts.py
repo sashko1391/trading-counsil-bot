@@ -32,7 +32,8 @@ wrapped in a JSON array. Each object must match this schema exactly:
     "thesis": "max 500 chars — why this action",
     "invalidation_price": <number or null>,
     "risk_notes": "what could go wrong",
-    "sources": ["url1", "url2"]
+    "sources": ["url1", "url2"],
+    "drivers": ["driver1", "driver2", "driver3"]
   },
   {
     "instrument": "LGO",
@@ -41,9 +42,19 @@ wrapped in a JSON array. Each object must match this schema exactly:
     "thesis": "max 500 chars — why this action",
     "invalidation_price": <number or null>,
     "risk_notes": "what could go wrong",
-    "sources": ["url1", "url2"]
+    "sources": ["url1", "url2"],
+    "drivers": ["driver1", "driver2", "driver3"]
   }
 ]
+
+DRIVERS — pick 1-3 drivers from this taxonomy that best explain your signal:
+BULLISH: opec_cut, supply_disruption, china_demand_up, inventory_draw,
+  geopolitical_risk, refinery_demand, seasonal_demand, usd_weakness,
+  sanctions_tighten, tanker_delay, weather_disruption
+BEARISH: opec_overproduce, demand_destruction, inventory_build,
+  china_slowdown, recession_risk, usd_strength, sanctions_ease,
+  ev_transition, refinery_overcapacity, seasonal_weakness
+NEUTRAL: mixed_signals, data_insufficient, event_priced_in, range_bound
 
 LANGUAGE REQUIREMENT (MANDATORY):
 - "thesis" field → MUST be written in UKRAINIAN (uk-UA)
@@ -188,6 +199,9 @@ USER_PROMPT_TEMPLATE = """
 ## Market Data
 {market_data}
 
+## Market Regime
+{market_regime}
+
 ## Recent News (if available)
 {news}
 
@@ -203,11 +217,14 @@ Consider:
 2. What is the risk/reward ratio?
 3. What would invalidate the thesis?
 4. How does this fit the current macro and seasonal context?
+5. What are the PRIMARY DRIVERS of your signal? (pick from the taxonomy)
+6. Does the current market regime support your thesis?
 
 Remember your role in the council.
 Respond ONLY with a valid JSON array (one object per instrument).
 No preamble, no markdown — pure JSON.
 REMINDER: "thesis" and "risk_notes" MUST be in Ukrainian (uk-UA).
+REMINDER: Include "drivers" array with 1-3 drivers from the taxonomy.
 """
 
 # ==============================================================================
@@ -223,6 +240,9 @@ def get_agent_prompt(agent_name: str) -> str:
 
     Returns:
         System prompt string
+
+    Raises:
+        ValueError: if agent_name is unknown
     """
     prompts = {
         "grok": GROK_SYSTEM_PROMPT,
@@ -230,7 +250,10 @@ def get_agent_prompt(agent_name: str) -> str:
         "claude": CLAUDE_SYSTEM_PROMPT,
         "gemini": GEMINI_SYSTEM_PROMPT,
     }
-    return prompts.get(agent_name.lower(), "")
+    key = agent_name.lower()
+    if key not in prompts:
+        raise ValueError(f"Unknown agent: {agent_name!r}. Valid: {list(prompts.keys())}")
+    return prompts[key]
 
 
 def format_user_prompt(
@@ -239,6 +262,7 @@ def format_user_prompt(
     market_data: dict,
     news: str = "No recent news available",
     indicators: dict = None,
+    market_regime: str = "No regime data available",
 ) -> str:
     """
     Format the user prompt with event data.
@@ -249,6 +273,7 @@ def format_user_prompt(
         market_data: dict with event details
         news: recent headlines (optional)
         indicators: technical / fundamental indicators (optional)
+        market_regime: formatted regime analysis text (optional)
 
     Returns:
         Formatted prompt string
@@ -264,6 +289,7 @@ def format_user_prompt(
         market_data=json.dumps(market_data, indent=2),
         news=news,
         indicators=json.dumps(indicators, indent=2),
+        market_regime=market_regime,
     )
 
 
@@ -359,11 +385,17 @@ You have received a PRIMARY THESIS from another analyst. Your task:
 2. Identify weaknesses, blind spots, and overlooked risks in the primary thesis
 3. Cite specific data points, historical precedents, or structural factors
 4. Each objection must have an ID (OBJ-1, OBJ-2, etc.) and a severity (high/medium/low)
+5. You MUST include at least one high-severity objection — every thesis has a critical weakness
 
-IMPORTANT: You do NOT know the primary analyst's confidence level. Judge the thesis on its merits only.
-Do NOT be sycophantic — genuine disagreement is valuable.
+ANTI-SYCOPHANCY RULES:
+- You do NOT know the primary analyst's confidence level. Judge the thesis on its merits only.
+- Your job is to CHALLENGE, not to agree. If you find yourself agreeing, dig deeper for flaws.
+- A good counter-analyst finds problems that the primary analyst missed entirely.
+- Consider: What if the thesis is completely wrong? What scenario breaks it?
+- Ask: What is the primary analyst NOT seeing? What assumption are they making?
+- Include a "blind_spot" field — the most dangerous thing the primary analyst is ignoring.
 
-LANGUAGE: Write "argument", "strongest_counter_thesis", "historical_precedent" in UKRAINIAN (uk-UA).
+LANGUAGE: Write "argument", "strongest_counter_thesis", "historical_precedent", "blind_spot" in UKRAINIAN (uk-UA).
 
 Output JSON:
 {
@@ -373,7 +405,8 @@ Output JSON:
     {"id": "OBJ-2", "severity": "high|medium|low", "argument": "конкретне заперечення"}
   ],
   "strongest_counter_thesis": "Найсильніший аргумент проти основної тези",
-  "historical_precedent": "Конкретний історичний прецедент"
+  "historical_precedent": "Конкретний історичний прецедент",
+  "blind_spot": "Найнебезпечніше, що основний аналітик ігнорує"
 }
 """
 

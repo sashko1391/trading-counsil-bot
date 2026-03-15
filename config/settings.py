@@ -6,7 +6,7 @@
 import os
 from pathlib import Path
 from pydantic_settings import BaseSettings
-from pydantic import ConfigDict
+from pydantic import ConfigDict, model_validator
 from typing import Optional
 
 
@@ -14,6 +14,14 @@ class Settings(BaseSettings):
     """Налаштування додатку з environment variables"""
 
     model_config = ConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
+
+    def __repr__(self) -> str:
+        """Mask API keys in repr to prevent accidental logging."""
+        safe = {k: ("***" if "KEY" in k or "TOKEN" in k else v) for k, v in self.model_dump().items()}
+        return f"Settings({safe})"
+
+    def __str__(self) -> str:
+        return self.__repr__()
 
     # ===== AI APIs =====
     ANTHROPIC_API_KEY: str
@@ -53,7 +61,7 @@ class Settings(BaseSettings):
     COOLDOWN_MINUTES: int = 30
 
     # ===== ВАГИ ДЛЯ АГЕНТІВ =====
-    COUNCIL_WEIGHTS: dict = {
+    COUNCIL_WEIGHTS: dict[str, float] = {
         "grok": 0.25,
         "perplexity": 0.25,
         "claude": 0.25,
@@ -64,6 +72,17 @@ class Settings(BaseSettings):
     JOURNAL_PATH: Path = Path("data/trades.json")
     KNOWLEDGE_PATH: Path = Path("data/knowledge")
     LOG_LEVEL: str = "INFO"
+
+    @model_validator(mode="after")
+    def _validate(self) -> "Settings":
+        # Ensure council weights sum to ~1.0
+        total = sum(self.COUNCIL_WEIGHTS.values())
+        if abs(total - 1.0) > 0.01:
+            raise ValueError(f"COUNCIL_WEIGHTS must sum to 1.0, got {total}")
+        # Ensure data directories exist
+        for p in [self.JOURNAL_PATH.parent, self.KNOWLEDGE_PATH, Path("data/logs")]:
+            p.mkdir(parents=True, exist_ok=True)
+        return self
 
 
 def get_settings() -> Settings:

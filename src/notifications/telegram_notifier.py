@@ -14,6 +14,7 @@ import httpx
 from loguru import logger
 
 from models.schemas import CouncilResponse, OilForecast, RiskCheck, Signal
+from notifications.digest_summarizer import DigestSummarizer
 
 
 TELEGRAM_API = "https://api.telegram.org"
@@ -27,7 +28,8 @@ class TelegramNotifier:
     and all send methods return False without raising.
     """
 
-    def __init__(self, bot_token: str = None, chat_id: str = None, chat_ids: str = None):
+    def __init__(self, bot_token: str = None, chat_id: str = None, chat_ids: str = None,
+                 summarizer: DigestSummarizer | None = None):
         self.bot_token = bot_token or ""
         # Support multiple chat IDs (comma-separated) via chat_ids, fallback to single chat_id
         if chat_ids:
@@ -39,6 +41,7 @@ class TelegramNotifier:
         # Keep for backward compat
         self.chat_id = self.chat_ids[0] if self.chat_ids else ""
         self.enabled = bool(self.bot_token and self.chat_ids)
+        self.summarizer = summarizer
 
         if not self.enabled:
             logger.warning("Telegram notifier disabled (missing bot_token or chat_id)")
@@ -169,8 +172,8 @@ class TelegramNotifier:
     # Digest (consolidated N-hour summary)
     # ------------------------------------------------------------------
 
-    @staticmethod
     def format_digest(
+        self,
         instrument: str,
         analyses: List[Dict],
         hours: int,
@@ -218,14 +221,12 @@ class TelegramNotifier:
                     agent_actions[display_name][sig.action] = (
                         agent_actions[display_name].get(sig.action, 0) + 1
                     )
-                if sig.thesis and sig.action != "WAIT" and len(all_theses) < 6:
-                    short = sig.thesis[:120]
-                    if short not in all_theses:
-                        all_theses.append(short)
-                if sig.risk_notes and len(all_risks) < 4:
-                    short = sig.risk_notes[:100]
-                    if short not in all_risks:
-                        all_risks.append(short)
+                if sig.thesis and sig.action != "WAIT" and len(all_theses) < 8:
+                    if sig.thesis not in all_theses:
+                        all_theses.append(sig.thesis)
+                if sig.risk_notes and len(all_risks) < 6:
+                    if sig.risk_notes not in all_risks:
+                        all_risks.append(sig.risk_notes)
 
         # Determine dominant trend
         directional = action_counts["LONG"] + action_counts["SHORT"]
@@ -288,16 +289,24 @@ class TelegramNotifier:
                 f"   {emoji} {agent_name}: {counts['LONG']}L / {counts['SHORT']}S / {counts['WAIT']}W → {dominant}"
             )
 
+        # Summarize theses and risks via LLM (or fallback to truncation)
+        if self.summarizer and self.summarizer.available:
+            sum_theses, sum_risks = self.summarizer.summarize(
+                all_theses, all_risks, instrument=instrument, trend=trend_action,
+            )
+        else:
+            sum_theses, sum_risks = DigestSummarizer._fallback(all_theses, all_risks)
+
         # Key theses
-        if all_theses:
+        if sum_theses:
             lines.extend(["", f"{'─' * 32}", "\U0001f4a1 Ключові тези:"])
-            for i, t in enumerate(all_theses[:4], 1):
+            for i, t in enumerate(sum_theses[:4], 1):
                 lines.append(f"   {i}. {t}")
 
         # Risks
-        if all_risks:
+        if sum_risks:
             lines.extend(["", f"{'─' * 32}", "\u26a0\ufe0f Ризики:"])
-            for i, r in enumerate(all_risks[:3], 1):
+            for i, r in enumerate(sum_risks[:3], 1):
                 lines.append(f"   {i}. {r}")
 
         lines.extend([

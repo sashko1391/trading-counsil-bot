@@ -1,14 +1,15 @@
 """
-Aggregator v2 — ABAIC Oil Trading Intelligence Bot
-Phase 3A
+Aggregator v3 — ABAIC Oil Trading Intelligence Bot
+P0 upgrade: Factor-Based Aggregation + Dynamic Weights
 
-Changes vs v1:
+Changes vs v2:
+  ✦ Factor-based scoring alongside action voting
+  ✦ Driver consensus: same drivers from different agents = stronger signal
+  ✦ Dynamic weight support with automatic Brier Score calibration
+  ✦ Improved conflict detection with directional penalty
   ✦ Confidence-weighted voting (not simple majority)
   ✦ Devil's Advocate: 5th virtual agent at 0.15 weight argues against consensus
-  ✦ Dynamic weight support (update from BrierScore tracker quarterly)
-  ✦ CONFLICT: both sides now logged in recommendation (not just WAIT)
   ✦ Per-agent vote logged in recommendation for transparency
-  ✦ Position sizing formula improved
 
 Core principle: This is NOT AI — it is deterministic Python.
 Transparent, fast, no hallucinations, no API cost.
@@ -21,6 +22,21 @@ from datetime import datetime
 from models.schemas import Signal, CouncilResponse, MarketEvent
 
 logger = logging.getLogger(__name__)
+
+# Driver taxonomy classification
+BULLISH_DRIVERS = {
+    "opec_cut", "supply_disruption", "china_demand_up", "inventory_draw",
+    "geopolitical_risk", "refinery_demand", "seasonal_demand", "usd_weakness",
+    "sanctions_tighten", "tanker_delay", "weather_disruption",
+}
+BEARISH_DRIVERS = {
+    "opec_overproduce", "demand_destruction", "inventory_build",
+    "china_slowdown", "recession_risk", "usd_strength", "sanctions_ease",
+    "ev_transition", "refinery_overcapacity", "seasonal_weakness",
+}
+NEUTRAL_DRIVERS = {
+    "mixed_signals", "data_insufficient", "event_priced_in", "range_bound",
+}
 
 # Default equal weights — updated quarterly via BrierScore tracker
 DEFAULT_WEIGHTS: Dict[str, float] = {
@@ -51,6 +67,9 @@ class Aggregator:
         total = sum(self.weights.values())
         if abs(total - 1.0) > 0.01:
             raise ValueError(f"Weights must sum to 1.0, got {total:.3f}")
+        # P1.7: per-agent calibration coefficients (1.0 = no adjustment)
+        # Updated by set_calibration_factors from PostMortem accuracy data
+        self._calibration: Dict[str, float] = {}
 
     def update_weights(self, new_weights: Dict[str, float]) -> None:
         """Update agent weights. Called by BrierScore tracker quarterly."""
@@ -60,6 +79,28 @@ class Aggregator:
         old = dict(self.weights)
         self.weights = dict(new_weights)
         logger.info(f"📊 Weights updated: {old} → {new_weights}")
+
+    def set_calibration_factors(self, factors: Dict[str, float]) -> None:
+        """
+        Set per-agent confidence calibration factors.
+
+        P1.7: If an agent has hit_rate=0.6 but avg_confidence=0.8,
+        its calibration factor = 0.6/0.8 = 0.75, meaning its confidence
+        is reduced by 25% during aggregation.
+
+        Args:
+            factors: {agent_name: calibration_coefficient}
+                     1.0 = well-calibrated, <1.0 = overconfident, >1.0 = underconfident
+        """
+        self._calibration = dict(factors)
+        logger.info(f"📊 Calibration factors set: {factors}")
+
+    def _calibrate_agent_confidence(self, agent_name: str, raw_confidence: float) -> float:
+        """Apply calibration factor to an agent's raw confidence."""
+        factor = self._calibration.get(agent_name, 1.0)
+        # Clamp factor to reasonable range [0.5, 1.5]
+        factor = max(0.5, min(1.5, factor))
+        return max(0.0, min(1.0, raw_confidence * factor))
 
     def aggregate(
         self,
@@ -99,6 +140,11 @@ class Aggregator:
         invalidation = self._invalidation(signals, consensus)
         rec = self._recommendation(consensus, strength, confidence, invalidation, signals)
 
+        # Factor-based analysis for recommendation enrichment
+        driver_analysis = self._analyze_drivers(signals)
+
+        rec["driver_consensus"] = driver_analysis
+
         return CouncilResponse(
             timestamp=datetime.now(),
             event_type=event.event_type,
@@ -136,7 +182,8 @@ class Aggregator:
 
         for name, signal in signals.items():
             w = self.weights.get(name, 0.25)
-            scores[signal.action] += w * signal.confidence
+            conf = self._calibrate_agent_confidence(name, signal.confidence)
+            scores[signal.action] += w * conf
 
         if devil is not None:
             scores["WAIT"] += DEVIL_WEIGHT * devil.confidence
@@ -178,8 +225,11 @@ class Aggregator:
     ) -> float:
         """
         Combined confidence = weighted avg of agreeing agents
-        minus penalty from disagreeing agents × their weight × 0.30
-        minus additional penalty from devil's advocate × 0.20
+        minus dynamic penalty from disagreeing agents.
+
+        P1.6 improvement: directional disagreement (LONG vs SHORT) penalized
+        harder (0.50) than non-directional (LONG/SHORT vs WAIT, 0.15).
+        Also detects extreme divergence: one agent > 0.8 opposing → extra penalty.
         """
         if consensus == "CONFLICT":
             vals = [s.confidence for s in signals.values()]
@@ -187,13 +237,27 @@ class Aggregator:
 
         agree_w, agree_c, penalty = 0.0, 0.0, 0.0
 
+        # Determine if consensus is directional
+        is_directional = consensus in ("LONG", "SHORT")
+        opposite = {"LONG": "SHORT", "SHORT": "LONG"}.get(consensus, "")
+
         for name, sig in signals.items():
             w = self.weights.get(name, 0.25)
+            conf = self._calibrate_agent_confidence(name, sig.confidence)
+
             if sig.action == consensus:
                 agree_w += w
-                agree_c += w * sig.confidence
+                agree_c += w * conf
             else:
-                penalty += w * sig.confidence * 0.30
+                # Directional disagreement: LONG vs SHORT → heavy penalty
+                if is_directional and sig.action == opposite:
+                    penalty += w * conf * 0.50
+                    # Extreme divergence: high-confidence opposition
+                    if conf > 0.8:
+                        penalty += w * 0.10
+                else:
+                    # Non-directional disagreement (action vs WAIT) → light penalty
+                    penalty += w * conf * 0.15
 
         if agree_w == 0:
             return 0.0
@@ -233,6 +297,78 @@ class Aggregator:
         if not prices:
             return None
         return max(prices) if consensus == "LONG" else min(prices)
+
+    # ── Driver Analysis (Factor-Based) ───────────────────────────────────────
+
+    def _analyze_drivers(
+        self, signals: Dict[str, Signal]
+    ) -> Dict[str, object]:
+        """
+        Analyse drivers across all agents.
+
+        Returns dict with:
+          - bullish_drivers: {driver: weighted_score}
+          - bearish_drivers: {driver: weighted_score}
+          - top_drivers: sorted list of (driver, score, direction)
+          - driver_agreement: 0-1 how much agents agree on drivers
+        """
+        bullish_scores: Dict[str, float] = {}
+        bearish_scores: Dict[str, float] = {}
+        agent_driver_sets: List[set] = []
+
+        for name, sig in signals.items():
+            w = self.weights.get(name, 0.25)
+            agent_drivers = set()
+            for driver in sig.drivers:
+                d = driver.lower().strip()
+                score = w * sig.confidence
+                if d in BULLISH_DRIVERS:
+                    bullish_scores[d] = bullish_scores.get(d, 0) + score
+                    agent_drivers.add(d)
+                elif d in BEARISH_DRIVERS:
+                    bearish_scores[d] = bearish_scores.get(d, 0) + score
+                    agent_drivers.add(d)
+                elif d in NEUTRAL_DRIVERS:
+                    agent_drivers.add(d)
+            agent_driver_sets.append(agent_drivers)
+
+        # Top drivers sorted by weighted score
+        all_scored = (
+            [(d, s, "bullish") for d, s in bullish_scores.items()]
+            + [(d, s, "bearish") for d, s in bearish_scores.items()]
+        )
+        all_scored.sort(key=lambda x: x[1], reverse=True)
+
+        # Driver agreement: Jaccard similarity across agent driver sets
+        agreement = 0.0
+        if len(agent_driver_sets) >= 2:
+            pairs = 0
+            total_sim = 0.0
+            for i in range(len(agent_driver_sets)):
+                for j in range(i + 1, len(agent_driver_sets)):
+                    a, b = agent_driver_sets[i], agent_driver_sets[j]
+                    union = a | b
+                    if union:
+                        total_sim += len(a & b) / len(union)
+                    pairs += 1
+            agreement = total_sim / pairs if pairs > 0 else 0.0
+
+        bull_total = sum(bullish_scores.values())
+        bear_total = sum(bearish_scores.values())
+
+        return {
+            "bullish_drivers": bullish_scores,
+            "bearish_drivers": bearish_scores,
+            "top_drivers": [(d, round(s, 3), direction) for d, s, direction in all_scored[:5]],
+            "driver_agreement": round(agreement, 2),
+            "bull_score": round(bull_total, 3),
+            "bear_score": round(bear_total, 3),
+            "factor_bias": (
+                "bullish" if bull_total > bear_total * 1.2
+                else "bearish" if bear_total > bull_total * 1.2
+                else "neutral"
+            ),
+        }
 
     # ── Recommendation ────────────────────────────────────────────────────────
 

@@ -46,6 +46,7 @@ from models.schemas import (
     Signal,
 )
 from notifications.telegram_notifier import TelegramNotifier
+from notifications.digest_summarizer import DigestSummarizer
 from risk.risk_governor import RiskGovernor
 from journal.trade_journal import TradeJournal
 from journal.digest_history import DigestHistory, DigestRecord
@@ -55,6 +56,17 @@ from watchers.oil_price_watcher import OilPriceWatcher
 from watchers.oil_news_scanner import OilNewsScanner
 from watchers.scheduled_events import ScheduledEventsManager
 from watchers.eia_client import EIAClient
+from watchers.regime_detector import RegimeDetector
+from watchers.microstructure import MicrostructureProvider
+from metrics.post_mortem import PostMortemTracker
+from metrics.weight_calibrator import WeightCalibrator
+from knowledge.historical_analogues import HistoricalAnalogueFinder
+from watchers.seasonal import get_seasonal_context, format_seasonal_for_prompt
+from watchers.volatility_watcher import VolatilityWatcher
+from watchers.macro_watcher import MacroWatcher
+from watchers.cot_client import COTClient
+from watchers.weather_watcher import WeatherWatcher
+from watchers.refinery_margins import RefineryMarginsWatcher
 
 
 # ==============================================================================
@@ -147,6 +159,18 @@ class TradingCouncil:
         self.digest_history = DigestHistory()
         self.agent_memory = AgentMemory()
         self.daily_summary = DailySummaryHistory()
+        self.regime_detector = RegimeDetector()
+        self.post_mortem = PostMortemTracker()
+        self.weight_calibrator = WeightCalibrator(
+            default_weights=dict(self.aggregator.weights)
+        )
+        self.microstructure = MicrostructureProvider()
+        self.analogue_finder = HistoricalAnalogueFinder()
+        self.volatility_watcher = VolatilityWatcher()
+        self.macro_watcher = MacroWatcher()
+        self.cot_client = COTClient()
+        self.weather_watcher = WeatherWatcher()
+        self.refinery_margins = RefineryMarginsWatcher()
         self._current_day: str = datetime.now().strftime("%Y-%m-%d")
         self.running = False
 
@@ -212,7 +236,38 @@ class TradingCouncil:
             logger.warning(f"Scheduled events error: {exc}")
             context["upcoming_events"] = []
 
-        # 5. Previous digest history (for cross-digest learning)
+        # 5. Market regime detection per instrument
+        regimes: dict[str, str] = {}
+        for symbol in self.price_watcher.instruments:
+            try:
+                history = getattr(self.price_watcher, "_history", {}).get(symbol, [])
+                if len(history) >= 10:
+                    prices = [snap.price for snap in history]
+                    analysis = self.regime_detector.detect(prices)
+                    regimes[symbol] = self.regime_detector.format_for_prompt(analysis)
+                    logger.info(
+                        f"Regime {symbol}: {analysis.regime} "
+                        f"(conf={analysis.confidence:.0%}, vol={analysis.volatility_pct:.1f}%)"
+                    )
+                else:
+                    regimes[symbol] = "Недостатньо даних для визначення режиму"
+            except Exception as exc:
+                logger.warning(f"Regime detection error for {symbol}: {exc}")
+                regimes[symbol] = "Помилка визначення режиму"
+        context["regimes"] = regimes
+
+        # 6. Market microstructure data (futures curve, crack spread)
+        try:
+            brent_price = prices.get("BZ=F", {}).get("price", 0.0)
+            gasoil_price = prices.get("LGO", {}).get("price", 0.0)
+            ms_data = self.microstructure.fetch(brent_price, gasoil_price)
+            ms_text = self.microstructure.format_for_prompt(ms_data)
+            context["microstructure"] = ms_text
+        except Exception as exc:
+            logger.warning(f"Microstructure fetch error: {exc}")
+            context["microstructure"] = ""
+
+        # 7. Previous digest history (for cross-digest learning)
         digest_contexts: dict[str, str] = {}
         for instrument in self.price_watcher.instruments:
             hist = self.digest_history.get_context_for_agents(instrument, n=4)
@@ -227,6 +282,55 @@ class TradingCouncil:
             if daily:
                 daily_contexts[instrument] = daily
         context["daily_history"] = daily_contexts
+
+        # 8. Seasonal context
+        try:
+            seasonal_ctx = get_seasonal_context()
+            context["seasonal"] = format_seasonal_for_prompt(seasonal_ctx)
+        except Exception as exc:
+            logger.warning(f"Seasonal context error: {exc}")
+            context["seasonal"] = ""
+
+        # 9. OVX volatility context
+        try:
+            vol_snap = self.volatility_watcher.fetch()
+            context["volatility"] = vol_snap.to_prompt_text()
+        except Exception as exc:
+            logger.warning(f"Volatility watcher error: {exc}")
+            context["volatility"] = ""
+
+        # 10. Macro correlations (DXY, FX)
+        try:
+            macro_snap = self.macro_watcher.fetch()
+            context["macro"] = macro_snap.to_prompt_text()
+        except Exception as exc:
+            logger.warning(f"Macro watcher error: {exc}")
+            context["macro"] = ""
+
+        # 11. CFTC COT positioning
+        try:
+            cot_data = self.cot_client.fetch()
+            context["cot"] = cot_data.to_prompt_text()
+        except Exception as exc:
+            logger.warning(f"COT client error: {exc}")
+            context["cot"] = ""
+
+        # 12. Weather / hurricane context
+        try:
+            weather_snap = self.weather_watcher.fetch()
+            context["weather"] = weather_snap.to_prompt_text()
+        except Exception as exc:
+            logger.warning(f"Weather watcher error: {exc}")
+            context["weather"] = ""
+
+        # 13. Refinery margins (3-2-1 crack spread)
+        try:
+            brent_price = prices.get("BZ=F", {}).get("price", 0.0)
+            ref_margins = self.refinery_margins.fetch(brent_price)
+            context["refinery_margins"] = ref_margins.to_prompt_text()
+        except Exception as exc:
+            logger.warning(f"Refinery margins error: {exc}")
+            context["refinery_margins"] = ""
 
         return context
 
@@ -244,7 +348,10 @@ class TradingCouncil:
             f"(severity: {event.severity:.0%})"
         )
 
-        # Format user prompt with rich context
+        # Format user prompt with rich context + regime
+        regime_text = context.get("regimes", {}).get(
+            event.instrument, "No regime data available"
+        )
         user_prompt = format_user_prompt(
             event_type=event.event_type,
             instrument=event.instrument,
@@ -255,6 +362,7 @@ class TradingCouncil:
                 "upcoming_events": context.get("upcoming_events", []),
                 "prices": context.get("prices", {}),
             },
+            market_regime=regime_text,
         )
 
         # Inject previous digest history for cross-digest learning
@@ -267,19 +375,76 @@ class TradingCouncil:
         if daily_hist:
             user_prompt += f"\n\n{daily_hist}\n"
 
+        # Inject microstructure data
+        ms_text = context.get("microstructure", "")
+        if ms_text:
+            user_prompt += f"\n\n{ms_text}\n"
+
+        # Inject seasonal context
+        seasonal_text = context.get("seasonal", "")
+        if seasonal_text:
+            user_prompt += f"\n\n{seasonal_text}\n"
+
+        # Inject volatility context (OVX)
+        vol_text = context.get("volatility", "")
+        if vol_text:
+            user_prompt += f"\n\n{vol_text}\n"
+
+        # Inject macro correlations (DXY, FX)
+        macro_text = context.get("macro", "")
+        if macro_text:
+            user_prompt += f"\n\n{macro_text}\n"
+
+        # Inject CFTC COT positioning
+        cot_text = context.get("cot", "")
+        if cot_text:
+            user_prompt += f"\n\n{cot_text}\n"
+
+        # Inject weather / hurricane context
+        weather_text = context.get("weather", "")
+        if weather_text:
+            user_prompt += f"\n\n{weather_text}\n"
+
+        # Inject refinery margins
+        margins_text = context.get("refinery_margins", "")
+        if margins_text:
+            user_prompt += f"\n\n{margins_text}\n"
+
+        # Inject historical analogues
+        try:
+            analogues = self.analogue_finder.find(event, max_results=3)
+            if analogues:
+                analogues_text = self.analogue_finder.format_for_prompt(analogues)
+                user_prompt += f"\n\n{analogues_text}\n"
+                logger.info(
+                    f"Historical analogues: "
+                    f"{', '.join(a.event_name for a in analogues)}"
+                )
+        except Exception as exc:
+            logger.warning(f"Historical analogues error: {exc}")
+
         # 1. Collect signals from all agents
         logger.info("Querying all 4 agents...")
         signals: dict[str, Signal] = {}
         for name, agent in self.agents.items():
             try:
                 logger.info(f"  -> {name.upper()}...")
-                # Inject per-agent history into context
+                # Inject per-agent history + post-mortem into context
                 agent_ctx = {"prompt": user_prompt, **context}
                 agent_hist = self.agent_memory.format_for_prompt(
                     name, event.instrument, n=8
                 )
+                # Post-mortem feedback from past predictions
+                post_mortem_ctx = self.post_mortem.format_for_prompt(
+                    name, event.instrument, event.event_type, n=5
+                )
+                combined_history = ""
                 if agent_hist:
-                    agent_ctx["agent_history"] = agent_hist
+                    combined_history += agent_hist + "\n\n"
+                if post_mortem_ctx:
+                    combined_history += post_mortem_ctx
+                if combined_history:
+                    agent_ctx["agent_history"] = combined_history
 
                 sig = agent.analyze(event, agent_ctx)
                 signals[name] = sig
@@ -551,14 +716,12 @@ class TradingCouncil:
                 agent_dominants[agent_name][sig.action] = (
                     agent_dominants[agent_name].get(sig.action, 0) + 1
                 )
-                if sig.thesis and sig.action != "WAIT" and len(theses) < 4:
-                    short = sig.thesis[:120]
-                    if short not in theses:
-                        theses.append(short)
-                if sig.risk_notes and len(risks) < 3:
-                    short = sig.risk_notes[:100]
-                    if short not in risks:
-                        risks.append(short)
+                if sig.thesis and sig.action != "WAIT" and len(theses) < 6:
+                    if sig.thesis not in theses:
+                        theses.append(sig.thesis)
+                if sig.risk_notes and len(risks) < 4:
+                    if sig.risk_notes not in risks:
+                        risks.append(sig.risk_notes)
 
         # Determine trend
         if action_counts["LONG"] > action_counts["SHORT"] and action_counts["LONG"] > action_counts["WAIT"]:
@@ -588,8 +751,39 @@ class TradingCouncil:
         )
         self.digest_history.add(record)
 
+    def _calibrate_weights(self) -> None:
+        """Auto-calibrate agent weights and confidence factors from accuracy data."""
+        agent_stats = self.post_mortem.get_agent_stats()
+        if not agent_stats:
+            return
+
+        # P0.3: Update agent weights
+        old_weights = dict(self.aggregator.weights)
+        new_weights = self.weight_calibrator.calibrate(agent_stats)
+        if new_weights != old_weights:
+            report = self.weight_calibrator.format_report(
+                agent_stats, old_weights, new_weights
+            )
+            logger.info(f"Weight calibration:\n{report}")
+            self.aggregator.update_weights(new_weights)
+
+        # P1.7: Update confidence calibration factors
+        # factor = hit_rate / avg_confidence (1.0 = well-calibrated)
+        cal_factors: dict[str, float] = {}
+        for name, stats in agent_stats.items():
+            hit = stats.get("hit_rate", 0.5)
+            conf = stats.get("avg_confidence", 0.5)
+            if conf > 0 and stats.get("total", 0) >= 5:
+                cal_factors[name] = round(hit / conf, 2)
+        if cal_factors:
+            self.aggregator.set_calibration_factors(cal_factors)
+            logger.info(f"Confidence calibration factors: {cal_factors}")
+
     def _build_daily_summaries(self, context: dict) -> None:
         """Build daily summaries from today's digests for each instrument."""
+        # Auto-calibrate agent weights at end of day
+        self._calibrate_weights()
+
         yesterday = self._current_day  # day that just ended
         prices = context.get("prices", {})
 
@@ -885,7 +1079,13 @@ def main() -> None:
     aggregator = Aggregator()
     risk_governor = RiskGovernor()
     journal = TradeJournal(journal_path=journal_path)
-    notifier = TelegramNotifier(bot_token=telegram_token, chat_id=telegram_chat, chat_ids=telegram_chat_ids)
+    # Create digest summarizer (uses Gemini Flash for cheap/fast summarization)
+    summarizer_key = None
+    if not args.dry_run:
+        summarizer_key = settings.GOOGLE_AI_API_KEY or settings.GOOGLE_API_KEY
+    summarizer = DigestSummarizer(api_key=summarizer_key or "") if summarizer_key else None
+    notifier = TelegramNotifier(bot_token=telegram_token, chat_id=telegram_chat, chat_ids=telegram_chat_ids,
+                                summarizer=summarizer)
 
     # CLI --digest-hours overrides settings
     if args.digest_hours is not None:

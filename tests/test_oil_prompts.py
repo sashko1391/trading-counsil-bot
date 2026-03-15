@@ -60,8 +60,9 @@ class TestPromptsExist:
         assert prompt, f"{agent_name} prompt is empty"
         assert len(prompt) > 200, f"{agent_name} prompt is suspiciously short ({len(prompt)} chars)"
 
-    def test_unknown_agent_returns_empty(self):
-        assert get_agent_prompt("unknown_agent") == ""
+    def test_unknown_agent_raises(self):
+        with pytest.raises(ValueError, match="Unknown agent"):
+            get_agent_prompt("unknown_agent")
 
     def test_system_prompt_nonempty(self):
         assert len(SYSTEM_PROMPT) > 100

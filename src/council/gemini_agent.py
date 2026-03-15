@@ -76,9 +76,11 @@ Respond ONLY with valid JSON (no markdown, no preamble):
     "thesis": "макс 500 символів УКРАЇНСЬКОЮ — макро/фундаментальне обґрунтування",
     "invalidation_price": number or null,
     "risk_notes": "що може спростувати тезу — УКРАЇНСЬКОЮ",
-    "sources": ["url1", "url2"]
+    "sources": ["url1", "url2"],
+    "drivers": ["driver1", "driver2"]
 }}
-ОБОВ'ЯЗКОВО: thesis та risk_notes писати УКРАЇНСЬКОЮ (uk-UA). Англійський текст = помилка формату."""
+ОБОВ'ЯЗКОВО: thesis та risk_notes писати УКРАЇНСЬКОЮ (uk-UA). Англійський текст = помилка формату.
+ОБОВ'ЯЗКОВО: Include 1-3 drivers from the taxonomy in your JSON."""
 
         try:
             response = self.client.models.generate_content(

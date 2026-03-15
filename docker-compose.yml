@@ -1,21 +1,60 @@
 services:
-  backend:
+  # ── Backend: Python bot + FastAPI + WebSocket ──────────────────────
+  bot:
     build: .
-    ports:
-      - "8000:8000"
+    container_name: oil-bot
+    restart: unless-stopped
     env_file:
       - .env
     environment:
       - PORT=8000
-    command: ["python", "-m", "api.run", "--dry-run", "--port", "8000"]
+      - BOT_ARGS=              # empty = real agents; set --dry-run for mocks
     volumes:
-      - ./data:/app/data
+      - bot-data:/app/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/status')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
+  # ── Frontend: static React SPA via nginx ───────────────────────────
   frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - VITE_API_URL=http://localhost:8000
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""       # empty = same origin (Caddy proxies /api and /ws)
+    container_name: oil-frontend
+    restart: unless-stopped
+    networks:
+      - internal
     depends_on:
-      - backend
+      - bot
+
+  # ── Caddy: reverse proxy + auto SSL (Let's Encrypt) ───────────────
+  caddy:
+    image: caddy:2-alpine
+    container_name: oil-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - internal
+    depends_on:
+      - bot
+      - frontend
+
+volumes:
+  bot-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  internal:
+    driver: bridge

@@ -162,18 +162,48 @@ class AdversarialStage:
             f"| δ={delta:+.2f} | accepted={len(accepted)} | total ${total_cost:.3f}"
         )
 
+        # P2.10: Detect sycophantic debate and apply penalty
+        debate_quality = d3.get("debate_quality", "strong")
+        final_confidence = d3.get("final_confidence", council.combined_confidence)
+        final_action = d3.get("final_action", council.consensus)
+
+        # Sycophancy detection: if no objections accepted AND confidence unchanged
+        # the debate added no value → mark as sycophantic
+        if not accepted and abs(delta) < 0.02 and objections_count > 0:
+            debate_quality = "sycophantic"
+            logger.warning(
+                "Sycophantic debate detected: all objections rejected, "
+                "confidence unchanged despite valid counter-arguments"
+            )
+
+        # Penalty for sycophantic debates: reduce confidence by 5%
+        if debate_quality == "sycophantic":
+            final_confidence = max(0.0, final_confidence - 0.05)
+            delta = final_confidence - d1.get("confidence", 0.5)
+            logger.info(
+                f"   Sycophancy penalty applied: confidence -0.05 → {final_confidence:.0%}"
+            )
+
+        # Bonus for meaningful debates: slight confidence boost if debate was strong
+        # and multiple objections were thoughtfully handled
+        if debate_quality == "strong" and len(accepted) >= 2:
+            logger.info(
+                f"   High-quality debate: {len(accepted)} objections accepted, "
+                f"confidence already adjusted by δ={delta:+.2f}"
+            )
+
         result = AdversarialResult(
             instrument=instrument,
             completed_at=datetime.now(),
             primary_thesis=step1,
             counterargument=step2,
             final_verdict=step3,
-            final_action=d3.get("final_action", council.consensus),
-            final_confidence=d3.get("final_confidence", council.combined_confidence),
+            final_action=final_action,
+            final_confidence=final_confidence,
             confidence_delta=delta,
             narrative_divergence=d3.get("narrative_divergence", ""),
             total_cost_usd=total_cost,
-            debate_quality=d3.get("debate_quality", "strong"),
+            debate_quality=debate_quality,
         )
 
         elapsed = time.time() - t0

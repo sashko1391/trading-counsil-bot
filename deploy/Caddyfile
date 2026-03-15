@@ -1,0 +1,36 @@
+# ─── Oil Trading Intelligence — Caddy reverse proxy ───────────────────
+#
+# MODE 1: Without domain (HTTP only, access via server IP)
+#   Just use this file as-is. Access: http://YOUR_SERVER_IP
+#
+# MODE 2: With domain (auto HTTPS via Let's Encrypt)
+#   Replace ":80" below with your domain, e.g.:
+#     oil.example.com {
+#   Caddy will automatically get an SSL certificate.
+
+:80 {
+    # API requests → bot container
+    handle /api/* {
+        reverse_proxy bot:8000
+    }
+
+    # WebSocket → bot container
+    handle /ws {
+        reverse_proxy bot:8000
+    }
+
+    # Everything else → frontend SPA
+    handle {
+        reverse_proxy frontend:3000
+    }
+
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+
+    encode gzip
+}
