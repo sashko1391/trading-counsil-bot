@@ -393,6 +393,9 @@ USER_PROMPT_TEMPLATE = """
 ## Technical / Fundamental Indicators
 {indicators}
 
+## Market Regime
+{market_regime}
+
 ## Your Task
 Analyse this event and provide a trading signal for BOTH Brent (BZ=F) and
 Gasoil (LGO).
@@ -433,6 +436,7 @@ def format_user_prompt(
     market_data: dict,
     news: str = "No recent news available",
     indicators: dict = None,
+    market_regime: str = "No regime data available",
 ) -> str:
     """Format the user prompt with event data."""
     import json
@@ -446,4 +450,5 @@ def format_user_prompt(
         market_data=json.dumps(market_data, indent=2),
         news=news,
         indicators=json.dumps(indicators, indent=2),
+        market_regime=market_regime,
     )
