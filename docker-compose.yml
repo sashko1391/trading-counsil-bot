@@ -8,7 +8,7 @@ services:
       - .env
     environment:
       - PORT=8000
-      - BOT_ARGS=              # empty = real agents; set --dry-run for mocks
+      - BOT_ARGS=--interval 900   # 15 min polling; add --dry-run for mocks
     volumes:
       - bot-data:/app/data
     networks:
