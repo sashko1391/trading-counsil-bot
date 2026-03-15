@@ -206,3 +206,32 @@ RAG:
 **AI:** Anthropic, xAI, Google AI, Perplexity, OpenAI APIs
 **Output:** PWA (planned) — Next.js + FastAPI + WebSockets (replaces Telegram)
 **Testing:** pytest, 240+ tests
+
+---
+
+## Digest Summarizer (Mar 14, 2026)
+
+**DigestSummarizer** (`src/notifications/digest_summarizer.py`) uses Gemini Flash for cheap, fast summarization of agent theses and risk notes. Instead of hard-truncating thesis at 120 chars and risk_notes at 100 chars, the summarizer compresses full text into concise, complete Ukrainian sentences. Integrated into TelegramNotifier and the main.py pipeline.
+
+## War Room History Tab (Mar 14, 2026)
+
+**HistoryPanel** (`frontend/src/HistoryPanel.jsx`) adds a full history view to the War Room dashboard. WarRoom.jsx now has tab navigation: ДАШБОРД | ІСТОРІЯ.
+
+HistoryPanel contains 3 sub-tabs:
+- **Daily summaries** — aggregated daily performance with DailyRow components
+- **3h digests** — recent digest records with DigestRow components
+- **Per-agent memory** — individual agent signal history with AgentMemoryRow and TrendChart visualization
+
+## New History API Endpoints (Mar 14, 2026)
+
+Added to `src/api/server.py`:
+- `GET /api/history/digests` — list of 3h digest records
+- `GET /api/history/daily` — daily summary records
+- `GET /api/history/agents` — per-agent memory for a specific agent
+- `GET /api/history/agents/all` — all agents' memory combined
+
+## Frontend Hooks (Mar 14, 2026)
+
+Added to `frontend/src/useApi.js`:
+- `useFetch` — generic data fetching hook with loading/error state
+- `useHistoryData` — specialized hook for history tab data (digests, daily, agents)

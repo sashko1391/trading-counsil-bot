@@ -1,0 +1,33 @@
+{
+  "BZ=F": [
+    {
+      "instrument": "BZ=F",
+      "date": "2026-03-14",
+      "digest_count": 12,
+      "total_events": 24,
+      "dominant_trend": "LONG",
+      "trend_changes": 0,
+      "avg_confidence": 0.76,
+      "action_counts": {
+        "LONG": 24,
+        "SHORT": 0,
+        "WAIT": 0
+      },
+      "agent_dominants": {
+        "grok": "LONG",
+        "perplexity": "LONG",
+        "claude": "WAIT",
+        "gemini": "LONG"
+      },
+      "key_theses": [
+        "Test thesis for LONG"
+      ],
+      "key_risks": [
+        "Test risk note"
+      ],
+      "opening_price": 0.0,
+      "closing_price": 83.0,
+      "price_change_pct": 0.0
+    }
+  ]
+}

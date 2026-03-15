@@ -1,0 +1,1250 @@
+{
+  "grok": {
+    "BZ=F": [
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.32,
+        "thesis": "[MOCK Grok] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.5,
+        "thesis": "[MOCK Grok] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:01",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:01",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.32,
+        "thesis": "[MOCK Grok] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.5,
+        "thesis": "[MOCK Grok] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.85,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      }
+    ],
+    "LGO": [
+      {
+        "timestamp": "2026-03-13 20:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 05:43",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 06:17",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 16:18",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 16:20",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 16:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 16:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 16:35",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 16:41",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 16:42",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 16:49",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 18:52",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.65,
+        "thesis": "[MOCK Grok] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Grok"
+      }
+    ]
+  },
+  "perplexity": {
+    "BZ=F": [
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "SHORT",
+        "confidence": 0.43,
+        "thesis": "[MOCK Perplexity] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.36,
+        "thesis": "[MOCK Perplexity] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:01",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:01",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "SHORT",
+        "confidence": 0.43,
+        "thesis": "[MOCK Perplexity] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.36,
+        "thesis": "[MOCK Perplexity] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.7,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      }
+    ],
+    "LGO": [
+      {
+        "timestamp": "2026-03-13 20:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 05:43",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 06:17",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 16:18",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 16:20",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 16:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 16:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 16:35",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 16:41",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 16:42",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 16:49",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 18:52",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.3,
+        "thesis": "[MOCK Perplexity] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Perplexity"
+      }
+    ]
+  },
+  "claude": {
+    "BZ=F": [
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.71,
+        "thesis": "[MOCK Claude] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.66,
+        "thesis": "[MOCK Claude] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:01",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:01",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.71,
+        "thesis": "[MOCK Claude] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.66,
+        "thesis": "[MOCK Claude] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "WAIT",
+        "confidence": 0.4,
+        "thesis": "Test thesis for WAIT",
+        "risk_notes": "Test risk note"
+      }
+    ],
+    "LGO": [
+      {
+        "timestamp": "2026-03-13 20:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 05:43",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 06:17",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 16:18",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 16:20",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 16:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 16:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 16:35",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 16:41",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 16:42",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 16:49",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 18:52",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "WAIT",
+        "confidence": 0.72,
+        "thesis": "[MOCK Claude] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Claude"
+      }
+    ]
+  },
+  "gemini": {
+    "BZ=F": [
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "[MOCK Gemini] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.74,
+        "thesis": "[MOCK Gemini] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:00",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:01",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:01",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.35,
+        "thesis": "[MOCK Gemini] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "WAIT",
+        "confidence": 0.74,
+        "thesis": "[MOCK Gemini] Simulated analysis for BZ=F price_spike",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "price_spike",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "BZ=F",
+        "event_type": "opec_event",
+        "action": "LONG",
+        "confidence": 0.8,
+        "thesis": "Test thesis for LONG",
+        "risk_notes": "Test risk note"
+      }
+    ],
+    "LGO": [
+      {
+        "timestamp": "2026-03-13 20:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 05:43",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 06:17",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 16:18",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 16:20",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 16:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 16:33",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 16:35",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 16:41",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 16:42",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 16:49",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 18:52",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 18:59",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      },
+      {
+        "timestamp": "2026-03-14 19:10",
+        "instrument": "LGO",
+        "event_type": "volume_surge",
+        "action": "LONG",
+        "confidence": 0.39,
+        "thesis": "[MOCK Gemini] Simulated analysis for LGO volume_surge",
+        "risk_notes": "[MOCK] Simulated risk from Gemini"
+      }
+    ]
+  }
+}

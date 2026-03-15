@@ -194,3 +194,29 @@ Extended existing:
 - [ ] CRISIS MODE: if >5% price move in 15min with no scheduled event → escalate all agents, disable cooldowns
 - [ ] Per-agent cost tracker → daily cost dashboard
 - [ ] Disclaimer on every signal: "AI-generated intelligence, not financial advice"
+
+---
+
+## Mar 14, 2026 — War Room History Tab + Digest Summarizer
+
+### History Tab in War Room
+- Integrated HistoryPanel into WarRoom.jsx with ДАШБОРД/ІСТОРІЯ tab switching
+- HistoryPanel shows 3 sub-tabs: daily summaries, 3h digests, and per-agent memory with trend chart
+
+### Digest Summarizer
+- Created DigestSummarizer (src/notifications/digest_summarizer.py) using Gemini Flash to compress agent theses/risks into concise, complete Ukrainian sentences instead of hard-truncating at 120/100 chars
+- Integrated into TelegramNotifier and main.py pipeline
+
+### Removed Hard Truncation
+- Thesis [:120] and risk_notes [:100] truncation removed from telegram_notifier.py and main.py _save_digest_record
+- Now collects full text and passes to summarizer
+
+### New API Endpoints
+- Added 4 history endpoints to server.py:
+  - /api/history/digests
+  - /api/history/daily
+  - /api/history/agents
+  - /api/history/agents/all
+
+### Frontend Hooks
+- Added useFetch and useHistoryData hooks to useApi.js
