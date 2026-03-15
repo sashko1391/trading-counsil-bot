@@ -25,8 +25,8 @@ import httpx
 from loguru import logger
 
 
-# CFTC SODA API — Traders in Financial Futures (TFF), Futures Only
-CFTC_API_URL = "https://publicreporting.cftc.gov/resource/gpe5-46if.json"
+# CFTC SODA API — Disaggregated Futures Only
+CFTC_API_URL = "https://publicreporting.cftc.gov/resource/72hh-3qpy.json"
 
 # Contract market names for oil futures
 CONTRACT_NAMES = {
@@ -181,7 +181,7 @@ class COTClient:
 
     def _fetch_contract(self, name: str, search_name: str) -> Optional[COTPosition]:
         """Fetch COT data for a single contract."""
-        # TFF dataset: search by contract_market_name (partial match)
+        # Disaggregated dataset: search by contract_market_name (partial match)
         params = {
             "$where": f"contract_market_name like '%{search_name}%'",
             "$order": "report_date_as_yyyy_mm_dd DESC",
@@ -197,17 +197,17 @@ class COTClient:
             logger.warning(f"COT: no data for {name}")
             return None
 
-        # Latest report — TFF field names
+        # Latest report — Disaggregated field names
         latest = rows[0]
 
-        # Asset Manager positions (closest to "Money Manager" in TFF)
-        mm_long = int(float(latest.get("asset_mgr_positions_long_all", 0)))
-        mm_short = int(float(latest.get("asset_mgr_positions_short_all", 0)))
+        # Money Manager (speculative) positions
+        mm_long = int(float(latest.get("m_money_positions_long_all", 0)))
+        mm_short = int(float(latest.get("m_money_positions_short_all", 0)))
         mm_net = mm_long - mm_short
 
-        # Dealer positions (commercial proxy)
-        prod_long = int(float(latest.get("dealer_positions_long_all", 0)))
-        prod_short = int(float(latest.get("dealer_positions_short_all", 0)))
+        # Producer/Merchant (commercial) positions
+        prod_long = int(float(latest.get("prod_merc_positions_long", 0)))
+        prod_short = int(float(latest.get("prod_merc_positions_short", 0)))
         prod_net = prod_long - prod_short
 
         oi = int(float(latest.get("open_interest_all", 0)))
@@ -216,16 +216,16 @@ class COTClient:
         mm_net_change = 0
         if len(rows) >= 2:
             prev = rows[1]
-            prev_long = int(float(prev.get("asset_mgr_positions_long_all", 0)))
-            prev_short = int(float(prev.get("asset_mgr_positions_short_all", 0)))
+            prev_long = int(float(prev.get("m_money_positions_long_all", 0)))
+            prev_short = int(float(prev.get("m_money_positions_short_all", 0)))
             prev_net = prev_long - prev_short
             mm_net_change = mm_net - prev_net
 
         # 52-week percentile
         all_nets = []
         for row in rows:
-            rl = int(float(row.get("asset_mgr_positions_long_all", 0)))
-            rs = int(float(row.get("asset_mgr_positions_short_all", 0)))
+            rl = int(float(row.get("m_money_positions_long_all", 0)))
+            rs = int(float(row.get("m_money_positions_short_all", 0)))
             all_nets.append(rl - rs)
 
         percentile = 50.0

@@ -169,7 +169,7 @@ def _load_feeds_from_settings() -> dict[str, dict]:
         return feeds
     except Exception:
         return {
-            "oilprice": {"url": "https://oilprice.com/rss", "weight": 0.40, "category": "news"},
+            "oilprice": {"url": "https://oilprice.com/rss/main", "weight": 0.40, "category": "news"},
             "eia": {"url": "https://www.eia.gov/rss/todayinenergy.xml", "weight": 0.85, "category": "official"},
         }
 
