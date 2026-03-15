@@ -39,26 +39,46 @@ def wire_bot_to_api(council: "TradingCouncil") -> None:
 
     council.analyze_event = patched_analyze
 
-    # Also patch run_once to capture forecasts after they're built
+    # Also patch run_once to capture forecasts and always update prices
     original_run_once = council.run_once
 
     async def patched_run_once():
         results = await original_run_once()
+
+        # Always update prices from price watcher (even when no events)
+        try:
+            prices = {}
+            for symbol in council.price_watcher.instruments:
+                snap = council.price_watcher.get_latest_snapshot(symbol)
+                if snap:
+                    prices[symbol] = {
+                        "price": snap.price,
+                        "high": snap.high,
+                        "low": snap.low,
+                        "volume": snap.volume,
+                    }
+            if prices:
+                state.prices = prices
+                state.last_cycle_at = datetime.now()
+                state.total_cycles += 1
+                # Broadcast price update to WS clients
+                try:
+                    from api.server import _broadcast_update
+                    import asyncio
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        asyncio.ensure_future(_broadcast_update())
+                except Exception:
+                    pass
+        except Exception as exc:
+            logger.warning(f"Price update failed: {exc}")
+
         for r in results:
             forecast = r.get("forecast")
             if forecast:
                 try:
                     state.latest_forecast = forecast.model_dump(mode="json")
                     logger.info(f"Forecast pushed to API: {forecast.direction} {forecast.confidence:.0%}")
-                    # Broadcast to WS clients
-                    try:
-                        from api.server import _broadcast_update
-                        import asyncio
-                        loop = asyncio.get_event_loop()
-                        if loop.is_running():
-                            asyncio.ensure_future(_broadcast_update())
-                    except Exception:
-                        pass
                 except Exception as exc:
                     logger.warning(f"Forecast push failed: {exc}")
         return results
