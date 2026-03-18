@@ -285,18 +285,14 @@ export default function WarRoom() {
 
   // Price chart data (maintained locally, updated from API)
   const [brentData, setBrentData] = useState(() => generatePriceData(82.0, 0.4));
-  const [gasoilData, setGasoilData] = useState(() => generatePriceData(1184.0, 5.0));
   const [brentFlash, setBrentFlash] = useState(false);
-  const [gasoilFlash, setGasoilFlash] = useState(false);
 
   const T = THEMES[theme];
 
   // Extract prices from API
   const brentPrice = prices?.["BZ=F"]?.price || brentData[brentData.length - 1]?.p || 82.0;
-  const gasoilPrice = prices?.["LGO"]?.price || gasoilData[gasoilData.length - 1]?.p || 1184.0;
   const brentChange = forecast?.instrument === "BZ=F" && forecast?.current_price
     ? ((brentPrice - forecast.current_price) / forecast.current_price * 100) : 0;
-  const gasoilChange = 0;
 
   // Update chart data when prices change
   useEffect(() => {
@@ -305,13 +301,6 @@ export default function WarRoom() {
       setBrentFlash(true); setTimeout(() => setBrentFlash(false), 220);
     }
   }, [prices?.["BZ=F"]?.price]);
-
-  useEffect(() => {
-    if (prices?.["LGO"]?.price) {
-      setGasoilData(d => [...d.slice(1), { t: 0, p: prices["LGO"].price }]);
-      setGasoilFlash(true); setTimeout(() => setGasoilFlash(false), 220);
-    }
-  }, [prices?.["LGO"]?.price]);
 
   // Clock + glitch
   useEffect(() => { const t = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(t); }, []);
@@ -365,7 +354,6 @@ export default function WarRoom() {
   // Ticker
   const tickerItems = [
     `BRENT $${brentPrice.toFixed(2)}`,
-    `HO $${gasoilPrice.toFixed(0)}/т`,
     `РИЗИК ${compositeDisplay}/10`,
     `КОНСЕНСУС: ${forecast?.direction || "—"}`,
     `СТАТУС: ${status.toUpperCase()}`,
@@ -421,20 +409,15 @@ export default function WarRoom() {
           </div>
 
           <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-            {[
-              { label: "БРЕНТ BZ=F", price: brentPrice, change: brentChange, flash: brentFlash },
-              { label: "ДИСТИЛЯТИ HO", price: gasoilPrice, change: gasoilChange, flash: gasoilFlash },
-            ].map((item) => (
-              <div key={item.label} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.15em" }}>{item.label}</div>
-                <div style={{ fontSize: 18, fontWeight: 700, fontFamily: "monospace",
-                  color: item.change >= 0 ? T.accent : "#ff4444",
-                  textShadow: `0 0 ${item.flash ? "18px" : "8px"} ${item.change >= 0 ? T.accent : "#ff4444"}`,
-                  transition: "text-shadow 0.25s ease" }}>
-                  ${item.price.toFixed(2)}
-                </div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.15em" }}>БРЕНТ BZ=F</div>
+              <div style={{ fontSize: 18, fontWeight: 700, fontFamily: "monospace",
+                color: brentChange >= 0 ? T.accent : "#ff4444",
+                textShadow: `0 0 ${brentFlash ? "18px" : "8px"} ${brentChange >= 0 ? T.accent : "#ff4444"}`,
+                transition: "text-shadow 0.25s ease" }}>
+                ${brentPrice.toFixed(2)}
               </div>
-            ))}
+            </div>
           </div>
 
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
@@ -527,32 +510,27 @@ export default function WarRoom() {
               )}
             </div>
 
-            {/* CHARTS */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, opacity: focusMode ? 0.7 : 1, transition: "opacity 0.4s" }}>
-              {[
-                { title: "Нафта Brent", ticker: "BZ=F · 1 ГОД.", price: brentPrice, change: brentChange, data: brentData },
-                { title: "Дистиляти (HO proxy)", ticker: "HO=F · $/т", price: gasoilPrice, change: gasoilChange, data: gasoilData },
-              ].map((c) => (
-                <div key={c.title} style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "12px 14px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                    <div>
-                      <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.12em" }}>{c.ticker}</div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: T.dim, fontFamily: "monospace" }}>{c.title}</div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 17, fontWeight: 700, color: c.change >= 0 ? T.accent : "#ff4444",
-                        textShadow: `0 0 8px ${c.change >= 0 ? T.accent : "#ff4444"}`, fontFamily: "monospace" }}>
-                        ${c.price.toFixed(2)}
-                      </div>
-                    </div>
+            {/* CHART */}
+            <div style={{ opacity: focusMode ? 0.7 : 1, transition: "opacity 0.4s" }}>
+              <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "12px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                  <div>
+                    <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.12em" }}>BZ=F · 1 ГОД.</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: T.dim, fontFamily: "monospace" }}>Нафта Brent</div>
                   </div>
-                  <MiniChart data={c.data} accent={T.accent} />
-                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 9, color: T.dark, fontFamily: "monospace" }}>
-                    <span>МІН ${Math.min(...c.data.map(d => d.p)).toFixed(2)}</span>
-                    <span>МАКС ${Math.max(...c.data.map(d => d.p)).toFixed(2)}</span>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: brentChange >= 0 ? T.accent : "#ff4444",
+                      textShadow: `0 0 8px ${brentChange >= 0 ? T.accent : "#ff4444"}`, fontFamily: "monospace" }}>
+                      ${brentPrice.toFixed(2)}
+                    </div>
                   </div>
                 </div>
-              ))}
+                <MiniChart data={brentData} accent={T.accent} />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 9, color: T.dark, fontFamily: "monospace" }}>
+                  <span>МІН ${Math.min(...brentData.map(d => d.p)).toFixed(2)}</span>
+                  <span>МАКС ${Math.max(...brentData.map(d => d.p)).toFixed(2)}</span>
+                </div>
+              </div>
             </div>
 
             {/* RISK */}

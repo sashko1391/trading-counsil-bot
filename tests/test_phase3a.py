@@ -549,8 +549,7 @@ class TestSettingsV31:
     def test_scheduled_events_new_3_present(self, settings):
         names = {e["name"] for e in settings.SCHEDULED_EVENTS}
         assert "Chinese Manufacturing PMI" in names
-        assert "Fujairah Petroleum Storage" in names
-        assert "EU Gas Storage Report (GIE)" in names
+        # Fujairah and EU Gas Storage removed (LGO-only events)
 
     def test_rag_decay_lambdas(self, settings):
         assert settings.RAG_NEWS_DECAY_LAMBDA > 0

@@ -5,7 +5,6 @@ Provides:
   - Futures curve shape (M1-M2, M1-M6 spreads)
   - Contango / backwardation classification
   - Volume and open interest context
-  - Crack spread (Brent vs Gasoil margin)
 
 Uses yfinance for futures data. Falls back gracefully when data unavailable.
 
@@ -37,7 +36,6 @@ class MicrostructureData:
     m1_m6_spread: float = 0.0   # front - sixth month
     curve_shape: str = "unknown"  # contango | backwardation | flat
 
-    crack_spread: float = 0.0    # Brent-Gasoil margin proxy
     volume_ratio: float = 0.0    # current vol / 20-day avg vol
 
     def to_prompt_text(self) -> str:
@@ -59,9 +57,6 @@ class MicrostructureData:
         }
         lines.append(f"  Структура: {shape_ua.get(self.curve_shape, self.curve_shape)}")
 
-        if self.crack_spread != 0:
-            lines.append(f"  Крек-спред (Brent→Gasoil): ${self.crack_spread:.2f}/bbl")
-
         if self.volume_ratio > 0:
             vol_desc = (
                 "підвищений" if self.volume_ratio > 1.5
@@ -82,35 +77,24 @@ class MicrostructureProvider:
     yfinance doesn't provide individual contract months easily.
     """
 
-    # Brent crude symbols (front month and heating oil as gasoil proxy)
     BRENT_SYMBOL = "BZ=F"
-    HEATING_OIL_SYMBOL = "HO=F"  # proxy for gasoil crack
 
     def fetch(
         self,
         brent_price: float = 0.0,
-        gasoil_price: float = 0.0,
     ) -> Dict[str, MicrostructureData]:
         """
-        Fetch microstructure data for Brent and LGO.
+        Fetch microstructure data for Brent.
 
         Args:
             brent_price: current Brent price (from price watcher)
-            gasoil_price: current Gasoil price (from price watcher)
 
         Returns:
             Dict mapping instrument to MicrostructureData
         """
         result: Dict[str, MicrostructureData] = {}
-
-        # Brent microstructure
         brent_data = self._fetch_brent_curve(brent_price)
         result["BZ=F"] = brent_data
-
-        # LGO microstructure (crack spread + basic data)
-        lgo_data = self._build_lgo_data(gasoil_price, brent_price)
-        result["LGO"] = lgo_data
-
         return result
 
     def _fetch_brent_curve(self, current_price: float) -> MicrostructureData:
@@ -166,20 +150,6 @@ class MicrostructureProvider:
 
         return data
 
-    def _build_lgo_data(
-        self, gasoil_price: float, brent_price: float
-    ) -> MicrostructureData:
-        """Build LGO microstructure with crack spread."""
-        data = MicrostructureData(instrument="LGO", front_month_price=gasoil_price)
-
-        if gasoil_price > 0 and brent_price > 0:
-            # Simple crack spread: gasoil ($/tonne) vs brent ($/bbl)
-            # Convert gasoil to $/bbl approximation: 1 tonne ≈ 7.45 barrels
-            gasoil_per_bbl = gasoil_price / 7.45
-            data.crack_spread = round(gasoil_per_bbl - brent_price, 2)
-
-        return data
-
     def format_for_prompt(self, data: Dict[str, MicrostructureData]) -> str:
         """Format all microstructure data as context block."""
         if not data:
@@ -196,6 +166,6 @@ class MicrostructureProvider:
 
         lines.append(
             "Враховуй структуру ринку: контанго = надлишок пропозиції, "
-            "бекуордація = дефіцит. Крек-спред показує маржу переробки."
+            "бекуордація = дефіцит."
         )
         return "\n".join(lines)

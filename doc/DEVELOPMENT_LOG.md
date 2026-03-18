@@ -220,3 +220,68 @@ Extended existing:
 
 ### Frontend Hooks
 - Added useFetch and useHistoryData hooks to useApi.js
+
+---
+
+## Mar 17, 2026 — Gasoil (LGO) Removal + Poll Interval Change
+
+### Configuration
+- `WATCH_INSTRUMENTS`: `["BZ=F", "LGO"]` → `["BZ=F"]` (Brent only)
+- `POLL_INTERVAL_SECONDS`: 900 (15 min) → 1200 (20 min)
+- Removed 2 LGO-only scheduled events: Fujairah Petroleum Storage, EU Gas Storage Report (GIE)
+- Removed `"LGO"` from instruments in 4 shared scheduled events (EIA, NFP, OPEC, IEA)
+
+### Prompts (config/prompts.py)
+- SYSTEM_PROMPT: single instrument (Brent only), output format changed from JSON array to single JSON object
+- Removed Gasoil/LGO/crack spread references from all agent prompts
+- USER_PROMPT_TEMPLATE: "signal for Brent Crude (BZ=F)" instead of "BOTH Brent and Gasoil"
+
+### Oil Price Watcher
+- Default instruments: `["BZ=F"]`
+- Removed `_detect_spread_change()` method entirely
+- Removed `_prev_crack_spread` state
+
+### Microstructure
+- Removed `crack_spread` field from `MicrostructureData`
+- Removed `_build_lgo_data()` method
+- Removed `HEATING_OIL_SYMBOL = "HO=F"` constant
+- `fetch()` takes only `brent_price` param (removed `gasoil_price`)
+
+### Seasonal
+- Removed `gasoil_bias` field from `SeasonalContext` dataclass
+- Removed `gasoil_bias` from all 12 monthly patterns
+- Format function no longer shows Gasoil bias line
+
+### Frontend (WarRoom.jsx)
+- Removed gasoil state (`gasoilData`, `gasoilFlash`, `gasoilPrice`, `gasoilChange`)
+- Removed gasoil useEffect for price updates
+- Single Brent chart (full width) instead of 2-column grid
+- Removed "ДИСТИЛЯТИ HO" from top bar and ticker
+
+### Tests
+- Removed `TestSpreadChange` class (2 tests)
+- Updated watcher fixture: `instruments=["BZ=F"]`
+- Removed LGO microstructure tests (`test_crack_spread_in_text`, `test_build_lgo_data`, `test_build_lgo_zero_prices`)
+- Updated scheduled events tests (removed Fujairah/EU Gas assertions, reduced expected count to 9)
+- Removed `gasoil_bias` assertions from seasonal tests
+- **464 tests passing**
+
+### Cost Impact
+- ~80% reduction in estimated monthly API costs ($78 → ~$12-15)
+- Single instrument = half the agent API calls per pipeline run
+- 20 min polling = fewer runs per day
+
+---
+
+## Mar 18, 2026 — Diesel-UA Bot Scaffold + --UPD Command
+
+### Diesel-UA Bot
+- Created `/home/oleksandr/Documents/Repositories/diesel-ua-bot/` — new project for Ukrainian wholesale diesel fuel market
+- Copied 43 reusable files from trading-counsil-bot (council framework, risk, notifications, journal, metrics, frontend shell)
+- Wrote TASK.md with full specification: data sources (UPECO, Enkorr, NBU), Ukrainian seasonality, risk categories, implementation phases
+- Wrote CLAUDE.md with project instructions
+- Git initialized with initial commit
+
+### --UPD Command
+- Created `commands.md` defining `--UPD` and `--ABAIC` custom commands
+- --UPD: updates DEVELOPMENT_LOG.md, regenerates FULL_SOURCE.txt, updates MEMORY.md

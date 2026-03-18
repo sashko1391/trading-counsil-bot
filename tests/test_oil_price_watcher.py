@@ -97,11 +97,10 @@ def watcher(mock_provider):
     """Watcher with small lookback so tests don't need many polls."""
     return OilPriceWatcher(
         provider=mock_provider,
-        instruments=["BZ=F", "LGO"],
+        instruments=["BZ=F"],
         window_size=50,
         price_spike_pct=2.0,
         volume_surge_ratio=2.0,
-        spread_change_pct=5.0,
         spike_lookback=3,
         cooldown_seconds=0,  # disable cooldown for tests
     )
@@ -222,63 +221,6 @@ class TestVolumeSurge:
 
         vol_events = [e for e in all_events if e.event_type == "volume_surge"]
         assert len(vol_events) == 0
-
-
-# ======================================================================
-# Spread change tests
-# ======================================================================
-
-class TestSpreadChange:
-    def test_spread_widening_detected(self, mock_provider):
-        """Crack spread changing by >5% should trigger spread_change."""
-        watcher = OilPriceWatcher(
-            provider=mock_provider,
-            instruments=["BZ=F", "LGO"],
-            spike_lookback=100,  # high to avoid price_spike noise
-            cooldown_seconds=0,
-            spread_change_pct=5.0,
-        )
-
-        # Poll 1: Brent=80, Gasoil=70 -> spread=10
-        mock_provider.set_prices("BZ=F", [
-            _make_price("BZ=F", 80.0),
-            _make_price("BZ=F", 80.0),
-            _make_price("BZ=F", 82.0),  # Brent rises -> spread widens
-        ])
-        mock_provider.set_prices("LGO", [
-            _make_price("LGO", 70.0),
-            _make_price("LGO", 70.0),
-            _make_price("LGO", 70.0),
-        ])
-
-        all_events = []
-        for _ in range(3):
-            all_events.extend(watcher.poll_once())
-
-        spread_events = [e for e in all_events if e.event_type == "spread_change"]
-        assert len(spread_events) >= 1
-        assert spread_events[0].data["direction"] in ("WIDENING", "NARROWING")
-
-    def test_no_spread_change_below_threshold(self, mock_provider):
-        """Tiny spread move should not fire."""
-        watcher = OilPriceWatcher(
-            provider=mock_provider,
-            instruments=["BZ=F", "LGO"],
-            spike_lookback=100,
-            cooldown_seconds=0,
-            spread_change_pct=5.0,
-        )
-
-        # Stable spread: Brent=80, Gasoil=70 -> spread stays at 10
-        mock_provider.set_prices("BZ=F", [_make_price("BZ=F", 80.0)] * 3)
-        mock_provider.set_prices("LGO", [_make_price("LGO", 70.0)] * 3)
-
-        all_events = []
-        for _ in range(3):
-            all_events.extend(watcher.poll_once())
-
-        spread_events = [e for e in all_events if e.event_type == "spread_change"]
-        assert len(spread_events) == 0
 
 
 # ======================================================================

@@ -20,7 +20,6 @@ class TestSeasonalContext:
         ctx = get_seasonal_context(date(2026, 1, 15))
         assert ctx.season == "Q1 — пік опалювального сезону"
         assert ctx.brent_bias == "neutral"
-        assert ctx.gasoil_bias == "bullish"
         assert len(ctx.key_factors) >= 2
 
     def test_get_seasonal_context_july(self):
@@ -44,14 +43,12 @@ class TestSeasonalContext:
             season="Q3 — пік driving season",
             month_pattern="Липень: максимальний бензиновий попит.",
             brent_bias="bullish",
-            gasoil_bias="neutral",
             key_factors=["Пік driving season", "Ризик ураганів"],
             historical_avg_move=1.8,
         )
         text = format_seasonal_for_prompt(ctx)
         assert "Сезонний контекст" in text
         assert "БИЧАЧИЙ" in text
-        assert "НЕЙТРАЛЬНИЙ" in text
         assert "+1.8%" in text
         assert "Пік driving season" in text
         assert "Ризик ураганів" in text

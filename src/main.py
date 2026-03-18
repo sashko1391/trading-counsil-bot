@@ -259,8 +259,7 @@ class TradingCouncil:
         # 6. Market microstructure data (futures curve, crack spread)
         try:
             brent_price = prices.get("BZ=F", {}).get("price", 0.0)
-            gasoil_price = prices.get("LGO", {}).get("price", 0.0)
-            ms_data = self.microstructure.fetch(brent_price, gasoil_price)
+            ms_data = self.microstructure.fetch(brent_price)
             ms_text = self.microstructure.format_for_prompt(ms_data)
             context["microstructure"] = ms_text
         except Exception as exc:
@@ -627,6 +626,23 @@ class TradingCouncil:
                 f"< {self.min_confidence:.0%}"
             )
             return
+
+        # Polish raw agent theses/risks into clean Ukrainian text
+        summarizer = self.notifier.summarizer
+        if summarizer and summarizer.available:
+            try:
+                polished_drivers, polished_risks = summarizer.polish_alert(
+                    drivers=forecast.drivers,
+                    risks=forecast.risks,
+                    instrument=forecast.instrument,
+                    direction=forecast.direction,
+                )
+                forecast = forecast.model_copy(update={
+                    "drivers": polished_drivers or forecast.drivers,
+                    "risks": polished_risks or forecast.risks,
+                })
+            except Exception as exc:
+                logger.warning(f"Alert polishing failed, using raw text: {exc}")
 
         if self.dry_run:
             msg = TelegramNotifier.format_oil_alert(forecast, council)

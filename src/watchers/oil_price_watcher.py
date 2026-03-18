@@ -1,10 +1,9 @@
 """
-OilPriceWatcher — monitors Brent Crude and Gasoil prices for anomalies.
+OilPriceWatcher — monitors Brent Crude prices for anomalies.
 
 Detectors:
   - price_spike   : single instrument moves >2 % since N polls ago
   - volume_surge  : current volume >2x rolling average
-  - spread_change : Brent-Gasoil crack spread shifts >5 %
 
 Uses DataProviderProtocol (default: YFinanceProvider) so the data source
 can be swapped without changing detection logic.
@@ -31,7 +30,7 @@ class OilPriceWatcher(BaseWatcher):
 
     Args:
         provider: Any object satisfying DataProviderProtocol.
-        instruments: List of symbols to monitor (default: ["BZ=F", "LGO"]).
+        instruments: List of symbols to monitor (default: ["BZ=F"]).
         window_size: Rolling history window size per instrument.
         price_spike_pct: Minimum % move to trigger price_spike (default 2.0).
         volume_surge_ratio: Volume / avg_volume threshold (default 2.0).
@@ -52,7 +51,7 @@ class OilPriceWatcher(BaseWatcher):
         cooldown_seconds: int = 300,
     ) -> None:
         self.provider: DataProviderProtocol = provider or YFinanceProvider()
-        self.instruments = instruments or ["BZ=F", "LGO"]
+        self.instruments = instruments or ["BZ=F"]
         self.window_size = window_size
         self.price_spike_pct = price_spike_pct
         self.volume_surge_ratio = volume_surge_ratio
@@ -67,9 +66,6 @@ class OilPriceWatcher(BaseWatcher):
 
         # Cooldown tracker: "BZ=F:price_spike" -> last_event_time
         self._last_event: Dict[str, datetime] = {}
-
-        # Track previous crack spread for spread_change detection
-        self._prev_crack_spread: Optional[float] = None
 
         # Stats
         self.total_polls = 0
@@ -99,13 +95,6 @@ class OilPriceWatcher(BaseWatcher):
             except Exception as exc:
                 self.errors += 1
                 logger.error(f"OilPriceWatcher error for {symbol}: {exc}")
-
-        # Crack spread detection (needs both Brent and Gasoil)
-        if "BZ=F" in self.instruments and "LGO" in self.instruments:
-            try:
-                events.extend(self._detect_spread_change())
-            except Exception as exc:
-                logger.error(f"Spread change detection error: {exc}")
 
         self.total_polls += 1
         self.total_events += len(events)
@@ -215,68 +204,6 @@ class OilPriceWatcher(BaseWatcher):
                     "current_volume": current.volume,
                     "average_volume": round(avg_vol, 2),
                     "current_price": current.price,
-                },
-            )
-        ]
-
-    def _detect_spread_change(self) -> List[MarketEvent]:
-        """
-        Crack spread = Brent price - Gasoil price (simplified).
-        Fires when spread changes by more than spread_change_pct relative
-        to the previous poll.
-        """
-        brent_snap = self.get_latest_snapshot("BZ=F")
-        gasoil_snap = self.get_latest_snapshot("LGO")
-
-        if brent_snap is None or gasoil_snap is None:
-            return []
-
-        if brent_snap.price == 0 or gasoil_snap.price == 0:
-            return []
-
-        current_spread = brent_snap.price - gasoil_snap.price
-
-        if self._prev_crack_spread is None:
-            self._prev_crack_spread = current_spread
-            return []
-
-        if self._prev_crack_spread == 0:
-            self._prev_crack_spread = current_spread
-            return []
-
-        prev_spread = self._prev_crack_spread
-        spread_change = (
-            (current_spread - prev_spread) / abs(prev_spread) * 100
-        )
-
-        # Update for next poll
-        self._prev_crack_spread = current_spread
-
-        if abs(spread_change) < self.spread_change_pct:
-            return []
-
-        if self._is_on_cooldown("CRACK_SPREAD", "spread_change"):
-            return []
-
-        self._set_cooldown("CRACK_SPREAD", "spread_change")
-
-        severity = min(abs(spread_change) / 15.0, 1.0)
-        severity = max(severity, 0.3)
-        direction = "WIDENING" if spread_change > 0 else "NARROWING"
-
-        return [
-            MarketEvent(
-                event_type="spread_change",
-                instrument="BZ=F",
-                severity=round(severity, 2),
-                headline=f"Crack spread {direction} {abs(spread_change):.1f}%",
-                data={
-                    "spread_change_pct": round(spread_change, 2),
-                    "direction": direction,
-                    "current_spread": round(current_spread, 2),
-                    "previous_spread": round(prev_spread, 2),
-                    "brent_price": brent_snap.price,
-                    "gasoil_price": gasoil_snap.price,
                 },
             )
         ]

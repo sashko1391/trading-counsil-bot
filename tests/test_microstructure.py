@@ -41,29 +41,7 @@ class TestMicrostructureData:
         text = data.to_prompt_text()
         assert "підвищений" in text
 
-    def test_crack_spread_in_text(self):
-        data = MicrostructureData(
-            instrument="LGO",
-            front_month_price=700.0,
-            crack_spread=15.5,
-        )
-        text = data.to_prompt_text()
-        assert "15.50" in text
-        assert "Крек-спред" in text
-
-
 class TestMicrostructureProvider:
-    def test_build_lgo_data(self):
-        provider = MicrostructureProvider()
-        data = provider._build_lgo_data(gasoil_price=700.0, brent_price=80.0)
-        assert data.instrument == "LGO"
-        assert data.crack_spread != 0  # should compute spread
-
-    def test_build_lgo_zero_prices(self):
-        provider = MicrostructureProvider()
-        data = provider._build_lgo_data(gasoil_price=0.0, brent_price=0.0)
-        assert data.crack_spread == 0
-
     def test_format_for_prompt_empty(self):
         provider = MicrostructureProvider()
         text = provider.format_for_prompt({})

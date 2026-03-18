@@ -96,22 +96,6 @@ class TestNewEvents:
         names = [e["name"] for e in events]
         assert "Chinese Manufacturing PMI" in names
 
-    def test_fujairah_weekly_monday(self):
-        """Fujairah storage on Monday should appear when looking from Sunday."""
-        now = make_now(2024, 1, 7, 12, 0)  # Sunday
-        mgr = ScheduledEventsManager(now_func=lambda: now)
-        events = mgr.get_upcoming_events(hours_ahead=48)
-        names = [e["name"] for e in events]
-        assert "Fujairah Petroleum Storage" in names
-
-    def test_eu_gie_weekly_thursday(self):
-        """EU GIE on Thursday should appear when looking from Monday."""
-        now = make_now(2024, 1, 8, 9, 0)  # Monday
-        mgr = ScheduledEventsManager(now_func=lambda: now)
-        events = mgr.get_upcoming_events(hours_ahead=120)
-        names = [e["name"] for e in events]
-        assert "EU Gas Storage Report (GIE)" in names
-
     def test_russian_oil_production_monthly_20th(self):
         """Russian Oil Production on 20th should appear mid-month."""
         now = make_now(2024, 1, 15, 12, 0)
@@ -146,8 +130,6 @@ class TestNewEvents:
             "OPEC Monthly Oil Market Report",
             "IEA Oil Market Report",
             "Chinese Manufacturing PMI",
-            "Fujairah Petroleum Storage",
-            "EU Gas Storage Report (GIE)",
             "Russian Oil Production Update",
             "Indian Oil Import Data (PPAC)",
         }

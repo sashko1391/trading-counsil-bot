@@ -45,7 +45,7 @@ class Settings:
     OPENAI_SUMMARY_MODEL: str = "gpt-4o"                # user-facing summary
 
     # ── Instruments ───────────────────────────────────────────────────────────
-    WATCH_INSTRUMENTS: List[str] = ["BZ=F", "LGO"]
+    WATCH_INSTRUMENTS: List[str] = ["BZ=F"]
     DATA_PROVIDER: str = "yfinance"   # yfinance | oilpriceapi | databento
 
     # ── Thresholds ────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ class Settings:
     MAX_DAILY_ALERTS: int = 30
     MAX_PIPELINE_RUNS_PER_HOUR: int = 5
     DIGEST_INTERVAL_HOURS: int = 3          # send consolidated Telegram digest every N hours
-    POLL_INTERVAL_SECONDS: int = 900        # how often to poll for events (15 min, silent between digests)
+    POLL_INTERVAL_SECONDS: int = 1200       # how often to poll for events (20 min)
 
     # ── Adversarial stage ─────────────────────────────────────────────────────
     ADVERSARIAL_ENABLED: bool = True
@@ -139,8 +139,8 @@ class Settings:
         # ─── ORIGINAL 6 ──────────────────────────────────────────────────────
         {"name": "EIA Weekly Petroleum Status",    "schedule": "weekly",  "day": 3,
          "utc_hour": 15, "utc_min": 30, "pre_alert_min": 30, "impact": "high",
-         "instruments": ["BZ=F", "LGO"],
-         "note": "Crude inventories, Cushing hub, refinery runs, gasoil stocks"},
+         "instruments": ["BZ=F"],
+         "note": "Crude inventories, Cushing hub, refinery runs"},
 
         {"name": "API Private Inventory Report",   "schedule": "weekly",  "day": 2,
          "utc_hour": 20, "utc_min": 30, "pre_alert_min": 30, "impact": "high",
@@ -154,17 +154,17 @@ class Settings:
 
         {"name": "US Non-Farm Payrolls",           "schedule": "monthly_first_friday",
          "utc_hour": 12, "utc_min": 30, "pre_alert_min": 60, "impact": "high",
-         "instruments": ["BZ=F", "LGO"],
+         "instruments": ["BZ=F"],
          "note": "US economy proxy → fuel demand. Broad market mover"},
 
         {"name": "OPEC Monthly Oil Market Report", "schedule": "monthly", "day_of_month": 15,
          "utc_hour": 10, "utc_min": 0,  "pre_alert_min": 60, "impact": "high",
-         "instruments": ["BZ=F", "LGO"],
+         "instruments": ["BZ=F"],
          "note": "Quota vs actual production, demand forecast, supply balance"},
 
         {"name": "IEA Oil Market Report",          "schedule": "monthly", "day_of_month": 14,
          "utc_hour": 9,  "utc_min": 0,  "pre_alert_min": 60, "impact": "high",
-         "instruments": ["BZ=F", "LGO"],
+         "instruments": ["BZ=F"],
          "note": "Independent demand/supply balance. Often diverges from OPEC"},
 
         # ─── NEW Phase 3A ─────────────────────────────────────────────────────
@@ -173,17 +173,7 @@ class Settings:
          "instruments": ["BZ=F"],
          "note": "China = largest crude importer. PMI below 50 = bearish demand"},
 
-        {"name": "Fujairah Petroleum Storage",     "schedule": "weekly",  "day": 1,
-         "utc_hour": 8,  "utc_min": 0,  "pre_alert_min": 30, "impact": "medium",
-         "instruments": ["LGO"],
-         "note": "Key Middle East gasoil stocks. Direct LGO proxy for ARA equivalent"},
-
-        {"name": "EU Gas Storage Report (GIE)",    "schedule": "weekly",  "day": 4,
-         "utc_hour": 9,  "utc_min": 0,  "pre_alert_min": 30, "impact": "medium",
-         "instruments": ["LGO"],
-         "note": "European gas storage → heating oil demand correlation"},
-
-        {"name": "Russian Oil Production Update",  "schedule": "monthly", "day_of_month": 20,
+{"name": "Russian Oil Production Update",  "schedule": "monthly", "day_of_month": 20,
          "utc_hour": 8,  "utc_min": 0,  "pre_alert_min": 30, "impact": "medium",
          "instruments": ["BZ=F"],
          "note": "Rosstat data. Under-tracked. Shows real sanctions impact"},
