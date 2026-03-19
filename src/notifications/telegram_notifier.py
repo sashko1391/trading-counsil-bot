@@ -74,9 +74,6 @@ class TelegramNotifier:
         agent_signals = [council.grok, council.perplexity, council.claude, council.gemini]
         consensus_count = sum(1 for s in agent_signals if s.action == consensus_action)
 
-        drivers_str = "; ".join(forecast.drivers[:4]) if forecast.drivers else "N/A"
-        risks_str = "; ".join(forecast.risks[:3]) if forecast.risks else "N/A"
-
         direction_ua = {
             "BULLISH": "ЗРОСТАННЯ",
             "BEARISH": "ПАДІННЯ",
@@ -89,11 +86,20 @@ class TelegramNotifier:
             f"\U0001f4aa Впевненість: {forecast.confidence * 100:.0f}%",
             f"\u23f0 Горизонт: {forecast.timeframe_hours} год",
             f"\U0001f3af Ціль: ${forecast.target_price:.2f} ({move_pct:+.1f}%)",
-            f"\U0001f4ca Драйвери: {drivers_str}",
-            f"\u26a0\ufe0f Ризики: {risks_str}",
             f"\U0001f916 Рада: {consensus_count}/4 {council.consensus} ({council.consensus_strength})",
-            f"\U0001f4dd Це НЕ фінансова порада.",
         ]
+
+        if forecast.drivers:
+            lines.append(f"\n\U0001f4ca Драйвери:")
+            for i, d in enumerate(forecast.drivers[:4], 1):
+                lines.append(f"   {i}. {d}")
+
+        if forecast.risks:
+            lines.append(f"\n\u26a0\ufe0f Ризики:")
+            for i, r in enumerate(forecast.risks[:3], 1):
+                lines.append(f"   {i}. {r}")
+
+        lines.append(f"\n\U0001f4dd Це НЕ фінансова порада.")
         return "\n".join(lines)
 
     def format_signal(

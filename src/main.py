@@ -242,8 +242,8 @@ class TradingCouncil:
             try:
                 history = getattr(self.price_watcher, "_history", {}).get(symbol, [])
                 if len(history) >= 10:
-                    prices = [snap.price for snap in history]
-                    analysis = self.regime_detector.detect(prices)
+                    price_series = [snap.price for snap in history]
+                    analysis = self.regime_detector.detect(price_series)
                     regimes[symbol] = self.regime_detector.format_for_prompt(analysis)
                     logger.info(
                         f"Regime {symbol}: {analysis.regime} "
