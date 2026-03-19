@@ -79,7 +79,7 @@ function TrendChart({ data, theme }) {
 }
 
 // ─── DAILY SUMMARY ROW ──────────────────────────────────────────────────────
-function DailyRow({ d, theme, expanded, onToggle }) {
+function DailyRow({ d, theme, expanded, onToggle, isMobile }) {
   const trend = TREND_UA[d.dominant_trend] || d.dominant_trend;
   const tColor = TREND_COLOR[d.dominant_trend] || theme.dim;
   const conf = Math.round((d.avg_confidence || 0) * 100);
@@ -87,22 +87,23 @@ function DailyRow({ d, theme, expanded, onToggle }) {
   return (
     <div style={{ borderBottom: `1px solid ${theme.darker}` }}>
       <div onClick={onToggle} style={{
-        display: "grid", gridTemplateColumns: "70px 60px 40px 70px 50px 1fr", gap: 8,
-        padding: "8px 0", alignItems: "center", cursor: "pointer",
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        padding: "8px 0", cursor: "pointer", gap: 8,
       }}>
-        <span style={{ fontSize: 10, color: theme.dim, fontFamily: "monospace" }}>{d.date}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: tColor, fontFamily: "monospace" }}>{trend}</span>
-        <span style={{ fontSize: 10, color: conf > 50 ? theme.accent : theme.dark, fontFamily: "monospace" }}>{conf}%</span>
-        <span style={{ fontSize: 9, color: theme.dark, fontFamily: "monospace" }}>
-          {d.total_events || 0} подій
-        </span>
-        <span style={{ fontSize: 9, color: theme.dark, fontFamily: "monospace" }}>
-          {d.digest_count || 0} дайдж
-        </span>
-        <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+          <span style={{ fontSize: 10, color: theme.dim, fontFamily: "monospace", flexShrink: 0 }}>{(d.date || "").slice(5)}</span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: tColor, fontFamily: "monospace", flexShrink: 0 }}>{trend}</span>
+          <span style={{ fontSize: 10, color: conf > 50 ? theme.accent : theme.dark, fontFamily: "monospace", flexShrink: 0 }}>{conf}%</span>
+          {!isMobile && (
+            <span style={{ fontSize: 9, color: theme.dark, fontFamily: "monospace" }}>
+              {d.total_events || 0} подій
+            </span>
+          )}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           {d.closing_price > 0 && (
             <span style={{ fontSize: 10, color: theme.dim, fontFamily: "monospace" }}>
-              ${d.closing_price?.toFixed(2)}
+              ${d.closing_price?.toFixed(isMobile ? 0 : 2)}
               {d.price_change_pct !== 0 && (
                 <span style={{ color: d.price_change_pct > 0 ? "#00ff41" : "#ff4444", marginLeft: 4 }}>
                   {d.price_change_pct > 0 ? "+" : ""}{d.price_change_pct?.toFixed(1)}%
@@ -161,19 +162,19 @@ function DigestRow({ d, theme }) {
   const tColor = TREND_COLOR[d.trend] || theme.dim;
   const conf = Math.round((d.avg_confidence || 0) * 100);
   const time = (d.timestamp || "").slice(11, 16) || "—";
-  const date = (d.timestamp || "").slice(0, 10);
+  const date = (d.timestamp || "").slice(5, 10);
 
   return (
-    <div style={{
-      display: "grid", gridTemplateColumns: "42px 38px 50px 35px 1fr", gap: 8,
-      padding: "6px 0", borderBottom: `1px solid ${theme.darker}`, alignItems: "center",
-    }}>
-      <span style={{ fontSize: 9, color: theme.dark, fontFamily: "monospace" }}>{date.slice(5)}</span>
-      <span style={{ fontSize: 9, color: theme.dark, fontFamily: "monospace" }}>{time}</span>
-      <span style={{ fontSize: 9, fontWeight: 700, color: tColor, fontFamily: "monospace" }}>{trend}</span>
-      <span style={{ fontSize: 9, color: conf > 50 ? theme.accent : theme.dark, fontFamily: "monospace" }}>{conf}%</span>
-      <div style={{ fontSize: 8, color: theme.dark, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {d.key_theses?.[0]?.slice(0, 80) || `${d.event_count || 0} подій`}
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
+      padding: "6px 0", borderBottom: `1px solid ${theme.darker}`, gap: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+        <span style={{ fontSize: 9, color: theme.dark, fontFamily: "monospace", flexShrink: 0 }}>{date}</span>
+        <span style={{ fontSize: 9, color: theme.dark, fontFamily: "monospace", flexShrink: 0 }}>{time}</span>
+        <span style={{ fontSize: 9, fontWeight: 700, color: tColor, fontFamily: "monospace", flexShrink: 0 }}>{trend}</span>
+        <span style={{ fontSize: 9, color: conf > 50 ? theme.accent : theme.dark, fontFamily: "monospace", flexShrink: 0 }}>{conf}%</span>
+      </div>
+      <div style={{ fontSize: 8, color: theme.dark, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
+        {d.key_theses?.[0]?.slice(0, 60) || `${d.event_count || 0} подій`}
       </div>
     </div>
   );
@@ -209,7 +210,7 @@ function AgentMemoryRow({ entry, theme }) {
 }
 
 // ─── MAIN HISTORY PANEL ─────────────────────────────────────────────────────
-export default function HistoryPanel({ theme, daily, digests, agentHistory, loading, onRefresh }) {
+export default function HistoryPanel({ theme, daily, digests, agentHistory, loading, onRefresh, isMobile = false }) {
   const T = theme;
   const [subTab, setSubTab] = useState("daily");
   const [expandedDay, setExpandedDay] = useState(null);
@@ -284,22 +285,13 @@ export default function HistoryPanel({ theme, daily, digests, agentHistory, load
               <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.18em" }}>ЩОДЕННІ ЗВЕДЕННЯ</span>
               <span style={{ fontSize: 9, color: T.dark, marginLeft: "auto" }}>{daily.length} записів</span>
             </div>
-            {/* Header */}
-            <div style={{
-              display: "grid", gridTemplateColumns: "70px 60px 40px 70px 50px 1fr", gap: 8,
-              marginBottom: 4,
-            }}>
-              {["ДАТА", "ТРЕНД", "ВПЕВН", "ПОДІЇ", "ДАЙДЖ", "ЦІНА"].map(h => (
-                <span key={h} style={{ fontSize: 7, color: T.darker, letterSpacing: "0.1em" }}>{h}</span>
-              ))}
-            </div>
             {daily.length === 0 && (
               <div style={{ textAlign: "center", padding: 20, fontSize: 10, color: T.dark }}>
                 Ще немає щоденних зведень. Дані з'являться після першого повного дня роботи.
               </div>
             )}
             {reversedDaily.map((d, i) => (
-              <DailyRow key={d.date || i} d={d} theme={T}
+              <DailyRow key={d.date || i} d={d} theme={T} isMobile={isMobile}
                 expanded={expandedDay === (d.date || i)}
                 onToggle={() => setExpandedDay(expandedDay === (d.date || i) ? null : (d.date || i))} />
             ))}
@@ -322,16 +314,6 @@ export default function HistoryPanel({ theme, daily, digests, agentHistory, load
               <TrendChart data={digests} theme={T} />
             </div>
           )}
-
-          {/* Header */}
-          <div style={{
-            display: "grid", gridTemplateColumns: "42px 38px 50px 35px 1fr", gap: 8,
-            marginBottom: 4,
-          }}>
-            {["ДАТА", "ЧАС", "ТРЕНД", "ВПЕВН", "ТЕЗА"].map(h => (
-              <span key={h} style={{ fontSize: 7, color: T.darker, letterSpacing: "0.1em" }}>{h}</span>
-            ))}
-          </div>
 
           {digests.length === 0 && (
             <div style={{ textAlign: "center", padding: 20, fontSize: 10, color: T.dark }}>

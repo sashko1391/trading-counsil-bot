@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useBotData, useHistoryData } from "./useApi.js";
 import HistoryPanel from "./HistoryPanel.jsx";
 
@@ -16,29 +16,40 @@ const AGENT_META = {
   claude:     { role: "Ризик-менеджер",    icon: "◆" },
 };
 
-const MATRIX_CHARS = "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ0123456789АБВГДЕЄЖЗИ";
-
 function generatePriceData(start, vol, n = 60) {
   const d = []; let p = start;
   for (let i = n - 1; i >= 0; i--) { p += (Math.random() - 0.47) * vol; d.push({ t: i, p: +p.toFixed(2) }); }
   return d;
 }
 
+// ─── useIsMobile ─────────────────────────────────────────────────────────────
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+  useEffect(() => {
+    const h = () => setIsMobile(window.innerWidth < breakpoint);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, [breakpoint]);
+  return isMobile;
+}
+
 // ─── MATRIX RAIN ────────────────────────────────────────────────────────────
-function MatrixRain({ opacity = 0.18 }) {
+const MATRIX_CHARS = "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ0123456789";
+
+function MatrixRain({ opacity = 0.18, disabled = false }) {
   const ref = useRef(null);
   useEffect(() => {
+    if (disabled) return;
     const c = ref.current; if (!c) return;
     const ctx = c.getContext("2d");
     const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
     resize(); window.addEventListener("resize", resize);
     const fs = 13, cols = Math.floor(c.width / fs);
     const drops = Array(cols).fill(1);
-    let rafId = 0;
-    let lastTime = 0;
+    let rafId = 0, lastTime = 0;
     const draw = (ts) => {
       rafId = requestAnimationFrame(draw);
-      if (ts - lastTime < 40) return; // throttle to ~25fps
+      if (ts - lastTime < 40) return;
       lastTime = ts;
       ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0, 0, c.width, c.height);
       for (let i = 0; i < drops.length; i++) {
@@ -51,7 +62,8 @@ function MatrixRain({ opacity = 0.18 }) {
     };
     rafId = requestAnimationFrame(draw);
     return () => { cancelAnimationFrame(rafId); window.removeEventListener("resize", resize); };
-  }, []);
+  }, [disabled]);
+  if (disabled) return null;
   return <canvas ref={ref} style={{ position: "fixed", top: 0, left: 0, zIndex: 0, opacity, pointerEvents: "none", transition: "opacity 0.5s" }} />;
 }
 
@@ -74,18 +86,20 @@ function MiniChart({ data, accent }) {
   const lineColor = isUp ? "#00ff41" : "#ff4444";
   const gradId = `g${accent.replace(/[^a-z0-9]/gi, "")}`;
 
-  const handleMove = (e) => {
+  const handleInteract = (e) => {
     if (!svgRef.current) return;
     const rect = svgRef.current.getBoundingClientRect();
-    const relX = (e.clientX - rect.left) / rect.width;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const relX = (clientX - rect.left) / rect.width;
     const idx = Math.round(relX * (data.length - 1));
     const clamped = Math.max(0, Math.min(data.length - 1, idx));
     setTooltip({ idx: clamped, x: pts[clamped][0], y: pts[clamped][1], p: data[clamped].p });
   };
 
   return (
-    <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block", cursor: "crosshair" }}
-      onMouseMove={handleMove} onMouseLeave={() => setTooltip(null)}>
+    <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block", cursor: "crosshair", touchAction: "none" }}
+      onMouseMove={handleInteract} onTouchMove={handleInteract}
+      onMouseLeave={() => setTooltip(null)} onTouchEnd={() => setTooltip(null)}>
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={lineColor} stopOpacity="0.2" />
@@ -111,104 +125,63 @@ function MiniChart({ data, accent }) {
 }
 
 // ─── CONFIDENCE GAUGE ───────────────────────────────────────────────────────
-function ConfidenceGauge({ value, color }) {
-  const R = 28, C = 2 * Math.PI * R;
+function ConfidenceGauge({ value, color, size = 70 }) {
+  const R = size * 0.4, C = 2 * Math.PI * R;
   const filled = (value / 100) * C;
   return (
-    <svg width={70} height={70} viewBox="0 0 70 70">
-      <circle cx={35} cy={35} r={R} fill="none" stroke={`${color}22`} strokeWidth="4" />
-      <circle cx={35} cy={35} r={R} fill="none" stroke={color} strokeWidth="4"
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <circle cx={size/2} cy={size/2} r={R} fill="none" stroke={`${color}22`} strokeWidth="4" />
+      <circle cx={size/2} cy={size/2} r={R} fill="none" stroke={color} strokeWidth="4"
         strokeDasharray={`${filled} ${C}`} strokeLinecap="round"
-        transform="rotate(-90 35 35)"
+        transform={`rotate(-90 ${size/2} ${size/2})`}
         style={{ filter: `drop-shadow(0 0 4px ${color})`, transition: "stroke-dasharray 0.6s ease" }} />
-      <text x={35} y={38} textAnchor="middle" fill={color} fontSize="13" fontFamily="monospace" fontWeight="700">{value}%</text>
+      <text x={size/2} y={size/2+4} textAnchor="middle" fill={color} fontSize={size*0.19} fontFamily="monospace" fontWeight="700">{value}%</text>
     </svg>
   );
 }
 
-// ─── COMMAND PALETTE ────────────────────────────────────────────────────────
-function CommandPalette({ open, onClose, theme, setTheme, focusMode, setFocusMode, rainOpacity, setRainOpacity }) {
-  const [query, setQuery] = useState("");
-  const T = THEMES[theme];
-  const commands = [
-    { key: "matrix",  label: "Тема: МАТРИЦЯ",      action: () => setTheme("matrix") },
-    { key: "amber",   label: "Тема: БУРШТИН",       action: () => setTheme("amber") },
-    { key: "cyber",   label: "Тема: КІБЕРСИНІЙ",    action: () => setTheme("cyber") },
-    { key: "focus",   label: focusMode ? "Режим фокусу: ВИМКНУТИ" : "Режим фокусу: УВІМКНУТИ", action: () => setFocusMode(f => !f) },
-    { key: "rain+",   label: "Матричний дощ: ЯСКРАВІШЕ", action: () => setRainOpacity(r => Math.min(0.5, r + 0.08)) },
-    { key: "rain-",   label: "Матричний дощ: ТИХІШЕ", action: () => setRainOpacity(r => Math.max(0, r - 0.08)) },
-    { key: "rain0",   label: "Матричний дощ: ВИМКНУТИ", action: () => setRainOpacity(0) },
-  ];
-  const filtered = commands.filter(c => c.label.toLowerCase().includes(query.toLowerCase()));
-
-  if (!open) return null;
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 120, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-      onClick={onClose}>
-      <div style={{ background: T.panel, border: `1px solid ${T.accent}`, width: 420, maxHeight: 360, overflow: "hidden", boxShadow: `0 0 40px ${T.accent}33` }}
-        onClick={e => e.stopPropagation()}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderBottom: `1px solid ${T.dark}` }}>
-          <span style={{ color: T.dim, fontSize: 11, fontFamily: "monospace" }}>⌘</span>
-          <input value={query} onChange={e => setQuery(e.target.value)} autoFocus
-            placeholder="введи команду..."
-            style={{ flex: 1, background: "none", border: "none", color: T.accent, fontSize: 12, fontFamily: "monospace", outline: "none" }} />
-          <span style={{ color: T.dark, fontSize: 10, fontFamily: "monospace" }}>ESC</span>
-        </div>
-        {filtered.map((c) => (
-          <div key={c.key} onClick={() => { c.action(); onClose(); }}
-            style={{ padding: "10px 14px", cursor: "pointer", fontSize: 11, fontFamily: "monospace", color: T.dim, borderBottom: `1px solid ${T.darker}`,
-              transition: "background 0.1s" }}
-            onMouseEnter={e => e.currentTarget.style.background = `${T.accent}11`}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-            <span style={{ color: T.dark, marginRight: 8 }}>&gt;</span>{c.label}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── AGENT CARD (wired to real data) ──────────────────────────────────────────
-function AgentCard({ name, agentData, theme, visible, focusMode }) {
+// ─── AGENT CARD ─────────────────────────────────────────────────────────────
+function AgentCard({ name, agentData, theme, visible, isMobile }) {
   const T = THEMES[theme];
   const [expanded, setExpanded] = useState(false);
   const meta = AGENT_META[name] || { role: name, icon: "?" };
-
   const statusLabel = agentData?.status || "ОЧІКУВАННЯ";
   const detail = agentData?.thesis || "Очікує на дані...";
   const confidence = agentData?.confidence ?? 0;
   const riskNotes = agentData?.risk_notes || "";
-
   const statusColors = { "BULLISH": T.accent, "BEARISH": "#ff4444", "NEUTRAL": "#ffaa00" };
   const statusUa = { "BULLISH": "БИЧАЧИЙ", "BEARISH": "ВЕДМЕЖИЙ", "NEUTRAL": "НЕЙТРАЛЬНО" };
   const sc = statusColors[statusLabel] || T.dim;
 
   return (
     <div onClick={() => setExpanded(e => !e)}
-      style={{ background: T.panel, border: `1px solid ${expanded ? T.accent : T.dark}`, padding: "12px 14px", cursor: "pointer",
-        opacity: visible ? (focusMode ? 0.4 : 1) : 0, transform: visible ? "translateX(0)" : "translateX(10px)", transition: "all 0.35s ease",
+      style={{ background: T.panel, border: `1px solid ${expanded ? T.accent : T.dark}`,
+        padding: isMobile ? "10px 12px" : "12px 14px", cursor: "pointer",
+        opacity: visible ? 1 : 0, transform: visible ? "translateX(0)" : "translateX(10px)", transition: "all 0.35s ease",
         boxShadow: expanded ? `0 0 12px ${T.accent}22` : "none" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 14, color: T.accent, textShadow: `0 0 8px ${T.accent}` }}>{meta.icon}</span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: T.accent, fontFamily: "monospace", textShadow: `0 0 6px ${T.accent}88` }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: T.accent, fontFamily: "monospace" }}>
             {name.charAt(0).toUpperCase() + name.slice(1)}
           </div>
-          <div style={{ fontSize: 9, color: T.dark, fontFamily: "monospace", letterSpacing: "0.06em" }}>{meta.role}</div>
+          <div style={{ fontSize: 9, color: T.dark, fontFamily: "monospace" }}>{meta.role}</div>
         </div>
-        <div style={{ fontSize: 9, fontWeight: 700, color: sc, fontFamily: "monospace", letterSpacing: "0.1em", textShadow: `0 0 6px ${sc}88` }}>
+        <div style={{ fontSize: 9, fontWeight: 700, color: sc, fontFamily: "monospace", letterSpacing: "0.08em", textShadow: `0 0 6px ${sc}88` }}>
           {statusUa[statusLabel] || statusLabel}
         </div>
         <span style={{ fontSize: 9, color: T.dim, fontFamily: "monospace" }}>{Math.round(confidence * 100)}%</span>
-        <span style={{ color: T.dark, fontSize: 10, marginLeft: 4 }}>{expanded ? "▲" : "▼"}</span>
+        <span style={{ color: T.dark, fontSize: 10 }}>{expanded ? "▲" : "▼"}</span>
       </div>
-      <div style={{ fontSize: 10, color: T.dim, fontFamily: "monospace", marginTop: 6, borderLeft: `1px solid ${T.dark}`, paddingLeft: 8,
-        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 260 }}>
-        {detail.slice(0, 100)}
-      </div>
-      <div style={{ maxHeight: expanded ? 200 : 0, overflow: "hidden", transition: "max-height 0.3s ease" }}>
+      {!expanded && (
+        <div style={{ fontSize: 10, color: T.dim, fontFamily: "monospace", marginTop: 5,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {detail.slice(0, isMobile ? 60 : 100)}
+        </div>
+      )}
+      <div style={{ maxHeight: expanded ? 300 : 0, overflow: "hidden", transition: "max-height 0.3s ease" }}>
         <div style={{ fontSize: 10, color: T.dim, fontFamily: "monospace", marginTop: 10, padding: "8px 10px",
-          background: T.darker, borderLeft: `2px solid ${T.accent}`, lineHeight: 1.7 }}>
+          background: T.darker, borderLeft: `2px solid ${T.accent}`, lineHeight: 1.7, wordBreak: "break-word" }}>
           <div>{detail}</div>
           {riskNotes && <div style={{ marginTop: 6, color: "#ffaa00" }}>⚠ {riskNotes}</div>}
         </div>
@@ -217,23 +190,44 @@ function AgentCard({ name, agentData, theme, visible, focusMode }) {
   );
 }
 
-// ─── SIGNAL ROW ──────────────────────────────────────────────────────────────
-function SignalRow({ s, idx, theme, isNew }) {
+// ─── SIGNAL ROW (mobile-aware) ──────────────────────────────────────────────
+function SignalRow({ s, idx, theme, isNew, isMobile }) {
   const T = THEMES[theme];
   const [flash, setFlash] = useState(isNew);
   useEffect(() => { if (isNew) { setFlash(true); setTimeout(() => setFlash(false), 700); } }, [isNew]);
 
   const actionUa = { "LONG": "КУПІВЛЯ", "SHORT": "ПРОДАЖ", "WAIT": "ОЧІКУВАННЯ", "CONFLICT": "КОНФЛІКТ" };
-  const strengthUa = { "UNANIMOUS": "ОДНОСТАЙНО", "STRONG": "СИЛЬНО", "WEAK": "СЛАБКО", "NONE": "—" };
   const actionColor = { "LONG": T.accent, "SHORT": "#ff4444", "WAIT": T.dark, "CONFLICT": "#ffaa00" };
-
   const conf = Math.round((s.confidence || 0) * 100);
+
+  if (isMobile) {
+    return (
+      <div style={{ padding: "8px 0", borderBottom: `1px solid ${T.darker}`,
+        opacity: Math.max(0.3, 1 - idx * 0.12),
+        background: flash ? `${T.accent}18` : "transparent", transition: "background 0.5s ease" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 10, color: T.dark, fontFamily: "monospace" }}>{s.time || "—"}</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: actionColor[s.action || s.consensus] || T.accent, fontFamily: "monospace" }}>
+              {s.allowed === false ? "⛔ " : ""}{actionUa[s.action || s.consensus] || s.consensus}
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 10, color: T.dim, fontFamily: "monospace" }}>
+              {s.price ? `$${Number(s.price).toFixed(0)}` : ""}
+            </span>
+            <span style={{ fontSize: 10, fontFamily: "monospace",
+              color: conf > 70 ? T.accent : conf > 40 ? "#ffaa00" : T.dark }}>
+              {conf > 0 ? `${conf}%` : ""}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const strengthUa = { "UNANIMOUS": "ОДНОСТАЙНО", "STRONG": "СИЛЬНО", "WEAK": "СЛАБКО", "NONE": "—" };
   const consensusLabel = strengthUa[s.consensus_strength] || s.consensus_strength || "—";
-  const consensusStyle = s.consensus_strength === "UNANIMOUS"
-    ? { bg: T.accent, color: "#000", weight: 900 }
-    : s.consensus_strength === "NONE" || s.consensus === "CONFLICT"
-      ? { bg: "transparent", color: "#ffaa00", weight: 700, border: "1px dashed #ffaa00" }
-      : { bg: "transparent", color: T.dim };
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "48px 1fr 100px 72px 50px", gap: 10,
@@ -245,16 +239,14 @@ function SignalRow({ s, idx, theme, isNew }) {
         <span style={{ fontSize: 10, fontWeight: 700, color: actionColor[s.action || s.consensus] || T.accent, fontFamily: "monospace" }}>
           {s.allowed === false ? "⛔ " : ""}{actionUa[s.action || s.consensus] || s.consensus}
         </span>
-        <div style={{ fontSize: 9, color: T.dark, fontFamily: "monospace", marginTop: 2, lineHeight: 1.4,
+        <div style={{ fontSize: 9, color: T.dark, fontFamily: "monospace", marginTop: 2,
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 300 }}>
           {s.reason || "—"}
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <span style={{ fontSize: 8, fontFamily: "monospace", padding: "2px 6px", background: consensusStyle.bg,
-          color: consensusStyle.color, fontWeight: consensusStyle.weight, border: consensusStyle.border }}>
-          {consensusLabel}
-        </span>
+        <span style={{ fontSize: 8, fontFamily: "monospace", padding: "2px 6px",
+          color: T.dim }}>{consensusLabel}</span>
       </div>
       <span style={{ fontSize: 10, color: T.dim, fontFamily: "monospace", textAlign: "right" }}>
         {s.price ? `$${Number(s.price).toFixed(2)}` : "—"}
@@ -267,34 +259,35 @@ function SignalRow({ s, idx, theme, isNew }) {
   );
 }
 
+// ─── INSTRUMENT TABS ────────────────────────────────────────────────────────
+const INSTRUMENTS = [
+  { key: "brent", label: "BRENT", sublabel: "BZ=F", active: true },
+  { key: "diesel", label: "ДИЗЕЛЬ УКР", sublabel: "ОПТ", active: false },
+];
+
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 export default function WarRoom() {
   const { forecast, agents, prices, riskScore, signals, events, status, wsConnected } = useBotData();
+  const isMobile = useIsMobile();
 
-  const [activeTab, setActiveTab] = useState("dashboard"); // "dashboard" | "history"
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [instrument, setInstrument] = useState("brent");
   const historyData = useHistoryData("BZ=F");
 
   const [theme, setTheme] = useState("matrix");
-  const [focusMode, setFocusMode] = useState(false);
-  const [rainOpacity, setRainOpacity] = useState(0.18);
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const [riskCollapsed, setRiskCollapsed] = useState(false);
+  const [riskCollapsed, setRiskCollapsed] = useState(isMobile);
   const [agentsVisible, setAgentsVisible] = useState(false);
-  const [glitch, setGlitch] = useState(false);
   const [time, setTime] = useState(new Date());
 
-  // Price chart data (maintained locally, updated from API)
   const [brentData, setBrentData] = useState(() => generatePriceData(82.0, 0.4));
   const [brentFlash, setBrentFlash] = useState(false);
 
   const T = THEMES[theme];
 
-  // Extract prices from API
   const brentPrice = prices?.["BZ=F"]?.price || brentData[brentData.length - 1]?.p || 82.0;
   const brentChange = forecast?.instrument === "BZ=F" && forecast?.current_price
     ? ((brentPrice - forecast.current_price) / forecast.current_price * 100) : 0;
 
-  // Update chart data when prices change
   useEffect(() => {
     if (prices?.["BZ=F"]?.price) {
       setBrentData(d => [...d.slice(1), { t: 0, p: prices["BZ=F"].price }]);
@@ -302,16 +295,8 @@ export default function WarRoom() {
     }
   }, [prices?.["BZ=F"]?.price]);
 
-  // Clock + glitch
   useEffect(() => { const t = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(t); }, []);
   useEffect(() => { setTimeout(() => setAgentsVisible(true), 400); }, []);
-  useEffect(() => { const g = setInterval(() => { setGlitch(true); setTimeout(() => setGlitch(false), 120); }, 5000); return () => clearInterval(g); }, []);
-
-  // Keyboard: Cmd+K
-  useEffect(() => {
-    const h = (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setPaletteOpen(p => !p); } if (e.key === "Escape") setPaletteOpen(false); };
-    window.addEventListener("keydown", h); return () => window.removeEventListener("keydown", h);
-  }, []);
 
   // Forecast data
   const isBull = forecast?.direction === "BULLISH";
@@ -319,8 +304,6 @@ export default function WarRoom() {
   const mainColor = isBull ? T.accent : isBear ? "#ff4444" : "#ffaa00";
   const confPct = Math.round((forecast?.confidence || 0) * 100);
   const drivers = forecast?.drivers || [];
-  const volatility = Math.abs(brentChange);
-  const isAlert = volatility > 2.5;
 
   // Risk score
   const rs = riskScore || {};
@@ -329,7 +312,6 @@ export default function WarRoom() {
      (rs.financial || 0) * 0.10 + (rs.seasonal || 0) * 0.10 + (rs.technical || 0) * 0.10) || 0
   );
   const compositeDisplay = (composite * 10).toFixed(1);
-
   const riskItems = [
     { l: "Геополітика", v: rs.geopolitical || 0 },
     { l: "Пропозиція", v: rs.supply || 0 },
@@ -339,313 +321,356 @@ export default function WarRoom() {
     { l: "Технічний", v: rs.technical || 0 },
   ];
 
-  // Agent list
   const agentNames = ["grok", "perplexity", "gemini", "claude"];
-
-  // Events
   const eventImpactMap = { "high": "КРИТИЧНО", "medium": "СЕРЕДНЬО", "low": "НИЗЬКО" };
-
-  const secOpacity = focusMode ? 0.2 : 1;
-
-  // Status indicator
-  const statusLabel = wsConnected ? "WS" : "REST";
   const statusColor = status === "active" ? T.accent : status === "idle" ? "#ffaa00" : T.dark;
 
-  // Ticker
-  const tickerItems = [
-    `BRENT $${brentPrice.toFixed(2)}`,
-    `РИЗИК ${compositeDisplay}/10`,
-    `КОНСЕНСУС: ${forecast?.direction || "—"}`,
-    `СТАТУС: ${status.toUpperCase()}`,
-  ].join("  ·  ");
-
+  // ────────────────────────────────────────────────────────────────────────────
   return (
     <div style={{ background: T.bg, minHeight: "100vh", color: T.accent, fontFamily: "monospace", overflow: "hidden" }}>
-      <MatrixRain opacity={rainOpacity} />
+      <MatrixRain opacity={isMobile ? 0.08 : 0.18} disabled={false} />
 
-      {/* Scanlines */}
+      {/* Scanlines (lighter on mobile) */}
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1,
-        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px)" }} />
+        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px)" }} />
 
-      {isAlert && <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1,
-        border: `2px solid ${T.accent}66`, boxShadow: `inset 0 0 60px ${T.accent}08` }} />}
-
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)}
-        theme={theme} setTheme={setTheme} focusMode={focusMode} setFocusMode={setFocusMode}
-        rainOpacity={rainOpacity} setRainOpacity={setRainOpacity} />
-
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 1400, margin: "0 auto", padding: "0 14px" }}>
+      <div style={{ position: "relative", zIndex: 2, maxWidth: 1400, margin: "0 auto", padding: isMobile ? "0 8px" : "0 14px" }}>
 
         {/* ── TOP BAR ── */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "12px 0", borderBottom: `1px solid ${T.dark}`, position: "sticky", top: 0, zIndex: 20,
-          background: T.bg, backdropFilter: "blur(8px)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <span style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.2em", color: T.accent, textShadow: `0 0 12px ${T.accent}` }}>
-              🛢 НАФТОВА_РАДА.EXE
+          padding: isMobile ? "8px 0" : "12px 0", borderBottom: `1px solid ${T.dark}`,
+          position: "sticky", top: 0, zIndex: 20, background: T.bg, backdropFilter: "blur(8px)",
+          gap: 8, flexWrap: isMobile ? "wrap" : "nowrap" }}>
+
+          {/* Left: logo + status */}
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 14, minWidth: 0 }}>
+            <span style={{ fontSize: isMobile ? 11 : 13, fontWeight: 900, letterSpacing: "0.15em", color: T.accent,
+              textShadow: `0 0 12px ${T.accent}`, whiteSpace: "nowrap" }}>
+              🛢 РАДА
             </span>
-            <div style={{ width: 6, height: 6, background: statusColor, boxShadow: `0 0 10px ${statusColor}` }} />
-            <span style={{ fontSize: 9, color: statusColor, letterSpacing: "0.2em" }}>
-              [ {status === "active" ? "СИСТЕМА АКТИВНА" : status === "idle" ? "ОЧІКУВАННЯ" : "ПІДКЛЮЧЕННЯ..."} · {statusLabel} ]
-            </span>
-            <div style={{ display: "flex", gap: 2, marginLeft: 14 }}>
-              {[
-                { key: "dashboard", label: "ДАШБОРД" },
-                { key: "history", label: "ІСТОРІЯ" },
-              ].map(tab => (
-                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                  style={{
-                    background: activeTab === tab.key ? `${T.accent}22` : "transparent",
-                    border: `1px solid ${activeTab === tab.key ? T.accent : T.dark}`,
-                    color: activeTab === tab.key ? T.accent : T.dark,
-                    fontSize: 9, padding: "3px 10px", fontFamily: "monospace", cursor: "pointer",
-                    letterSpacing: "0.12em", transition: "all 0.2s",
-                    textShadow: activeTab === tab.key ? `0 0 6px ${T.accent}88` : "none",
-                  }}>
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+            <div style={{ width: 6, height: 6, background: statusColor, boxShadow: `0 0 10px ${statusColor}`, flexShrink: 0 }} />
+            {!isMobile && (
+              <span style={{ fontSize: 9, color: statusColor, letterSpacing: "0.15em" }}>
+                [ {status === "active" ? "АКТИВНА" : status === "idle" ? "ОЧІКУВАННЯ" : "ПІДКЛЮЧЕННЯ..."} ]
+              </span>
+            )}
           </div>
 
-          <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.15em" }}>БРЕНТ BZ=F</div>
-              <div style={{ fontSize: 18, fontWeight: 700, fontFamily: "monospace",
-                color: brentChange >= 0 ? T.accent : "#ff4444",
-                textShadow: `0 0 ${brentFlash ? "18px" : "8px"} ${brentChange >= 0 ? T.accent : "#ff4444"}`,
-                transition: "text-shadow 0.25s ease" }}>
-                ${brentPrice.toFixed(2)}
-              </div>
+          {/* Center: price */}
+          <div style={{ textAlign: "center", flexShrink: 0 }}>
+            <div style={{ fontSize: isMobile ? 18 : 20, fontWeight: 700, fontFamily: "monospace",
+              color: brentChange >= 0 ? T.accent : "#ff4444",
+              textShadow: `0 0 ${brentFlash ? "18px" : "8px"} ${brentChange >= 0 ? T.accent : "#ff4444"}`,
+              transition: "text-shadow 0.25s ease", lineHeight: 1 }}>
+              ${brentPrice.toFixed(2)}
             </div>
+            <div style={{ fontSize: 8, color: T.dark, letterSpacing: "0.1em", marginTop: 2 }}>BRENT</div>
           </div>
 
-          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-            <button onClick={() => setPaletteOpen(true)}
-              style={{ background: "none", border: `1px solid ${T.dark}`, color: T.dim, fontSize: 9, padding: "3px 8px",
-                fontFamily: "monospace", cursor: "pointer", letterSpacing: "0.1em" }}>
-              ⌘ КОМАНДИ
+          {/* Right: time */}
+          <div style={{ fontSize: isMobile ? 10 : 11, color: T.dark, letterSpacing: "0.08em", textAlign: "right", whiteSpace: "nowrap" }}>
+            {time.toLocaleTimeString("uk-UA")}
+          </div>
+        </div>
+
+        {/* ── INSTRUMENT TABS ── */}
+        <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${T.darker}`, overflow: "auto" }}>
+          {INSTRUMENTS.map(inst => (
+            <button key={inst.key} onClick={() => inst.active && setInstrument(inst.key)}
+              style={{
+                flex: 1, padding: isMobile ? "8px 4px" : "10px 16px",
+                background: instrument === inst.key ? `${T.accent}15` : "transparent",
+                borderBottom: instrument === inst.key ? `2px solid ${T.accent}` : "2px solid transparent",
+                border: "none", borderLeft: "none", borderRight: "none",
+                color: !inst.active ? `${T.dark}88` : instrument === inst.key ? T.accent : T.dim,
+                fontSize: isMobile ? 10 : 11, fontFamily: "monospace", cursor: inst.active ? "pointer" : "default",
+                letterSpacing: "0.1em", transition: "all 0.2s", whiteSpace: "nowrap",
+                opacity: inst.active ? 1 : 0.4,
+              }}>
+              {inst.label}
+              <span style={{ fontSize: 8, color: T.dark, marginLeft: 6 }}>{inst.sublabel}</span>
+              {!inst.active && <span style={{ fontSize: 7, color: T.dark, marginLeft: 4 }}>СКОРО</span>}
             </button>
-            <div style={{ fontSize: 11, color: T.dark, letterSpacing: "0.1em" }}>{time.toLocaleTimeString("uk-UA")}</div>
+          ))}
+
+          {/* Spacer + nav tabs */}
+          <div style={{ flex: "0 0 auto", display: "flex", marginLeft: "auto" }}>
+            {["dashboard", "history"].map(tab => (
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                style={{
+                  padding: isMobile ? "8px 10px" : "10px 16px",
+                  background: "transparent",
+                  borderBottom: activeTab === tab ? `2px solid ${T.accent}` : "2px solid transparent",
+                  border: "none",
+                  color: activeTab === tab ? T.accent : T.dark,
+                  fontSize: isMobile ? 9 : 10, fontFamily: "monospace", cursor: "pointer",
+                  letterSpacing: "0.1em", transition: "all 0.2s",
+                }}>
+                {tab === "dashboard" ? "📊" : "📋"}{!isMobile && (tab === "dashboard" ? " ДАШБОРД" : " ІСТОРІЯ")}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* ── TICKER ── */}
-        <div style={{ overflow: "hidden", borderBottom: `1px solid ${T.darker}`, background: T.darker }}>
-          <div style={{ display: "inline-block", whiteSpace: "nowrap", animation: "ticker 25s linear infinite",
-            fontSize: 9, color: T.dim, padding: "5px 0", letterSpacing: "0.1em" }}>
-            {tickerItems}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{tickerItems}
-          </div>
-        </div>
-        <style>{`@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }`}</style>
-
-        {/* ── HISTORY TAB ── */}
-        {activeTab === "history" && (
-          <div style={{ paddingTop: 12 }}>
-            <HistoryPanel
-              theme={T}
-              daily={historyData.daily}
-              digests={historyData.digests}
-              agentHistory={historyData.agentHistory}
-              loading={historyData.loading}
-              onRefresh={historyData.refetch}
-            />
+        {/* ── DIESEL PLACEHOLDER ── */}
+        {instrument === "diesel" && (
+          <div style={{ textAlign: "center", padding: isMobile ? "40px 16px" : "80px 20px" }}>
+            <div style={{ fontSize: isMobile ? 28 : 40, marginBottom: 16 }}>⛽</div>
+            <div style={{ fontSize: isMobile ? 14 : 18, color: T.accent, fontWeight: 700, marginBottom: 8 }}>
+              ДИЗЕЛЬ УКРАЇНА — ОПТ
+            </div>
+            <div style={{ fontSize: isMobile ? 11 : 13, color: T.dim, maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>
+              Моніторинг оптових цін на дизпаливо в Україні.
+              Джерела: UPECO, Enkorr, НБУ.
+            </div>
+            <div style={{ fontSize: 10, color: T.dark, marginTop: 20, letterSpacing: "0.15em" }}>
+              [ В РОЗРОБЦІ ]
+            </div>
           </div>
         )}
 
-        {/* ── MAIN GRID (DASHBOARD) ── */}
-        {activeTab === "dashboard" && <div style={{ display: "grid", gridTemplateColumns: "1fr 295px", gap: 12, paddingTop: 12 }}>
+        {/* ── HISTORY TAB ── */}
+        {instrument === "brent" && activeTab === "history" && (
+          <div style={{ paddingTop: 12 }}>
+            <HistoryPanel theme={T} daily={historyData.daily} digests={historyData.digests}
+              agentHistory={historyData.agentHistory} loading={historyData.loading} onRefresh={historyData.refetch} isMobile={isMobile} />
+          </div>
+        )}
 
-          {/* ── LEFT ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* ── DASHBOARD ── */}
+        {instrument === "brent" && activeTab === "dashboard" && (
+          <div style={isMobile
+            ? { display: "flex", flexDirection: "column", gap: 10, paddingTop: 10, paddingBottom: 20 }
+            : { display: "grid", gridTemplateColumns: "1fr 295px", gap: 12, paddingTop: 12 }
+          }>
 
-            {/* FORECAST — STICKY */}
-            <div style={{ position: "sticky", top: 57, zIndex: 10,
-              background: T.panel, border: `1px solid ${mainColor}`,
-              padding: "18px 22px", boxShadow: `0 0 ${isAlert ? "50px" : "25px"} ${mainColor}18, inset 0 0 50px ${mainColor}04`,
-              transition: "box-shadow 1.5s ease" }}>
-              <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: 1,
-                background: `linear-gradient(90deg, transparent, ${mainColor}, transparent)` }} />
+            {/* ── LEFT / MAIN ── */}
+            <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 8 : 12 }}>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <div style={{ width: 7, height: 7, background: mainColor, boxShadow: `0 0 10px ${mainColor}` }} />
-                <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.2em" }}>// ПРОГНОЗ РАДИ · НАСТУПНІ 12 ГОДИН</span>
-                {isAlert && <span style={{ fontSize: 9, color: "#ffaa00", letterSpacing: "0.15em", marginLeft: "auto" }}>[ ВИСОКА ВОЛАТИЛЬНІСТЬ ]</span>}
-              </div>
+              {/* FORECAST */}
+              <div style={{ background: T.panel, border: `1px solid ${mainColor}`,
+                padding: isMobile ? "14px" : "18px 22px",
+                boxShadow: `0 0 25px ${mainColor}18, inset 0 0 50px ${mainColor}04` }}>
+                <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: 1,
+                  background: `linear-gradient(90deg, transparent, ${mainColor}, transparent)` }} />
 
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 20 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 10, color: T.dark, letterSpacing: "0.2em", marginBottom: 8 }}>НАША_ДУМКА::</div>
-                  <div style={{ fontSize: 30, fontWeight: 900, fontFamily: "monospace", lineHeight: 1,
-                    color: mainColor, textShadow: `0 0 20px ${mainColor}, 0 0 40px ${mainColor}66`,
-                    transform: glitch ? "translateX(2px)" : "translateX(0)", transition: "transform 0.05s",
-                    letterSpacing: "0.04em" }}>
-                    {forecast ? (isBull ? "▲ ЦІНА ЗРОСТАТИМЕ" : isBear ? "▼ ЦІНА ПАДАТИМЕ" : "— НЕВИЗНАЧЕНО") : "⏳ ОЧІКУВАННЯ ДАНИХ..."}
-                  </div>
-                  {forecast && (
-                    <div style={{ fontSize: 12, color: T.dim, marginTop: 10, fontFamily: "monospace",
-                      lineHeight: 1.7, maxWidth: 440, borderLeft: `2px solid ${T.dark}`, paddingLeft: 12 }}>
-                      Ціль: ${forecast.target_price?.toFixed(2)} · Стоп: ${forecast.stop_loss_price?.toFixed(2) || "—"}
-                      <br/>{drivers.join(". ")}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <div style={{ width: 6, height: 6, background: mainColor, boxShadow: `0 0 10px ${mainColor}` }} />
+                  <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.15em" }}>ПРОГНОЗ · 12 ГОД</span>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: isMobile ? 20 : 28, fontWeight: 900, fontFamily: "monospace", lineHeight: 1.1,
+                      color: mainColor, textShadow: `0 0 16px ${mainColor}`,
+                      letterSpacing: "0.02em" }}>
+                      {forecast ? (isBull ? "▲ ЗРОСТАННЯ" : isBear ? "▼ ПАДІННЯ" : "— НЕВИЗНАЧЕНО") : "⏳ ОЧІКУВАННЯ..."}
                     </div>
-                  )}
+                    {forecast && (
+                      <div style={{ fontSize: isMobile ? 10 : 12, color: T.dim, marginTop: 8, fontFamily: "monospace", lineHeight: 1.6 }}>
+                        Ціль: ${forecast.target_price?.toFixed(2)} · Стоп: ${forecast.stop_loss_price?.toFixed(2) || "—"}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ flexShrink: 0, textAlign: "center" }}>
+                    <ConfidenceGauge value={confPct} color={mainColor} size={isMobile ? 56 : 70} />
+                  </div>
                 </div>
 
-                <div style={{ flexShrink: 0, borderLeft: `1px solid ${T.dark}`, paddingLeft: 18, textAlign: "center" }}>
-                  <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.15em", marginBottom: 4 }}>ВПЕВНЕНІСТЬ</div>
-                  <ConfidenceGauge value={confPct} color={mainColor} />
+                {drivers.length > 0 && (
+                  <div style={{ display: "flex", gap: 4, marginTop: 10, flexWrap: "wrap" }}>
+                    {drivers.slice(0, isMobile ? 3 : 4).map((f, i) => (
+                      <span key={i} style={{ fontSize: 8, color: T.dim, background: `${T.accent}08`,
+                        border: `1px solid ${T.dark}`, padding: "2px 6px", fontFamily: "monospace",
+                        maxWidth: isMobile ? 150 : 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {f.slice(0, isMobile ? 30 : 40)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* CHART */}
+              <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: isMobile ? "10px" : "12px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <div>
+                    <div style={{ fontSize: 9, color: T.dark }}>BZ=F · 1 ГОД.</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.dim, fontFamily: "monospace" }}>Brent Crude</div>
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: brentChange >= 0 ? T.accent : "#ff4444",
+                    textShadow: `0 0 8px ${brentChange >= 0 ? T.accent : "#ff4444"}`, fontFamily: "monospace" }}>
+                    ${brentPrice.toFixed(2)}
+                  </div>
+                </div>
+                <MiniChart data={brentData} accent={T.accent} />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: 8, color: T.dark, fontFamily: "monospace" }}>
+                  <span>МІН ${Math.min(...brentData.map(d => d.p)).toFixed(2)}</span>
+                  <span>МАКС ${Math.max(...brentData.map(d => d.p)).toFixed(2)}</span>
                 </div>
               </div>
 
-              {drivers.length > 0 && (
-                <div style={{ display: "flex", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
-                  {drivers.map((f, i) => (
-                    <span key={i} style={{ fontSize: 9, color: T.dim, background: `${T.accent}08`,
-                      border: `1px solid ${T.dark}`, padding: "3px 8px", fontFamily: "monospace", letterSpacing: "0.1em",
-                      maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      [{f.slice(0, 40)}]
+              {/* RISK */}
+              <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: isMobile ? "10px" : "12px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
+                  marginBottom: riskCollapsed ? 0 : 10, cursor: "pointer" }}
+                  onClick={() => setRiskCollapsed(r => !r)}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 3, height: 10, background: T.accent, boxShadow: `0 0 5px ${T.accent}` }} />
+                    <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.15em" }}>РИЗИК</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 18, fontWeight: 900, color: composite > 0.6 ? "#ff4444" : "#ffaa00", fontFamily: "monospace" }}>
+                      {compositeDisplay}<span style={{ fontSize: 10, color: T.dark }}>/10</span>
                     </span>
+                    <span style={{ color: T.dark, fontSize: 10 }}>{riskCollapsed ? "+" : "−"}</span>
+                  </div>
+                </div>
+                <div style={{ maxHeight: riskCollapsed ? 0 : 200, overflow: "hidden", transition: "max-height 0.35s ease" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(3, 1fr)", gap: "6px 14px" }}>
+                    {riskItems.map(r => {
+                      const val = Math.round(r.v * 10);
+                      return (
+                        <div key={r.l}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                            <span style={{ fontSize: 8, color: T.dark }}>{r.l.toUpperCase()}</span>
+                            <span style={{ fontSize: 8, color: val >= 7 ? "#ff4444" : val >= 5 ? "#ffaa00" : T.accent, fontFamily: "monospace" }}>{val}/10</span>
+                          </div>
+                          <div style={{ height: 2, background: T.darker }}>
+                            <div style={{ height: 2, width: `${val * 10}%`, transition: "width 0.4s",
+                              background: val >= 7 ? "#ff4444" : val >= 5 ? "#ffaa00" : T.accent }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* AGENTS (mobile: inline, desktop: in sidebar) */}
+              {isMobile && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.15em", paddingTop: 2 }}>AI РАДА</div>
+                  {agentNames.map(name => (
+                    <AgentCard key={name} name={name} agentData={agents[name]} theme={theme} visible={agentsVisible} isMobile={isMobile} />
+                  ))}
+                </div>
+              )}
+
+              {/* SIGNAL HISTORY */}
+              <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: isMobile ? "10px" : "12px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 3, height: 10, background: T.accent, boxShadow: `0 0 5px ${T.accent}` }} />
+                    <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.15em" }}>СИГНАЛИ</span>
+                  </div>
+                  <span style={{ fontSize: 9, color: T.dim, fontFamily: "monospace" }}>{signals.length}</span>
+                </div>
+                {!isMobile && (
+                  <div style={{ display: "grid", gridTemplateColumns: "48px 1fr 100px 72px 50px", gap: 10, marginBottom: 4 }}>
+                    {["ЧАС", "СИГНАЛ", "КОНСЕНСУС", "ЦІНА", "ВПЕВН."].map(h => (
+                      <span key={h} style={{ fontSize: 7, color: T.darker, letterSpacing: "0.1em" }}>{h}</span>
+                    ))}
+                  </div>
+                )}
+                {signals.length === 0 && (
+                  <div style={{ textAlign: "center", padding: 16, fontSize: 10, color: T.dark }}>Очікування сигналу...</div>
+                )}
+                {signals.slice(0, isMobile ? 6 : 10).map((s, i) => (
+                  <SignalRow key={`${s.time}-${i}`} s={s} idx={i} theme={theme} isNew={i === 0} isMobile={isMobile} />
+                ))}
+              </div>
+
+              {/* EVENTS (mobile: here, desktop: sidebar) */}
+              {isMobile && events.length > 0 && (
+                <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <div style={{ width: 3, height: 10, background: T.accent, boxShadow: `0 0 5px ${T.accent}` }} />
+                    <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.15em" }}>ПОДІЇ</span>
+                  </div>
+                  {events.slice(0, 3).map((e, i) => (
+                    <div key={i} style={{ padding: "6px 0", borderBottom: `1px solid ${T.darker}` }}>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 10, color: T.dim, fontFamily: "monospace" }}>{e.name}</span>
+                        <span style={{ fontSize: 8, color: e.impact_level === "high" ? "#ff4444" : "#ffaa00" }}>
+                          {eventImpactMap[e.impact_level] || e.impact_level}
+                        </span>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* CHART */}
-            <div style={{ opacity: focusMode ? 0.7 : 1, transition: "opacity 0.4s" }}>
-              <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "12px 14px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <div>
-                    <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.12em" }}>BZ=F · 1 ГОД.</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: T.dim, fontFamily: "monospace" }}>Нафта Brent</div>
+            {/* ── RIGHT SIDEBAR (desktop only) ── */}
+            {!isMobile && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.15em", paddingTop: 2 }}>AI РАДА</div>
+                {agentNames.map(name => (
+                  <AgentCard key={name} name={name} agentData={agents[name]} theme={theme} visible={agentsVisible} isMobile={false} />
+                ))}
+
+                {/* EVENTS */}
+                <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "12px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 3, height: 10, background: T.accent, boxShadow: `0 0 5px ${T.accent}` }} />
+                    <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.15em" }}>ЗАПЛАНОВАНІ ПОДІЇ</span>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 17, fontWeight: 700, color: brentChange >= 0 ? T.accent : "#ff4444",
-                      textShadow: `0 0 8px ${brentChange >= 0 ? T.accent : "#ff4444"}`, fontFamily: "monospace" }}>
-                      ${brentPrice.toFixed(2)}
+                  {events.length === 0 && (
+                    <div style={{ fontSize: 9, color: T.dark, padding: "8px 0" }}>Немає подій в найближчі 48г</div>
+                  )}
+                  {events.slice(0, 5).map((e, i) => (
+                    <div key={i} style={{ padding: "7px 0", borderBottom: `1px solid ${T.darker}` }}>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 10, color: T.dim, fontFamily: "monospace" }}>{e.name}</span>
+                        <span style={{ fontSize: 8, color: e.impact_level === "high" ? "#ff4444" : "#ffaa00", letterSpacing: "0.1em" }}>
+                          {eventImpactMap[e.impact_level] || e.impact_level}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 9, color: T.dark, marginTop: 2 }}>{e.datetime || ""}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CONNECTION */}
+                <div style={{ background: T.panel, border: `1px solid ${wsConnected ? T.accent + "44" : "#ff444444"}`, padding: "10px 14px",
+                  display: "flex", alignItems: "center", gap: 10 }}>
+                  <span>{wsConnected ? "🟢" : "🔴"}</span>
+                  <div>
+                    <div style={{ fontSize: 10, color: wsConnected ? T.accent : "#ff4444", fontFamily: "monospace" }}>
+                      {wsConnected ? "LIVE · WS" : "POLLING · REST"}
                     </div>
                   </div>
                 </div>
-                <MiniChart data={brentData} accent={T.accent} />
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 9, color: T.dark, fontFamily: "monospace" }}>
-                  <span>МІН ${Math.min(...brentData.map(d => d.p)).toFixed(2)}</span>
-                  <span>МАКС ${Math.max(...brentData.map(d => d.p)).toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
 
-            {/* RISK */}
-            <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "12px 14px", opacity: focusMode ? 0.2 : 1, transition: "opacity 0.4s" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: riskCollapsed ? 0 : 12, cursor: "pointer" }}
-                onClick={() => setRiskCollapsed(r => !r)}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 3, height: 11, background: T.accent, boxShadow: `0 0 5px ${T.accent}` }} />
-                  <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.18em" }}>РИЗИК-КОНТРОЛЬ</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                  <span style={{ fontSize: 22, fontWeight: 900, color: composite > 0.6 ? "#ff4444" : "#ffaa00", fontFamily: "monospace" }}>
-                    {compositeDisplay}<span style={{ fontSize: 11, color: T.dark }}>/10</span>
-                  </span>
-                  <span style={{ color: T.dark, fontSize: 11 }}>{riskCollapsed ? "[+]" : "[−]"}</span>
+                {/* Theme selector */}
+                <div style={{ display: "flex", gap: 4, justifyContent: "center", padding: "4px 0" }}>
+                  {Object.keys(THEMES).map(tk => (
+                    <button key={tk} onClick={() => setTheme(tk)}
+                      style={{ background: theme === tk ? `${THEMES[tk].accent}22` : "transparent",
+                        border: `1px solid ${theme === tk ? THEMES[tk].accent : T.darker}`,
+                        color: THEMES[tk].accent, fontSize: 8, padding: "2px 8px", fontFamily: "monospace",
+                        cursor: "pointer", letterSpacing: "0.08em" }}>
+                      {THEMES[tk].name}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div style={{ maxHeight: riskCollapsed ? 0 : 200, overflow: "hidden", transition: "max-height 0.35s ease" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px 18px" }}>
-                  {riskItems.map(r => {
-                    const val = Math.round(r.v * 10);
-                    return (
-                      <div key={r.l}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                          <span style={{ fontSize: 8, color: T.dark, letterSpacing: "0.08em" }}>{r.l.toUpperCase()}</span>
-                          <span style={{ fontSize: 8, color: val >= 7 ? "#ff4444" : val >= 5 ? "#ffaa00" : T.accent, fontFamily: "monospace" }}>{val}/10</span>
-                        </div>
-                        <div style={{ height: 2, background: T.darker }}>
-                          <div style={{ height: 2, width: `${val * 10}%`, transition: "width 0.4s",
-                            background: val >= 7 ? "#ff4444" : val >= 5 ? "#ffaa00" : T.accent,
-                            boxShadow: `0 0 4px ${val >= 7 ? "#ff4444" : val >= 5 ? "#ffaa00" : T.accent}` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* SIGNAL HISTORY */}
-            <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "12px 14px", opacity: focusMode ? 0.2 : 1, transition: "opacity 0.4s" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 3, height: 11, background: T.accent, boxShadow: `0 0 5px ${T.accent}` }} />
-                  <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.18em" }}>ІСТОРІЯ ПРОГНОЗІВ</span>
-                </div>
-                <span style={{ fontSize: 9, color: T.dim, fontFamily: "monospace" }}>СИГНАЛІВ: {signals.length}</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "48px 1fr 100px 72px 50px", gap: 10, marginBottom: 6 }}>
-                {["ЧАС", "СИГНАЛ", "КОНСЕНСУС", "ЦІНА", "ВПЕВН."].map(h => (
-                  <span key={h} style={{ fontSize: 8, color: T.darker, letterSpacing: "0.12em" }}>{h}</span>
-                ))}
-              </div>
-              {signals.length === 0 && (
-                <div style={{ textAlign: "center", padding: 20, fontSize: 10, color: T.dark }}>
-                  Очікування першого сигналу...
-                </div>
-              )}
-              {signals.slice(0, 10).map((s, i) => <SignalRow key={`${s.time}-${i}`} s={s} idx={i} theme={theme} isNew={i === 0} />)}
-            </div>
+            )}
           </div>
-
-          {/* ── RIGHT ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <div style={{ fontSize: 9, color: T.dark, letterSpacing: "0.2em", paddingTop: 2 }}>// СТАТУС AI РАДИ</div>
-            {agentNames.map(name => (
-              <AgentCard key={name} name={name} agentData={agents[name]} theme={theme} visible={agentsVisible} focusMode={focusMode} />
-            ))}
-
-            {/* EVENTS */}
-            <div style={{ background: T.panel, border: `1px solid ${T.dark}`, padding: "12px 14px", opacity: secOpacity, transition: "opacity 0.4s" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <div style={{ width: 3, height: 11, background: T.accent, boxShadow: `0 0 5px ${T.accent}` }} />
-                <span style={{ fontSize: 9, color: T.dim, letterSpacing: "0.18em" }}>ЗАПЛАНОВАНІ ПОДІЇ</span>
-              </div>
-              {events.length === 0 && (
-                <div style={{ fontSize: 9, color: T.dark, padding: "8px 0" }}>Немає подій в найближчі 48г</div>
-              )}
-              {events.slice(0, 5).map((e, i) => (
-                <div key={i} style={{ padding: "7px 0", borderBottom: `1px solid ${T.darker}` }}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 10, color: T.dim, fontFamily: "monospace" }}>{e.name}</span>
-                    <span style={{ fontSize: 8, color: e.impact_level === "high" ? "#ff4444" : "#ffaa00", letterSpacing: "0.1em" }}>
-                      {eventImpactMap[e.impact_level] || e.impact_level}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 9, color: T.dark, marginTop: 2 }}>{e.datetime || ""}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* CONNECTION STATUS */}
-            <div style={{ background: T.panel, border: `1px solid ${wsConnected ? T.accent + "44" : "#ff444444"}`, padding: "10px 14px",
-              display: "flex", alignItems: "center", gap: 10, opacity: secOpacity, transition: "opacity 0.4s" }}>
-              <span>{wsConnected ? "🟢" : "🔴"}</span>
-              <div>
-                <div style={{ fontSize: 10, color: wsConnected ? T.accent : "#ff4444", fontFamily: "monospace", letterSpacing: "0.1em" }}>
-                  {wsConnected ? "LIVE · WEBSOCKET" : "POLLING · REST API"}
-                </div>
-                <div style={{ fontSize: 9, color: T.dark, marginTop: 2 }}>
-                  Бекенд: localhost:8000
-                </div>
-              </div>
-            </div>
-
-            <div style={{ fontSize: 8, color: T.dark, textAlign: "center", letterSpacing: "0.15em", padding: "4px 0" }}>
-              ТЕМА: {THEMES[theme].name} · ⌘K — КОМАНДИ
-            </div>
-          </div>
-        </div>}
+        )}
       </div>
 
+      {/* Accessibility */}
       <div aria-live="assertive" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", opacity: 0 }}>
         {`Прогноз: ${forecast?.direction || "очікування"}, впевненість ${confPct}%`}
       </div>
+
+      {/* Global styles */}
+      <style>{`
+        @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; overflow-x: hidden; }
+      `}</style>
     </div>
   );
 }
