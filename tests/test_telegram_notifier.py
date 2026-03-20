@@ -134,5 +134,60 @@ def test_format_risks(notifier, sample_response):
     print("Risks included in message")
 
 
+# ==============================================================================
+# DIGEST SUMMARIZER — polish_alert & fallback
+# ==============================================================================
+
+class TestDigestSummarizerPolish:
+    """Tests for DigestSummarizer.polish_alert and _fallback_alert."""
+
+    def test_fallback_alert_removes_prefixes(self):
+        from notifications.digest_summarizer import DigestSummarizer
+        drivers = [
+            "[GROK] Бичачий сигнал через скорочення ОПЕК",
+            "[CLAUDE] Геополітичний ризик підтримує ціни",
+        ]
+        risks = [
+            "[PERPLEXITY] Можливе зниження попиту в Китаї",
+            "[GEMINI] Сезонна слабкість рафінування",
+        ]
+        pol_drivers, pol_risks = DigestSummarizer._fallback_alert(drivers, risks)
+
+        for d in pol_drivers:
+            assert not d.startswith("["), f"Prefix not removed: {d}"
+        for r in pol_risks:
+            assert not r.startswith("["), f"Prefix not removed: {r}"
+
+    def test_fallback_alert_truncates_long_text(self):
+        from notifications.digest_summarizer import DigestSummarizer
+        long_driver = "А" * 300
+        pol_drivers, _ = DigestSummarizer._fallback_alert([long_driver], [])
+        assert len(pol_drivers[0]) <= 181  # 180 + ellipsis char
+
+    def test_fallback_alert_limits_count(self):
+        from notifications.digest_summarizer import DigestSummarizer
+        drivers = [f"Driver {i}" for i in range(10)]
+        risks = [f"Risk {i}" for i in range(10)]
+        pol_drivers, pol_risks = DigestSummarizer._fallback_alert(drivers, risks)
+        assert len(pol_drivers) <= 3
+        assert len(pol_risks) <= 2
+
+    def test_polish_alert_unavailable_falls_back(self):
+        from notifications.digest_summarizer import DigestSummarizer
+        summarizer = DigestSummarizer(api_key="")  # no key = unavailable
+        assert not summarizer.available
+        drivers = ["[GROK] Some thesis"]
+        risks = ["[CLAUDE] Some risk"]
+        pol_drivers, pol_risks = summarizer.polish_alert(drivers, risks)
+        assert not pol_drivers[0].startswith("[")
+
+    def test_polish_alert_empty_input(self):
+        from notifications.digest_summarizer import DigestSummarizer
+        summarizer = DigestSummarizer(api_key="")
+        pol_drivers, pol_risks = summarizer.polish_alert([], [])
+        assert pol_drivers == []
+        assert pol_risks == []
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "-s"])

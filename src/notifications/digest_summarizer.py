@@ -61,10 +61,10 @@ class DigestSummarizer:
 {risks_block}
 
 ПРАВИЛА:
-1. Максимум 4 тези, кожна до 100 символів — але речення має бути ЗАВЕРШЕНИМ
-2. Максимум 3 ризики, кожен до 90 символів — речення має бути ЗАВЕРШЕНИМ
-3. Об'єднуй схожі тези в одну
-4. Видаляй дублікати та загальні фрази
+1. Максимум 3 тези, кожна до 200 символів — речення ОБОВ'ЯЗКОВО має бути ЗАВЕРШЕНИМ, без трикрапки
+2. Максимум 2 ризики, кожен до 180 символів — речення ОБОВ'ЯЗКОВО має бути ЗАВЕРШЕНИМ, без трикрапки
+3. Об'єднуй схожі тези в одну. Дублікати видаляй
+4. НІКОЛИ не обривай речення на середині. Краще коротше, але повне
 5. Пиши ТІЛЬКИ УКРАЇНСЬКОЮ
 6. Відповідай ТІЛЬКИ у форматі JSON:
 
@@ -101,6 +101,98 @@ class DigestSummarizer:
 
         return self._fallback(theses, risks)
 
+    def polish_alert(
+        self,
+        drivers: list[str],
+        risks: list[str],
+        instrument: str = "BZ=F",
+        direction: str = "BULLISH",
+    ) -> tuple[list[str], list[str]]:
+        """
+        Polish raw agent theses/risks for individual oil alerts.
+
+        Returns (polished_drivers, polished_risks).
+        Falls back to truncation if LLM is unavailable or fails.
+        """
+        if not self.available or (not drivers and not risks):
+            return self._fallback_alert(drivers, risks)
+
+        drivers_block = "\n".join(f"- {d}" for d in drivers) if drivers else "(немає)"
+        risks_block = "\n".join(f"- {r}" for r in risks) if risks else "(немає)"
+
+        prompt = f"""Ти — редактор Telegram-каналу про нафтовий ринок.
+Відполіруй сирі тези агентів та ризики: зроби їх читабельними, стислими, ЗАВЕРШЕНИМИ реченнями УКРАЇНСЬКОЮ.
+
+Інструмент: {instrument}
+Напрямок: {direction}
+
+ДРАЙВЕРИ (сирі тези AI-агентів):
+{drivers_block}
+
+РИЗИКИ (сирі нотатки AI-агентів):
+{risks_block}
+
+ПРАВИЛА:
+1. Максимум 3 драйвери, кожен до 180 символів — речення ОБОВ'ЯЗКОВО ЗАВЕРШЕНЕ, без трикрапки
+2. Максимум 2 ризики, кожен до 160 символів — речення ОБОВ'ЯЗКОВО ЗАВЕРШЕНЕ, без трикрапки
+3. Видали префікси типу [GROK], [CLAUDE] тощо
+4. Об'єднуй схожі пункти в один. НІКОЛИ не обривай речення
+5. Пиши ТІЛЬКИ УКРАЇНСЬКОЮ, без англійських слів де можливо
+6. НЕ додавай нової інформації — лише переформулюй існуючу
+7. Відповідай ТІЛЬКИ у форматі JSON:
+
+{{"drivers": ["драйвер1", "драйвер2"], "risks": ["ризик1", "ризик2"]}}
+
+Чистий JSON, без markdown."""
+
+        try:
+            from google.genai import types
+
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.1,
+                ),
+            )
+
+            import json
+            text = response.text.strip()
+            start = text.find("{")
+            end = text.rfind("}") + 1
+            if start != -1 and end > start:
+                data = json.loads(text[start:end])
+                pol_drivers = data.get("drivers", [])[:4]
+                pol_risks = data.get("risks", [])[:3]
+                if pol_drivers or pol_risks:
+                    logger.debug(f"Alert polished: {len(pol_drivers)} drivers, {len(pol_risks)} risks")
+                    return pol_drivers, pol_risks
+
+        except Exception as e:
+            logger.warning(f"Alert polisher failed, using fallback: {e}")
+
+        return self._fallback_alert(drivers, risks)
+
+    @staticmethod
+    def _fallback_alert(drivers: list[str], risks: list[str]) -> tuple[list[str], list[str]]:
+        """Truncate and clean raw alert drivers/risks when LLM is unavailable."""
+        import re
+
+        def clean(s: str, limit: int) -> str:
+            # Remove [AGENT_NAME] prefixes
+            s = re.sub(r'^\[[\w]+\]\s*', '', s)
+            if len(s) <= limit:
+                return s
+            cut = s[:limit].rfind(" ")
+            if cut < limit // 2:
+                cut = limit
+            return s[:cut] + "…"
+
+        return (
+            [clean(d, 180) for d in drivers[:3]],
+            [clean(r, 160) for r in risks[:2]],
+        )
+
     @staticmethod
     def _fallback(theses: list[str], risks: list[str]) -> tuple[list[str], list[str]]:
         """Truncate with ellipsis — used when LLM is unavailable."""
@@ -114,6 +206,6 @@ class DigestSummarizer:
             return s[:cut] + "…"
 
         return (
-            [trunc(t, 120) for t in theses[:4]],
-            [trunc(r, 100) for r in risks[:3]],
+            [trunc(t, 200) for t in theses[:3]],
+            [trunc(r, 180) for r in risks[:2]],
         )
